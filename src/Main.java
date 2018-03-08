@@ -24,7 +24,7 @@ public class Main
             tegevus = sc.nextLine();
             seis = arvutaUusSeis(seis,tegevus);
         }
-        while(tegevus != "");
+        while(tegevus != "exit");
     }
     static String arvutaUusSeis(String seis, String sündmus)
     {
@@ -36,6 +36,10 @@ public class Main
         else if (sündmus.toLowerCase().equals("vasak"))
         {
             vasak(read);
+        }
+        else if (sündmus.toLowerCase().equals("exit"))
+        {
+
         }
         else if (sündmus.toLowerCase().equals("parem"))
         {
