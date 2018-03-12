@@ -1,0 +1,25 @@
+I etapp:
+Singleplayer graafiline tetris (kogu tavatetrise funktsionaalsus, plus punktide lugemine) - Theo
+Mänguserveri 1 etapp mis suudab lobbyga suhelda - Karl
+Võrguprotokolli planeerimine I = lobby tööle  - Karl & Ingo
+Lobby vaade (singleplayer - algab singleplayer tetris, multiplayer - näiteks kaks akent suurema akna saas, üks millest näitab online'is mängijaid ning teine üldchat (chat võiks toimida)) - Ingo
+ehk jõuab ka: Veebiserveri alged - Karl
+
+
+II etapp:
+Multiplayer graafiline tetris (1-4 mängijat? Mängu loomise interface läheb keerukaks lobbys. Jääks 2 juurde) (ka. multiplayer punktide saatmine serverisse) - Theo
+Võrguprotokolli planeerimine II = tetris tööle  - Karl & Theo
+Veebiserver, mis serveerib edetabeleid - Karl
+Lobby lisafunktsionaalsus (mängude logi, järelvaatamine) - Ingo
+
+III etapp:
+Võrguprotokolli silumine (tegelt tuleks kohe ilgelt hea protokoll teha) - Karl
+Online sessiooni vaatamise võimalus ning ka järelevaatamine - Theo=client, Karl=server
+Punktinäitamise weebiserverile viisaka sisu loomine? Ingo?
+
+
+Ideaalis tahaks weebiserveri teha nii, et see suudaks käivitada class faile mis tegeleks siis reaals sisu näitamisega. Umbes nagu tavaliselt lastakse käima .php, siis meie laseks käima javas kirjutatud classe mis siis ühenduvad andmebaasi ja genereerivad html).
+Kas selle reaalselt valmsi saab, ei tea, aga ilgelt äge oleks.
+
+
+Ingo nime juures võiks midagi vist veel olla?
