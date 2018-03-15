@@ -1,6 +1,6 @@
 Plaanitav funktsionaalsus: Online tetris kus saavad kaks kasutajat omavahel üle võrgu mängida. Keskserver kogub statistikat ja mängude logi. Mängitavat mängu on võimalik vaadata nii mängu ajal kui järele. Javas loodud veebiserver näitab üle http protokolli statistikat.
-
-Esimese etapi funktsionaalsus: singleplayer tertis, multiplayeri lobby esmane funktsionaalsus, seda toetav backend server
+Mängijatel on võimalik suhelda läbi chati.
+Esimese etapi funktsionaalsus: singleplayer tetris, multiplayeri lobby esmane funktsionaalsus, seda toetav backend server
 
 
 
