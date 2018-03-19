@@ -1,0 +1,29 @@
+Karli nägemus võrguprotokollist.
+
+Lihtsuse huvideks võiks kasutada DataInputStream/DataOutputStream-i, siis ei pea ise leiutama andmepakettide mõõtude pärast.
+Kõigepealt saadetakse int mis on käsu number ning vastavalt käsule alati kindel hulk datat kindlal kujul. Kui teine pool saab inti, siis teab mida edasi oodata. Kui tuleb midagi muud, siis võib vabalt õhku lennata.
+Klient peaks kannatama asünkroonset suhtlust, st. saama hakkama kui server enne küsimusele vastamist ise midagi muud vahepeal küsib
+
+(siia võiks mingi viisaka tabeli teha, hetkel pole ideed kuidas seda formaatida)
+
+>  - klient saadab serverile
+<  - server saadab kliendile
+
+i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
+
+> 1  s: username s:parool   # uue kontro registreerimine
+< 1  i: status s: errormessage # status: 1: OK  -1: ERR  errormessage: misjuhtus   
+> 2  s: username s:parool   # sisselogimine
+< 2  i: status s: errormessage  # sama mis <1
+> 3    # get userlist
+< 3 i: userid s: username   # lobby userlist ja/või logis lobbysse
+< 4 i: userid s: username   # lobbyst logis välja
+> 5 s: chatmessage          # kirjuta midagi lobby chatti
+< 5 i: userid s:username s: chatmessage          # lobby chatti ütles keegi midagi    (kas useri info on oluline või võib message sees olla)?
+> 6  # get current running games
+< 6 i: gameid s: username1 s: username2
+
+
+peaks vist piisavalt olema, et esimene lobby vaade ära teha?
+
+
