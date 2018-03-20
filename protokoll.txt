@@ -23,7 +23,18 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 > 6  # get current running games
 < 6 i: gameid s: username1 s: username2
 
-
 peaks vist piisavalt olema, et esimene lobby vaade ära teha?
+
+
+< 100 i: tickid  # serveri "tiks", et klotsid langeks. ID, et neil vahet teha
+< 101 i: tickid i: action i: userid  # server saadab teise useri liigutuse. tickid: mis tiksu järel pidi see olemas
+> 101 i: tickid i: action            # klient saadab välja oma liigutuse/klahvivajutuse
+
+...
+
+< 105 s: chatmessage                 # teine mängija ütles midagi
+> 105 s: chatmessage                 # mängija ütles midagi
+
+
 
 
