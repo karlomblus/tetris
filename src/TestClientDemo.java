@@ -48,7 +48,7 @@ public class TestClientDemo {
 
     private static void loesisendit(DataInputStream dis) throws Exception {
         System.out.println("Loeme serveri vastust");
-        while (dis.available() > 0) {
+        while (dis.available() > 0) {  // seda konstruktsiooni ei soovitatud vist üldse kasutada
             switch (dis.readInt()) {
                 case 1:
                     System.out.println("Uue konto regamise vastus: status: " + dis.readInt() + ", message: " + dis.readUTF());
