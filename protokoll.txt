@@ -1,3 +1,4 @@
+
 Karli nägemus võrguprotokollist.
 
 Lihtsuse huvideks võiks kasutada DataInputStream/DataOutputStream-i, siis ei pea ise leiutama andmepakettide mõõtude pärast.
@@ -18,6 +19,7 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 > 3    # get userlist
 < 3 i: userid s: username   # lobby userlist ja/või logis lobbysse
 < 4 i: userid s: username   # lobbyst logis välja
+> 4                         # do logout
 > 5 s: chatmessage          # kirjuta midagi lobby chatti
 < 5 i: userid s:username s: chatmessage          # lobby chatti ütles keegi midagi    (kas useri info on oluline või võib message sees olla)?
 > 6  # get current running games
