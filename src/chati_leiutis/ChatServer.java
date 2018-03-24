@@ -1,13 +1,10 @@
 package chati_leiutis;
 
-import javax.imageio.IIOException;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 public class ChatServer implements Runnable {
@@ -39,10 +36,40 @@ public class ChatServer implements Runnable {
         }
     }
 
+    //eemaldan ID alusel kliendi serverite nimekirjast
+    public synchronized void remove(int Id) {
+        for (int i = 0; i < clients.size(); i++) {
+            if ((clients.get(i).getId()) == Id) {
+                clients.remove(i);
+                System.out.println("Dropped client with ID: " + Id);
+            }
+        }
+    }
+
+
+    private int findClientIndex(int Id) {
+        for (int i = 0; i < clients.size(); i++) {
+            if (clients.get(i).getId() == Id)
+                return i;
+        }
+        return -1;
+    }
+    //meetod, mida kutsume välja ChatThreadi run tsüklis, saates kõikidele clientidele loetud sõnumi
+    public synchronized void toSend(int Id, String message) {
+        if (message.equals("logout")) {
+            clients.get(findClientIndex(Id)).sendMessage("logout");
+        } else {
+            for (int i = 0; i < clients.size(); i++) {
+                clients.get(i).sendMessage(message);
+            }
+        }
+    }
+
     //uue serveri lõime loomine
     public void addThread(Socket socket) throws Exception {
         System.out.println("Client accepted ----- " + socket);
         ChatThread client = new ChatThread(this, socket);
+        clients.add(client);
         Thread clienthread = new Thread(client);
         clienthread.start();
     }
@@ -50,6 +77,5 @@ public class ChatServer implements Runnable {
 
     public static void main(String[] args) throws Exception {
         ChatServer server = new ChatServer(5000);
-
     }
 }
