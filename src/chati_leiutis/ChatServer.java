@@ -6,17 +6,18 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
 public class ChatServer implements Runnable {
-    private Socket socket;
     private ServerSocket ss;
-    private DataInputStream in;
+    private ArrayList<ChatThread> clients = new ArrayList<>();
 
-    //konstruktoris loon serversocketi ja käivitan lõime
+    //konstruktoris loon serversocketi ja käivitan lõime(vajadusel saab mitu serverit käima panna)
     public ChatServer(int port) throws Exception {
         try {
+            System.out.println("Starting server on port: " + port);
             ss = new ServerSocket(port);
             Thread chatthread = new Thread(this);
             chatthread.start();
@@ -25,33 +26,27 @@ public class ChatServer implements Runnable {
         }
     }
 
+    //siin ootan kliente, ja saabumisel hakkan neid uue threadi peal serveerima
     @Override
     public void run() {
-        boolean threaddone = false;
-        while (!threaddone) {
-            System.out.println("Waiting for a client...");
+        System.out.println("Awaiting new clients...");
+        while (true) {
             try {
-                Socket socket = ss.accept();
-                DataInputStream in = new DataInputStream(socket.getInputStream());
-                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-                System.out.println("Waiting input...");
-                boolean done = false;
-
-                while (!done) {
-                    String msg = in.readUTF();
-                    System.out.println(msg);
-                    out.writeUTF(msg);
-                    done = msg.equals("close");
-                    if (msg.equals("shutdown")) {
-                        threaddone = true;
-                        done = true;
-                    }
-                }
-            } catch (IOException e) {
+                addThread(ss.accept());
+            } catch (Exception e) {
                 throw new RuntimeException();
             }
         }
     }
+
+    //uue serveri lõime loomine
+    public void addThread(Socket socket) throws Exception {
+        System.out.println("Client accepted ----- " + socket);
+        ChatThread client = new ChatThread(this, socket);
+        Thread clienthread = new Thread(client);
+        clienthread.start();
+    }
+
 
     public static void main(String[] args) throws Exception {
         ChatServer server = new ChatServer(5000);

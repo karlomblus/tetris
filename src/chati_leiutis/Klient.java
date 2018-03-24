@@ -16,6 +16,8 @@ public class Klient {
                 String msg = sc.nextLine();
                 out.writeUTF(msg);
                 String echo = in.readUTF();
+                if(echo.equals("shutdown"))
+                    break;
                 System.out.println(echo);
                 //TODO teha, et konstruktoris viime töö uue lõime peale kohe ja loome ka clienthreadi
             }
