@@ -3,11 +3,8 @@ import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -27,10 +24,8 @@ public class TetrisGraafika extends Application {
             for (int j = 0; j < kuubikutLaiuses; j++) {
                 ristkülik[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
                 ristkülik[i][j].setFill(Color.BLUE);
-                System.out.println(50 * i + j);
-                rectToColor.put(50 * i + j, Color.BLUE);
+                rectToColor.put(50 * i + j, Color.BLUE); // 0 kuni 2499
                 ristkülik[i][j].setStroke(Color.BLUE);
-               // System.out.println(ristkülik[i][j].getFill());
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
