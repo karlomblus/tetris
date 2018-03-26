@@ -4,6 +4,8 @@ import java.net.Socket;
 public class ServerMain {
     public static void main(String[] args) throws Exception {
 
+System.out.println("Server alustab");
+
         // tekitame mingi hulga threade weebi ühendustega tegelemiseks
 
         // connectioni peale tekitan threadi ja ServerGameConnectionHandler tegeleb
