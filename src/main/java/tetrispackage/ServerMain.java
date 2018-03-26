@@ -14,6 +14,7 @@ System.out.println("Server alustab");
             while (true) {
                 // wait for an incoming connection
                 Socket gameSocket = gameServerSocket.accept();
+                debug("Uus connection accepted");
                 Thread connectionHandler = new Thread(new ServerGameConnectionHandler(gameSocket));
                 connectionHandler.start();
 
@@ -32,4 +33,15 @@ System.out.println("Server alustab");
         //todo: logime errori
         throw new java.lang.Exception("custom error: " + msg);
     } // error
+
+
+    public static void debug(String msg) throws Exception {
+      debug(5,msg);
+  }
+
+    public static void debug(int debuglevel, String msg) throws Exception {
+        System.out.println("DEBUG: " + msg);
+        //todo: logime 
+    } // error
+
 }
