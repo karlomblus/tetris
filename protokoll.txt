@@ -36,6 +36,10 @@ peaks vist piisavalt olema, et esimene lobby vaade ära teha?
 
 < 105 s: chatmessage                 # teine mängija ütles midagi
 > 105 s: chatmessage                 # mängija ütles midagi
+< 106 s/i(?): teinemängija           # mängija kutsub sind mängima. aksepteerimiseks vasta kutsele nagu saadaks kutse
+> 106 s/i(?): teinemängija           # kutsume teise mängija mängima / vastame kutsele
+
+
 
 
 
