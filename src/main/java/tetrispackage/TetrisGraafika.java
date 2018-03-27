@@ -1,3 +1,4 @@
+package main.java.tetrispackage;
 
 import javafx.application.Application;
 import javafx.scene.Group;

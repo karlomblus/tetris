@@ -1,3 +1,5 @@
+package main.java.tetrispackage;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;

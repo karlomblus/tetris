@@ -1,3 +1,5 @@
+package main.java.tetrispackage;
+
 import java.util.Scanner;
 
 public class Main {

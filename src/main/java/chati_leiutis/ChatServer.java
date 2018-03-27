@@ -1,5 +1,6 @@
-package chati_leiutis;
+package main.java.chati_leiutis;
 
+import main.java.chati_leiutis.ChatThread;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -54,6 +55,7 @@ public class ChatServer implements Runnable {
         }
         return -1;
     }
+
     //meetod, mida kutsume välja ChatThreadi run tsüklis, saates kõikidele clientidele loetud sõnumi
     public synchronized void toSend(int Id, String message) {
         if (message.equals("logout")) {

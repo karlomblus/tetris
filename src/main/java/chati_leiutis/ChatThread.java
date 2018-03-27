@@ -1,4 +1,4 @@
-package chati_leiutis;
+package main.java.chati_leiutis;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

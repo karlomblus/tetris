@@ -1,3 +1,5 @@
+package main.java.tetrispackage;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 
