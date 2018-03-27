@@ -80,6 +80,9 @@ public class ServerGameConnectionHandler implements Runnable {
 
     private void createAccount(DataOutputStream dos, String username, String password) throws Exception {
         // todo: reaalne konto loomine. kui OK, siis logime kasutaja sisse
+        // kontrollime, kas sql-is on nimi juba olemas
+        // kui ei ole, siis lisame. õnnestumisel märgime logimisperioodi lõppenuks
+        // salvestame sessioonitabelisse (seda võiks kasutada web)
         dos.writeInt(1);
         dos.writeInt(1);
         dos.writeUTF("OK");
@@ -89,6 +92,8 @@ public class ServerGameConnectionHandler implements Runnable {
 
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         // todo: reaalne sisselogimine
+        // kontrollime sql-ist kasutajanime ja parooli.
+        // kui OK, siis salvestame sessioonitabelisse
         dos.writeInt(2);
         dos.writeInt(1);
         dos.writeUTF("OK");
@@ -120,18 +125,23 @@ public class ServerGameConnectionHandler implements Runnable {
         dos.writeInt(12);
         dos.writeUTF("Mari");
 
+        // variant1:  loeme mälust ette kasutajate listi.  vist on mõtekam
+        // variant2: loeme sql-ist listi ette (teadmata, kas see on õige)
 
         login = false;
-    } // doLogin
+    } // getUserList
 
 
     private void doLogout(DataOutputStream dos) throws Exception {
         // todo: reaalne
+        // kustutame kasutaja sessioonilistist
+        // eemaldame ta sisseloginud kasutajate listist
         connected = false;
     } // doLogout
 
     private void saveChatmessage(DataOutputStream dos, String message) throws Exception {
-        //todo: reaalne
+        //todo: salvestame sql-i
+        // saadame kõigile seesolijatele välja
 
     } // saveChatmessage
 
@@ -145,7 +155,16 @@ public class ServerGameConnectionHandler implements Runnable {
         dos.writeInt(7);
         dos.writeUTF("Jüri");
         dos.writeUTF("Mari");
+        
+        // tuleks teha list kus on sees mängivad pooled ja mängu ID
 
     } // getRunningGames
 
+    // todo:   mängu kutsumine  : saadame teisele kasutajale kutse. endale jätame meelde, et oleme kutsunud Y
+    // todo    kutsele vastamine: sisuliselt sama kui kutse saatmine, aga teisel peab olema kutsutav minu,id.
+    //         kui vastus õnnestub, siis mõlema staatuseks, et mängib.   lobby nimekirjast maha
+    //                                                                   mängupaaride nimekirja sisse
+    
+    
+    
 } //ServerGameConnectionHandler class
