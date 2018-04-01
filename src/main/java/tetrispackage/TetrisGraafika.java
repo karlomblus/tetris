@@ -1,4 +1,4 @@
-package main.java.tetrispackage;
+package tetrispackage;
 
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -16,7 +16,7 @@ public class TetrisGraafika extends Application {
         Group juur = new Group(); // luuakse juur
         int mitukuubikut = 50;
         HashMap<Integer, Color> rectToColor = new HashMap<>();
-        Rectangle ristkülik[][] = new Rectangle[50][50];
+        Rectangle ristkülik[][] = new Rectangle[mitukuubikut][mitukuubikut];
         int ruuduSuurus = 10;
 
         int kuubikutLaiuses = mitukuubikut;
