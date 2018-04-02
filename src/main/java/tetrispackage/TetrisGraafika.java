@@ -20,7 +20,7 @@ public class TetrisGraafika extends Application {
     final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
-    Tetromino tetromino;
+    tetrispackage.Tetromino tetromino;
 
     @Override
     public void start(Stage peaLava) throws Exception {
