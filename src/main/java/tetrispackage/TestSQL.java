@@ -1,22 +1,17 @@
 package tetrispackage;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSet;
+import java.sql.*;
+import java.util.Calendar;
 
 public class TestSQL {
 
 
-    public static void main(String[] argv) throws Exception{
+    public static void main(String[] argv) throws Exception {
 
         Connection conn = null;
 
         try {
             conn = DriverManager.getConnection("jdbc:mysql://tetris.carlnet.ee:33060/tetris?user=tetris&password=oopprojekt");
-
-
 
 
         } catch (SQLException ex) {
@@ -27,16 +22,11 @@ public class TestSQL {
         }
 
 
-
-
         Statement stmt = null;
         ResultSet rs = null;
 
         try {
             stmt = conn.createStatement();
-
-
-
 
 
             //
@@ -51,7 +41,24 @@ public class TestSQL {
             //
 
             stmt.executeUpdate(
-                    "INSERT INTO test (id,data) values (0,'Can I Get the Auto Increment Field?')",  Statement.RETURN_GENERATED_KEYS);
+                    "INSERT INTO test (id,data) values (0,'Can I Get the Auto Increment Field?')", Statement.RETURN_GENERATED_KEYS);
+
+
+            // create a sql date object so we can use it in our INSERT statement
+            Calendar calendar = Calendar.getInstance();
+            java.sql.Date startDate = new java.sql.Date(calendar.getTime().getTime());
+
+            // the mysql insert statement
+            String query2 = " insert into test (id,data)"
+                    + " values (?, ?)";
+
+            // create the mysql insert preparedstatement
+            PreparedStatement preparedStmt = conn.prepareStatement(query2);
+            preparedStmt.setInt(1, 0);
+            //preparedStmt.setString (2, "Barney");
+            preparedStmt.setDate(2, startDate);
+
+            preparedStmt.execute();
 
 
             int autoIncKeyFromApi = -1;
@@ -62,15 +69,25 @@ public class TestSQL {
                 // throw an exception from here
             }
 
-            System.out.println("Key returned from getGeneratedKeys():"   + autoIncKeyFromApi);
+            System.out.println("Key returned from getGeneratedKeys():" + autoIncKeyFromApi);
 
+            /*
+            //var 2
+            int autoIncKeyFromFunc = -1;
+    rs = stmt.executeQuery("SELECT LAST_INSERT_ID()");
+
+    if (rs.next()) {
+        autoIncKeyFromFunc = rs.getInt(1);
+    } else {
+        // throw an exception from here
+    }
+             */
 
 
             //rs = stmt.executeQuery("SELECT foo FROM bar");
 
             // or alternatively, if you don't know ahead of time that
             // the query will be a SELECT...
-
 
 
             //if (stmt.execute("SELECT id,data FROM test")) {
@@ -88,12 +105,10 @@ public class TestSQL {
             rs = st.executeQuery(query);
 
             // iterate through the java resultset
-            while (rs.next())
-            {
+            while (rs.next()) {
                 System.out.println(rs.getInt("id") + " " + rs.getString("data"));
             }
             st.close();
-
 
 
         }
@@ -102,8 +117,7 @@ public class TestSQL {
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
-        }*/
-        finally {
+        }*/ finally {
             // it is a good idea to release
             // resources in a finally{} block
             // in reverse-order of their creation
@@ -129,8 +143,6 @@ public class TestSQL {
 
 
         } // finally
-
-
 
 
     } // main
