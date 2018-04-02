@@ -39,7 +39,7 @@ public class TetrisGraafika extends Application {
 
                 tick();
                 if (tetromino.isDrawingAllowed()){
-                    tetromino.draw('S');
+                    tetromino.draw('I');
                 }
             }
         }));
