@@ -66,16 +66,16 @@ public class Tetromino {
             }
             for (int j = ruudud[i].length - 1; j >= 0; j--) {
                 if (getRectStatusAt(i, j) == 'A') {
-                    if (i == ruudud.length - 1){
+                    if (i == ruudud.length - 1 || (i+1 < ruudud.length && getRectStatusAt(i+1, j) == 'P')){
                         reachedBottom = true;
                         for (int k = 0; k < ruudud.length; k++) {
                             for (int l = 0; l < ruudud[k].length; l++) {
                                 if (getRectStatusAt(k, l) == 'A'){
-                                    setRectStatusAt(k, l, 'P');
+                                    setRectStatusAt(k, l, 'P'); //All active blocks now set to passive.
                                 }
                             }
                         }
-                        //All active blocks now set to passive.
+
                         break;
                     }
                     if (i + 1 < ruudud.length){
