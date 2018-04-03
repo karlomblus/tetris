@@ -10,7 +10,7 @@ import java.util.Base64;
 import java.util.Random;
 
 
-
+// baseerub sellel koodil: http://www.appsdeveloperblog.com/encrypt-user-password-example-java/
 public class PasswordCrypto {
 
     private static byte[] hash(char[] password, byte[] salt) {
