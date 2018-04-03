@@ -61,9 +61,11 @@ public class Tetromino {
     void tick() {
         System.out.println("Ticked");
         for (int i = ruudud.length - 1; i >= 0; i--) {
+            if (reachedBottom){
+                break;
+            }
             for (int j = ruudud[i].length - 1; j >= 0; j--) {
                 if (getRectStatusAt(i, j) == 'A') {
-                    System.out.println("Found A at " + i + " " + j );
                     if (i == ruudud.length - 1){
                         reachedBottom = true;
                         for (int k = 0; k < ruudud.length; k++) {
@@ -73,7 +75,7 @@ public class Tetromino {
                                 }
                             }
                         }
-                        System.out.println("All active blocks set to passive");
+                        //All active blocks now set to passive.
                         break;
                     }
                     if (i + 1 < ruudud.length){
@@ -81,9 +83,6 @@ public class Tetromino {
                     }
                     setRectStatusAt(i, j, 'B');
                 }
-            }
-            if (reachedBottom){
-                break;
             }
         }
         if (reachedBottom){
