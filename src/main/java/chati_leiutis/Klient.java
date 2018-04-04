@@ -1,6 +1,8 @@
 package main.java.chati_leiutis;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -9,12 +11,20 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import main.java.tetrispackage.TetrisGraafika;
 
+import javax.swing.text.StyledEditorKit;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
@@ -42,12 +52,15 @@ public class Klient extends Application {
         if (message.equals("logout")) {
             cont = false;
             System.exit(0);
-        }//todo väga halb, midagi paremat peab kindlasti välja mõtlema)
+        }//TODO halb?, midagi paremat peaks välja mõtlema)
         else {
-            ekraan.appendText(nimi + "<<<<  " + message + "\n");
+            ekraan.appendText(nimi + "<< " + message + "\n");
         }
     }
     public void showLobby()throws Exception{
+        //säti suurus
+        int w = 900;
+        int h = 800;
         Stage primaryStage = new Stage();
         Socket socket = new Socket("localhost", 5000);
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
@@ -55,28 +68,58 @@ public class Klient extends Application {
 
         Thread clienthread = new Thread(new ClientThread(socket, this));
         clienthread.start();
-        System.out.println("Connected. Awaiting input...");
+
         Group juur = new Group();
         TextArea messagearea = new TextArea();
         TextArea userlist = new TextArea();
         this.ekraan = messagearea;
 
+        Font labelfont = new Font(16);
         Label userlabel = new Label("Users");
+        userlabel.setFont(labelfont);
         Label chatlabel = new Label("Messages");
+        chatlabel.setFont(labelfont);
 
         messagearea.setEditable(false);
         userlist.setEditable(false);
 
-        messagearea.setPrefSize(200, 300);
-        userlist.setPrefSize(150, 300);
+        messagearea.setWrapText(true);
+        userlist.setWrapText(true);
+
+        messagearea.setPrefSize((w/4)*3, (h/4.5)*3);
+        userlist.setPrefSize((w/4)-2, (h/4.5)*3);
 
         userlist.setPromptText("Users");
         messagearea.setPromptText("Messages...");
 
         TextField messagefield = new TextField();
         messagefield.setPromptText("Enter message here...");
+        messagefield.setFont(labelfont);
+        messagefield.setPrefWidth((w/3.5)*3);
 
+        //pilt
+
+        Image chatImage = new Image("file:\\C:\\Users\\Ingo\\IdeaProjects\\OOPprojekt\\tetris\\src\\main\\resources\\Tetris.png", 850, 200, true, false);
+        ImageView pilt = new ImageView(chatImage);
+
+        Button singleplayerbtn = new Button("Singpleplayer");
+        singleplayerbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                Application.launch(TetrisGraafika.class);
+            }
+        });
+
+        StackPane stackPane = new StackPane();
+        BorderPane border = new BorderPane();
+
+        border.setBottom(stackPane);
+        stackPane.getChildren().add(pilt);
+        stackPane.getChildren().add(singleplayerbtn);
+
+        //send nupp
         Button sendbtn = new Button("Send");
+        sendbtn.setFont(new Font(20));
         sendbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -95,15 +138,15 @@ public class Klient extends Application {
         VBox vbox2 = new VBox();
         HBox hbox2 = new HBox();
 
-        messagefield.setPrefWidth(300);
         vbox.getChildren().addAll(userlabel,userlist);
         vbox2.getChildren().addAll(chatlabel,messagearea);
         hbox.getChildren().addAll(vbox,vbox2);
+        hbox.setSpacing(2);
         hbox2.getChildren().addAll(messagefield,sendbtn);
-        outervbox.getChildren().addAll(hbox,hbox2);
+        outervbox.getChildren().addAll(hbox,hbox2,border);
         juur.getChildren().add(outervbox);
 
-        Scene lava = new Scene(juur, 350, 400);
+        Scene lava = new Scene(juur, w, h);
         primaryStage.setResizable(false);
         primaryStage.setScene(lava);
         primaryStage.setTitle("Client");

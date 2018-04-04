@@ -30,7 +30,6 @@ public class TetrisGraafika extends Application implements Runnable {
     public void run() {
         launch();
     }
-
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     @Override
@@ -52,8 +51,6 @@ public class TetrisGraafika extends Application implements Runnable {
                 if (tetromino.isDrawingAllowed()) {
                     tetromino.draw('S');
                 }
-
-
             }
         }));
 
