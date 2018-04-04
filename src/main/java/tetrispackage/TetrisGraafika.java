@@ -41,12 +41,6 @@ public class TetrisGraafika extends Application {
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)){
-                    tetromino.moveRight();
-                }
-                if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)){
-                    tetromino.moveLeft();
-                }
                 tetromino.tick();
                 if (tetromino.isDrawingAllowed()){
                     tetromino.draw('S');
@@ -65,6 +59,12 @@ public class TetrisGraafika extends Application {
         Scene stseen1 = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         stseen1.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
+            if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)){
+                tetromino.moveRight();
+            }
+            if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)){
+                tetromino.moveLeft();
+            }
 
         });
         stseen1.setOnKeyReleased(event ->
