@@ -45,7 +45,7 @@ public class Tetromino {
                 if (getRectStatusAt(i, j) == 'A') {
                     activeRectCoordI.add(i); //remember where the active blocks are
                     activeRectCoordJ.add(j);
-                    if (j + 1 >= ruudud[i].length){
+                    if (j + 1 >= ruudud[i].length || getRectStatusAt(i, j+1) == 'P'){
                         movingRightPossible = false;
                     }
                 }
@@ -67,7 +67,7 @@ public class Tetromino {
                 if (getRectStatusAt(i, j) == 'A') {
                     activeRectCoordI.add(i); //remember where the active blocks are
                     activeRectCoordJ.add(j);
-                    if (j - 1 < 0){
+                    if (j - 1 < 0 || getRectStatusAt(i, j-1) == 'P'){
                         movingLeftPossible = false;
                     }
                 }
