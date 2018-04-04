@@ -1,4 +1,4 @@
-package tetrispackage;
+package main.java.tetrispackage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -94,8 +94,8 @@ public class ServerGameConnectionHandler implements Runnable {
                 return;
             }
 
- 
-            String hashedPassword = tetrispackage.PasswordCrypto.generateSecurePassword(password);
+
+            String hashedPassword = PasswordCrypto.generateSecurePassword(password);
             int result = ServerMain.sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
 
             if (result > 0) {
