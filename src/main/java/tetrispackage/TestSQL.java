@@ -148,4 +148,23 @@ public class TestSQL {
     } // main
 
 
+    public static String getstring(String... args) throws Exception {
+        /*
+        PreparedStatement preparedStatement = dbConnection.prepareStatement(args[0]);
+        String response = "";
+        for (int i = 1; i < args.length; i++) {
+            preparedStatement.setString(i, args[i]);
+        }
+        ResultSet rs = preparedStatement.executeQuery(args[0]);
+        if (rs.next()) {
+            response = rs.getString(1);
+        }
+        if (preparedStatement != null) {
+            preparedStatement.close();
+        }
+        return response;
+        */
+        return null;
+    }
+
 }

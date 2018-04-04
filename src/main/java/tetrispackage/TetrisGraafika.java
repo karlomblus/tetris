@@ -7,10 +7,14 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class TetrisGraafika extends Application implements Runnable {
@@ -27,6 +31,8 @@ public class TetrisGraafika extends Application implements Runnable {
         launch();
     }
 
+    private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
+
     @Override
     public void start(Stage peaLava) throws Exception {
         Group juur = new Group(); // luuakse juur
@@ -37,55 +43,50 @@ public class TetrisGraafika extends Application implements Runnable {
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
+
         tetromino = new Tetromino(ristkülik);
-        Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
+        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-
-                tick();
+                tetromino.tick();
                 if (tetromino.isDrawingAllowed()) {
-                    tetromino.draw('I');
+                    tetromino.draw('S');
                 }
+
+
             }
         }));
+
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
         });
-        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-        fiveSecondsWonder.play();
+
+        tickTime.setCycleCount(Timeline.INDEFINITE);
+        tickTime.play();
         Scene stseen1 = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
+        stseen1.setOnKeyPressed(event -> {
+            currentActiveKeys.put(event.getCode(), true);
+            if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
+                tetromino.moveRight();
+            }
+            if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
+                tetromino.moveLeft();
+            }
+
+        });
+        stseen1.setOnKeyReleased(event ->
+                currentActiveKeys.put(event.getCode(), false)
+        );
+
         peaLava.setTitle("Tetris");  // lava tiitelribale pannakse tekst
         peaLava.setScene(stseen1);  // lavale lisatakse stseen
         peaLava.show();  // lava tehakse nähtavaks
 
     }
 
-    void tick() {
-        System.out.println("Ticked");
-        if (tetromino.tetrominoDrawingAllowance == 0) {
-            System.out.println("TetriminoDrawing false!");
-            tetromino.allowTetrominoDrawing = false;
-        } else if (tetromino.tetrominoDrawingAllowance == -4) {//Esialgu lubab uut iga nelja sekundi tagamt
-            tetromino.allowTetrominoDrawing = true;
-            tetromino.tetrominoDrawingAllowance = 2;
-        }
-        tetromino.tetrominoDrawingAllowance -= 1;
-        for (int i = mitukuubikutPikkuses - 1; i >= 0; i--) {
-            for (int j = mitukuubikutLaiuses - 1; j >= 0; j--) {
-                if (tetromino.getRectStatusAt(i, j) == 'A') {
-                    System.out.println("Found active");
-                    if (i + 1 < mitukuubikutPikkuses) {
-                        tetromino.setRectStatusAt(i + 1, j, 'A');
-                    }
-                    tetromino.setRectStatusAt(i, j, 'B');
-                }
-            }
-        }
-
-    }
     public static void main(String[] args) {
         //panin tetrisgraafika lõie peal töötama
-    //launch(args);
+        //launch(args);
         Thread lõim = new Thread(new TetrisGraafika());
         lõim.start();
     }
