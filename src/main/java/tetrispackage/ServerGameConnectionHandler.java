@@ -84,6 +84,7 @@ public class ServerGameConnectionHandler implements Runnable {
         // kontrollime, kas sql-is on nimi juba olemas
         // kui ei ole, siis lisame. õnnestumisel märgime logimisperioodi lõppenuks
 
+
         synchronized (dos) {
             String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
             dos.writeInt(1);
@@ -93,6 +94,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 return;
             }
 
+ 
             String hashedPassword = tetrispackage.PasswordCrypto.generateSecurePassword(password);
             int result = ServerMain.sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
 

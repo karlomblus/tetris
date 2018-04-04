@@ -1,4 +1,4 @@
-package tetrispackage;
+package main.java.tetrispackage;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -12,20 +12,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import main.java.chati_leiutis.Klient;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class TetrisGraafika extends Application {
+public class TetrisGraafika extends Application{
     private final int resoWidth = 450;
     private final int resoHeight = 600;
     final int ruuduSuurus = 15;
     final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    Tetromino tetromino;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
-    tetrispackage.Tetromino tetromino;
 
     @Override
     public void start(Stage peaLava) throws Exception {
@@ -37,22 +38,15 @@ public class TetrisGraafika extends Application {
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
-        tetromino  = new Tetromino(ristkülik);
+
+        tetromino = new Tetromino(ristkülik);
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)){
-                    tetromino.moveRight();
-                }
-                if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)){
-                    tetromino.moveLeft();
-                }
                 tetromino.tick();
-                if (tetromino.isDrawingAllowed()){
+                if (tetromino.isDrawingAllowed()) {
                     tetromino.draw('S');
                 }
-
-
             }
         }));
 
@@ -65,6 +59,12 @@ public class TetrisGraafika extends Application {
         Scene stseen1 = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         stseen1.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
+            if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
+                tetromino.moveRight();
+            }
+            if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
+                tetromino.moveLeft();
+            }
 
         });
         stseen1.setOnKeyReleased(event ->
@@ -73,12 +73,10 @@ public class TetrisGraafika extends Application {
 
         peaLava.setTitle("Tetris");  // lava tiitelribale pannakse tekst
         peaLava.setScene(stseen1);  // lavale lisatakse stseen
-        peaLava.show();  // lava tehakse nähtavaks
-
+        peaLava.showAndWait();  // lava tehakse nähtavaks
     }
 
-
     public static void main(String[] args) {
-        launch(args);
+        launch();
     }
 }
