@@ -1,4 +1,4 @@
-package main.java.tetrispackage;
+package tetrispackage;
 
 import java.sql.*;
 import java.util.Calendar;

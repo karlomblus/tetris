@@ -1,4 +1,4 @@
-package main.java.tetrispackage;
+package tetrispackage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -95,7 +95,7 @@ public class ServerGameConnectionHandler implements Runnable {
             }
 
 
-            String hashedPassword = PasswordCrypto.generateSecurePassword(password);
+            String hashedPassword = ServerPasswordCrypto.generateSecurePassword(password);
             int result = ServerMain.sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
 
             if (result > 0) {
@@ -120,7 +120,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
                 return;
             }
-            boolean passwordMatch = PasswordCrypto.verifyUserPassword(password, andmebaasist);
+            boolean passwordMatch = ServerPasswordCrypto.verifyUserPassword(password, andmebaasist);
             if (passwordMatch) {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
