@@ -149,6 +149,7 @@ public class TestSQL {
 
 
     public static String getstring(String... args) throws Exception {
+        /*
         PreparedStatement preparedStatement = dbConnection.prepareStatement(args[0]);
         String response = "";
         for (int i = 1; i < args.length; i++) {
@@ -162,6 +163,8 @@ public class TestSQL {
             preparedStatement.close();
         }
         return response;
+        */
+        return null;
     }
 
 }
