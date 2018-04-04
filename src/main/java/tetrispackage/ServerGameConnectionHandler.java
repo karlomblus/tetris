@@ -1,4 +1,4 @@
-package main.java.tetrispackage;
+package tetrispackage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -84,6 +84,10 @@ public class ServerGameConnectionHandler implements Runnable {
         // todo: reaalne konto loomine. kui OK, siis logime kasutaja sisse
         // kontrollime, kas sql-is on nimi juba olemas
         // kui ei ole, siis lisame. õnnestumisel märgime logimisperioodi lõppenuks
+
+        String hashedPassword= tetrispackage.PasswordCrypto.generateSecurePassword(password);
+        // salvestada andmebaasi
+
         // salvestame sessioonitabelisse (seda võiks kasutada web)
         dos.writeInt(1);
         dos.writeInt(1);
@@ -95,6 +99,15 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         // todo: reaalne sisselogimine
         // kontrollime sql-ist kasutajanime ja parooli.
+        String andmebaasist="123223";
+        boolean passwordMatch = PasswordCrypto.verifyUserPassword(password,andmebaasist);
+        if(passwordMatch)
+        {
+         //  OK
+        } else {
+           // NOT OK
+        }
+
         // kui OK, siis salvestame sessioonitabelisse
         dos.writeInt(2);
         dos.writeInt(1);
