@@ -12,12 +12,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import main.java.chati_leiutis.Klient;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class TetrisGraafika extends Application implements Runnable {
+public class TetrisGraafika extends Application{
     private final int resoWidth = 450;
     private final int resoHeight = 600;
     final int ruuduSuurus = 15;
@@ -25,11 +26,6 @@ public class TetrisGraafika extends Application implements Runnable {
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     Tetromino tetromino;
-
-    @Override
-    public void run() {
-        launch();
-    }
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     @Override
@@ -77,14 +73,10 @@ public class TetrisGraafika extends Application implements Runnable {
 
         peaLava.setTitle("Tetris");  // lava tiitelribale pannakse tekst
         peaLava.setScene(stseen1);  // lavale lisatakse stseen
-        peaLava.show();  // lava tehakse nähtavaks
-
+        peaLava.showAndWait();  // lava tehakse nähtavaks
     }
 
     public static void main(String[] args) {
-        //panin tetrisgraafika lõie peal töötama
-        //launch(args);
-        Thread lõim = new Thread(new TetrisGraafika());
-        lõim.start();
+        launch();
     }
 }

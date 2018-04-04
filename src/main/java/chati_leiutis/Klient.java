@@ -33,6 +33,8 @@ public class Klient extends Application {
     DataOutputStream out;
     TextArea ekraan;
     static String nimi;
+    boolean tetrisrunning = false;
+    TetrisGraafika tetris = new TetrisGraafika();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -54,15 +56,17 @@ public class Klient extends Application {
             System.exit(0);
         }//TODO halb?, midagi paremat peaks välja mõtlema)
         else {
-            ekraan.appendText(nimi + "<< " + message + "\n");
+            ekraan.appendText(nimi + ">> " + message + "\n");
         }
     }
-    public void showLobby()throws Exception{
+
+    public void showLobby() throws Exception {
         //säti suurus
         int w = 900;
         int h = 800;
         Stage primaryStage = new Stage();
         Socket socket = new Socket("localhost", 5000);
+
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
         this.out = output;
 
@@ -86,8 +90,8 @@ public class Klient extends Application {
         messagearea.setWrapText(true);
         userlist.setWrapText(true);
 
-        messagearea.setPrefSize((w/4)*3, (h/4.5)*3);
-        userlist.setPrefSize((w/4)-2, (h/4.5)*3);
+        messagearea.setPrefSize((w / 4) * 3, (h / 4.5) * 3);
+        userlist.setPrefSize((w / 4) - 2, (h / 4.5) * 3);
 
         userlist.setPromptText("Users");
         messagearea.setPromptText("Messages...");
@@ -95,18 +99,27 @@ public class Klient extends Application {
         TextField messagefield = new TextField();
         messagefield.setPromptText("Enter message here...");
         messagefield.setFont(labelfont);
-        messagefield.setPrefWidth((w/3.5)*3);
+        messagefield.setPrefWidth((w / 3.5) * 3);
 
         //pilt
 
         Image chatImage = new Image("file:\\C:\\Users\\Ingo\\IdeaProjects\\OOPprojekt\\tetris\\src\\main\\resources\\Tetris.png", 850, 200, true, false);
         ImageView pilt = new ImageView(chatImage);
 
+        //TODO pole kindel kas selline lahendus on okei, aga töötab hetkel.
         Button singleplayerbtn = new Button("Singpleplayer");
         singleplayerbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                Application.launch(TetrisGraafika.class);
+                if(!tetrisrunning){
+                Platform.runLater(() -> {
+                    try {
+                        tetrisrunning = true;
+                        new TetrisGraafika().start(new Stage());
+                    } catch (Exception e) {
+                        throw new RuntimeException();
+                    }
+                });}
             }
         });
 
@@ -138,12 +151,12 @@ public class Klient extends Application {
         VBox vbox2 = new VBox();
         HBox hbox2 = new HBox();
 
-        vbox.getChildren().addAll(userlabel,userlist);
-        vbox2.getChildren().addAll(chatlabel,messagearea);
-        hbox.getChildren().addAll(vbox,vbox2);
+        vbox.getChildren().addAll(userlabel, userlist);
+        vbox2.getChildren().addAll(chatlabel, messagearea);
+        hbox.getChildren().addAll(vbox, vbox2);
         hbox.setSpacing(2);
-        hbox2.getChildren().addAll(messagefield,sendbtn);
-        outervbox.getChildren().addAll(hbox,hbox2,border);
+        hbox2.getChildren().addAll(messagefield, sendbtn);
+        outervbox.getChildren().addAll(hbox, hbox2, border);
         juur.getChildren().add(outervbox);
 
         Scene lava = new Scene(juur, w, h);
@@ -176,7 +189,7 @@ public class Klient extends Application {
         newStage.showAndWait();
     }
 
-    public void sendandclear(TextField ekraan){
+    public void sendandclear(TextField ekraan) {
         try {
             out.writeUTF(ekraan.getText());
             out.flush();
@@ -185,6 +198,7 @@ public class Klient extends Application {
             throw new RuntimeException();
         }
     }
+
     public static void main(String[] args) throws Exception {
         launch(args);
     }

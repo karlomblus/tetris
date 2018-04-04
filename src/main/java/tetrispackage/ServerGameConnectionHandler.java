@@ -1,4 +1,4 @@
-package tetrispackage;
+package main.java.tetrispackage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -84,7 +84,7 @@ public class ServerGameConnectionHandler implements Runnable {
         // kontrollime, kas sql-is on nimi juba olemas
         // kui ei ole, siis lisame. õnnestumisel märgime logimisperioodi lõppenuks
 
-        String hashedPassword= tetrispackage.PasswordCrypto.generateSecurePassword(password);
+        String hashedPassword= PasswordCrypto.generateSecurePassword(password);
         // salvestada andmebaasi
 
         // salvestame sessioonitabelisse (seda võiks kasutada web)
