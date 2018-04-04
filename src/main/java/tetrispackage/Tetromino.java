@@ -3,7 +3,9 @@ package tetrispackage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Tetromino {
@@ -12,7 +14,7 @@ public class Tetromino {
     private boolean allowTetrominoDrawing = true;
     private Color activeTetrominoColor;
     Rectangle [][] ruudud;
-    private boolean reachedBottom = false;
+    private boolean allActiveToPassive = false;
 
     public Tetromino(Rectangle [][] ristkülik){
         ruudud = ristkülik;
@@ -59,36 +61,41 @@ public class Tetromino {
         }
     }
     void tick() {
-        System.out.println("Ticked");
-        for (int i = ruudud.length - 1; i >= 0; i--) {
-            if (reachedBottom){
-                break;
-            }
+        List<Integer> activeRectCoordI = new ArrayList<>();
+        List<Integer> activeRectCoordJ = new ArrayList<>();
+        for (int i = ruudud.length - 1; i >= 0; i--) {  //Find all active blocks and check if all active blocks need to be set to passive
             for (int j = ruudud[i].length - 1; j >= 0; j--) {
                 if (getRectStatusAt(i, j) == 'A') {
-                    if (i == ruudud.length - 1 || (i+1 < ruudud.length && getRectStatusAt(i+1, j) == 'P')){
-                        reachedBottom = true;
-                        for (int k = 0; k < ruudud.length; k++) {
-                            for (int l = 0; l < ruudud[k].length; l++) {
-                                if (getRectStatusAt(k, l) == 'A'){
-                                    setRectStatusAt(k, l, 'P'); //All active blocks now set to passive.
-                                }
-                            }
-                        }
+                    activeRectCoordI.add(i); //remember where the active blocks are
+                    activeRectCoordJ.add(j);
+                    if (i + 1 == ruudud.length || getRectStatusAt(i+1, j) == 'P') {
+                        allActiveToPassive = true;
+                    }
 
-                        break;
-                    }
-                    if (i + 1 < ruudud.length){
-                        setRectStatusAt(i + 1, j, 'A');
-                    }
-                    setRectStatusAt(i, j, 'B');
                 }
             }
         }
-        if (reachedBottom){
+        if (allActiveToPassive){
+            System.out.println("All active to passive!");
+            for (int k = 0; k < ruudud.length; k++) {
+                for (int l = 0; l < ruudud[k].length; l++) {
+                    if (getRectStatusAt(k, l) == 'A') {
+                        setRectStatusAt(k, l, 'P');
+                    }
+                }
+            }
             drawingTurns = 2;
             allowTetrominoDrawing = true;
-            reachedBottom = false;
+            allActiveToPassive = false;
+        }
+        else if (!allActiveToPassive){
+            for (int i = 0; i < activeRectCoordI.size(); i++) {
+                setRectStatusAt(activeRectCoordI.get(i) + 1, activeRectCoordJ.get(i), 'A');
+                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
+            }
+
+
+
         }
     }
     //Tetriminos I O T J L S Z
