@@ -1,4 +1,4 @@
-package tetrispackage;
+package main.java.tetrispackage;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;

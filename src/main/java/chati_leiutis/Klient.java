@@ -1,16 +1,41 @@
 package main.java.chati_leiutis;
 
+import javafx.application.Application;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
-public class Klient implements Runnable {
-    public boolean cont = true;
-    String name;
+public class Klient extends Application {
+    static boolean cont = true;
+    DataOutputStream out;
+    TextArea ekraan;
+    static String nimi;
 
-    public Klient(String name) {
-        this.name = name;
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        showLogIn();
+        showLobby();
+        out.writeUTF("logout");
+    }
+
+    public Klient() {
+    }
+
+    public Klient(DataOutputStream out) {
+        this.out = out;
     }
 
     public void recieveMessage(String message) {
@@ -19,43 +44,106 @@ public class Klient implements Runnable {
             System.exit(0);
         }//todo väga halb, midagi paremat peab kindlasti välja mõtlema)
         else {
-            System.out.println(message+name);
+            ekraan.appendText(nimi + "<<<<  " + message + "\n");
         }
     }
+    public void showLobby()throws Exception{
+        Stage primaryStage = new Stage();
+        Socket socket = new Socket("localhost", 5000);
+        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+        this.out = output;
 
-    public static void main(String[] args) throws Exception {
-        Klient client = new Klient("ingotester");
-        Thread lõim1 = new Thread(client);
-        Thread lõim2 = new Thread(new Klient("jaanus"));
-        Thread lõim3 = new Thread(new Klient("malle"));
-        lõim1.start();
-        lõim2.start();
-        System.out.println("lõimet alanud");
-        //TODO teha, et konstruktoris viime töö uue lõime peale kohe ja loome ka clienthreadi
+        Thread clienthread = new Thread(new ClientThread(socket, this));
+        clienthread.start();
+        System.out.println("Connected. Awaiting input...");
+        Group juur = new Group();
+        TextArea messagearea = new TextArea();
+        TextArea userlist = new TextArea();
+        this.ekraan = messagearea;
+
+        Label userlabel = new Label("Users");
+        Label chatlabel = new Label("Messages");
+
+        messagearea.setEditable(false);
+        userlist.setEditable(false);
+
+        messagearea.setPrefSize(200, 300);
+        userlist.setPrefSize(150, 300);
+
+        userlist.setPromptText("Users");
+        messagearea.setPromptText("Messages...");
+
+        TextField messagefield = new TextField();
+        messagefield.setPromptText("Enter message here...");
+
+        Button sendbtn = new Button("Send");
+        sendbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                sendandclear(messagefield);
+            }
+        });
+
+        messagefield.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                sendandclear(messagefield);
+            }
+        });
+        VBox outervbox = new VBox();
+        VBox vbox = new VBox();
+        HBox hbox = new HBox();
+        VBox vbox2 = new VBox();
+        HBox hbox2 = new HBox();
+
+        messagefield.setPrefWidth(300);
+        vbox.getChildren().addAll(userlabel,userlist);
+        vbox2.getChildren().addAll(chatlabel,messagearea);
+        hbox.getChildren().addAll(vbox,vbox2);
+        hbox2.getChildren().addAll(messagefield,sendbtn);
+        outervbox.getChildren().addAll(hbox,hbox2);
+        juur.getChildren().add(outervbox);
+
+        Scene lava = new Scene(juur, 350, 400);
+        primaryStage.setResizable(false);
+        primaryStage.setScene(lava);
+        primaryStage.setTitle("Client");
+        primaryStage.centerOnScreen();
+        primaryStage.showAndWait();
     }
 
-
-    @Override
-    public void run() {
-        try {
-            Socket socket = new Socket("localhost", 5000);
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            Scanner sc = new Scanner(System.in);
-
-            Thread clienthread = new Thread(new ClientThread(socket, this));
-            clienthread.start();
-            System.out.println("Connected. Awaiting input...");
-
-            while (cont) {
-                String msg = sc.nextLine();
-                out.writeUTF(msg);
-                out.flush();
-                //TODO teha, et konstruktoris viime töö uue lõime peale kohe ja loome ka clienthreadi
+    public static void showLogIn() {
+        Stage newStage = new Stage();
+        VBox comp = new VBox();
+        Label namelabel = new Label("Enter your name below:");
+        TextField nameField = new TextField();
+        nameField.setPromptText("Enter your name here...");
+        comp.getChildren().add(namelabel);
+        comp.getChildren().add(nameField);
+        Button niminupp = new Button("Log in");
+        niminupp.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                nimi = nameField.getText();
+                newStage.close();
             }
+        });
+        Scene stageScene = new Scene(comp, 300, 300);
+        comp.getChildren().add(niminupp);
+        newStage.setScene(stageScene);
+        newStage.showAndWait();
+    }
 
-        } catch (Exception e) {
+    public void sendandclear(TextField ekraan){
+        try {
+            out.writeUTF(ekraan.getText());
+            out.flush();
+            ekraan.clear();
+        } catch (Exception ex) {
             throw new RuntimeException();
         }
     }
-}
+    public static void main(String[] args) throws Exception {
+        launch(args);
+    }
 
+}

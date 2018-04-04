@@ -10,6 +10,15 @@ public class ClientThread extends Thread {
     Klient client;
     DataInputStream in;
 
+    private void shutDown(){
+        try{
+        socket.close();
+        in.close();
+
+    }catch (Exception e){
+            throw new RuntimeException();
+        }
+    }
     public ClientThread(Socket socket, Klient client) throws Exception {
         this.socket = socket;
         this.client = client;
@@ -26,6 +35,7 @@ public class ClientThread extends Thread {
                 cont=false;
             }
         }
+        shutDown();
     }
 }
 

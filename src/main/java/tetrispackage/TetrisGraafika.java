@@ -1,4 +1,4 @@
-package tetrispackage;
+package main.java.tetrispackage;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,14 +13,19 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 
-public class TetrisGraafika extends Application {
+public class TetrisGraafika extends Application implements Runnable {
     private final int resoWidth = 450;
     private final int resoHeight = 600;
     final int ruuduSuurus = 15;
     final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
-    tetrispackage.Tetromino tetromino;
+    Tetromino tetromino;
+
+    @Override
+    public void run() {
+        launch();
+    }
 
     @Override
     public void start(Stage peaLava) throws Exception {
@@ -32,13 +37,13 @@ public class TetrisGraafika extends Application {
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
-        tetromino  = new Tetromino(ristkülik);
+        tetromino = new Tetromino(ristkülik);
         Timeline fiveSecondsWonder = new Timeline(new KeyFrame(Duration.seconds(1), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
 
                 tick();
-                if (tetromino.isDrawingAllowed()){
+                if (tetromino.isDrawingAllowed()) {
                     tetromino.draw('I');
                 }
             }
@@ -57,11 +62,10 @@ public class TetrisGraafika extends Application {
 
     void tick() {
         System.out.println("Ticked");
-        if (tetromino.tetrominoDrawingAllowance == 0){
+        if (tetromino.tetrominoDrawingAllowance == 0) {
             System.out.println("TetriminoDrawing false!");
             tetromino.allowTetrominoDrawing = false;
-        }
-        else if (tetromino.tetrominoDrawingAllowance == -4){//Esialgu lubab uut iga nelja sekundi tagamt
+        } else if (tetromino.tetrominoDrawingAllowance == -4) {//Esialgu lubab uut iga nelja sekundi tagamt
             tetromino.allowTetrominoDrawing = true;
             tetromino.tetrominoDrawingAllowance = 2;
         }
@@ -70,7 +74,7 @@ public class TetrisGraafika extends Application {
             for (int j = mitukuubikutLaiuses - 1; j >= 0; j--) {
                 if (tetromino.getRectStatusAt(i, j) == 'A') {
                     System.out.println("Found active");
-                    if (i + 1 < mitukuubikutPikkuses){
+                    if (i + 1 < mitukuubikutPikkuses) {
                         tetromino.setRectStatusAt(i + 1, j, 'A');
                     }
                     tetromino.setRectStatusAt(i, j, 'B');
@@ -80,6 +84,9 @@ public class TetrisGraafika extends Application {
 
     }
     public static void main(String[] args) {
-        launch(args);
+        //panin tetrisgraafika lõie peal töötama
+    //launch(args);
+        Thread lõim = new Thread(new TetrisGraafika());
+        lõim.start();
     }
 }
