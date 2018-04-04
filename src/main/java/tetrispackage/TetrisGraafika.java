@@ -13,8 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class TetrisGraafika extends Application {
@@ -37,13 +36,19 @@ public class TetrisGraafika extends Application {
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
-        tetromino  = new Tetromino(ristkülik);
+        tetromino = new Tetromino(ristkülik);
+
+        char[] possibleTetrominos = {'I', 'O', 'Z', 'S'};
+        Random rand = new Random();
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+
+
             @Override
             public void handle(ActionEvent event) {
                 tetromino.tick();
-                if (tetromino.isDrawingAllowed()){
-                    tetromino.draw('S');
+                if (tetromino.isDrawingAllowed()) {
+                    char randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                    tetromino.draw(randomTetromino);
                 }
 
 
@@ -59,11 +64,13 @@ public class TetrisGraafika extends Application {
         Scene stseen1 = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         stseen1.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
-            if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)){
-                tetromino.moveRight();
-            }
-            if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)){
-                tetromino.moveLeft();
+            if (tetromino.isDrawingAllowed() == false) {
+                if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
+                    tetromino.moveRight();
+                }
+                if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
+                    tetromino.moveLeft();
+                }
             }
 
         });

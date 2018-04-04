@@ -123,8 +123,9 @@ public class Tetromino {
         drawingTurns -= 1;
         if (tetrominoType == 'I') {
             int i = 0;
+            int j = 0;
             activeTetrominoColor = Color.CYAN;
-            for (int j = 0; j < 4; j++) {
+            for (;j < 4; j++) {
                 setRectStatusAt(i, j, 'A');
             }
             drawingTurns -= 1;
