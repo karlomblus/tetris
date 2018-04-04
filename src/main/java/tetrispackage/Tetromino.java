@@ -37,26 +37,46 @@ public class Tetromino {
         }
     }
     void moveRight(){
+        List<Integer> activeRectCoordI = new ArrayList<>();
+        List<Integer> activeRectCoordJ = new ArrayList<>();
+        boolean movingRightPossible = true;
         for (int i = ruudud.length - 1; i >= 0; i--) {
             for (int j = ruudud[i].length - 1; j >= 0; j--) {
                 if (getRectStatusAt(i, j) == 'A') {
-                    if (j + 1 < ruudud[i].length){
-                        setRectStatusAt(i, j + 1, 'A');
+                    activeRectCoordI.add(i); //remember where the active blocks are
+                    activeRectCoordJ.add(j);
+                    if (j + 1 >= ruudud[i].length){
+                        movingRightPossible = false;
                     }
-                    setRectStatusAt(i, j, 'B');
                 }
+            }
+        }
+        if (movingRightPossible){
+            for (int i = 0; i < activeRectCoordI.size(); i++) {
+                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i) + 1, 'A');
+                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
             }
         }
     }
     void moveLeft(){
+        List<Integer> activeRectCoordI = new ArrayList<>();
+        List<Integer> activeRectCoordJ = new ArrayList<>();
+        boolean movingLeftPossible = true;
         for (int i = ruudud.length - 1; i >= 0; i--) {
             for (int j = 0; j < ruudud[i].length; j++) {
                 if (getRectStatusAt(i, j) == 'A') {
-                    if (j - 1 >= 0){
-                        setRectStatusAt(i, j - 1, 'A');
+                    activeRectCoordI.add(i); //remember where the active blocks are
+                    activeRectCoordJ.add(j);
+                    if (j - 1 < 0){
+                        movingLeftPossible = false;
                     }
-                    setRectStatusAt(i, j, 'B');
                 }
+            }
+        }
+        if (movingLeftPossible){
+            for (int i = 0; i < activeRectCoordI.size(); i++) {
+                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i) - 1, 'A');
+                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
             }
         }
     }
