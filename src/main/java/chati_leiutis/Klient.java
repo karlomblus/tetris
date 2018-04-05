@@ -1,4 +1,4 @@
-package main.java.chati_leiutis;
+package chati_leiutis;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,11 +20,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import main.java.tetrispackage.TetrisGraafika;
+import tetrispackage.TetrisGraafika;
 
-import javax.swing.text.StyledEditorKit;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
@@ -34,7 +32,7 @@ public class Klient extends Application {
     TextArea ekraan;
     static String nimi;
     boolean tetrisrunning = false;
-    TetrisGraafika tetris = new TetrisGraafika();
+    //TetrisGraafika tetris = new TetrisGraafika();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
