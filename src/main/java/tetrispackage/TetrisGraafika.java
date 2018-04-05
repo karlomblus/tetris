@@ -12,19 +12,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import main.java.chati_leiutis.Klient;
 
 import java.util.*;
 
 
-public class TetrisGraafika extends Application {
+public class TetrisGraafika extends Application{
     private final int resoWidth = 450;
     private final int resoHeight = 600;
     final int ruuduSuurus = 15;
     final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    Tetromino tetromino;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
-    tetrispackage.Tetromino tetromino;
 
     @Override
     public void start(Stage peaLava) throws Exception {
@@ -36,10 +37,12 @@ public class TetrisGraafika extends Application {
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
+
         tetromino = new Tetromino(ristkülik);
 
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S'};
         Random rand = new Random();
+
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
 
 
@@ -47,11 +50,11 @@ public class TetrisGraafika extends Application {
             public void handle(ActionEvent event) {
                 tetromino.tick();
                 if (tetromino.isDrawingAllowed()) {
+
                     char randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
                     tetromino.draw(randomTetromino);
+
                 }
-
-
             }
         }));
 
@@ -71,6 +74,7 @@ public class TetrisGraafika extends Application {
                 if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
                     tetromino.moveLeft();
                 }
+
             }
 
         });
@@ -80,12 +84,10 @@ public class TetrisGraafika extends Application {
 
         peaLava.setTitle("Tetris");  // lava tiitelribale pannakse tekst
         peaLava.setScene(stseen1);  // lavale lisatakse stseen
-        peaLava.show();  // lava tehakse nähtavaks
-
+        peaLava.showAndWait();  // lava tehakse nähtavaks
     }
 
-
     public static void main(String[] args) {
-        launch(args);
+        launch();
     }
 }

@@ -84,34 +84,56 @@ public class ServerGameConnectionHandler implements Runnable {
         // kontrollime, kas sql-is on nimi juba olemas
         // kui ei ole, siis lisame. õnnestumisel märgime logimisperioodi lõppenuks
 
-        String hashedPassword= tetrispackage.PasswordCrypto.generateSecurePassword(password);
-        // salvestada andmebaasi
 
-        // salvestame sessioonitabelisse (seda võiks kasutada web)
-        dos.writeInt(1);
-        dos.writeInt(1);
-        dos.writeUTF("OK");
-        login = false;
+        synchronized (dos) {
+            String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
+            dos.writeInt(1);
+            if (uid.length() > 0) {
+                dos.writeInt(-1);
+                dos.writeUTF("Valitud kasutajanimi on juba olemas");
+                return;
+            }
+
+
+            String hashedPassword = ServerPasswordCrypto.generateSecurePassword(password);
+            int result = ServerMain.sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
+
+            if (result > 0) {
+                // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
+                dos.writeInt(1);
+                dos.writeUTF("OK, kasutaja loodud, oled sisselogitud");
+                login = false;
+            } else {
+                dos.writeInt(-1);
+                dos.writeUTF("Kasutaja lisamine andmebaasi ebaõnnestus");
+            }
+        } // sync
     } // createAccount
 
 
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
-        // todo: reaalne sisselogimine
-        // kontrollime sql-ist kasutajanime ja parooli.
-        String andmebaasist="123223";
-        boolean passwordMatch = PasswordCrypto.verifyUserPassword(password,andmebaasist);
-        if(passwordMatch)
-        {
-         //  OK
-        } else {
-           // NOT OK
-        }
+        synchronized (dos) {
+            dos.writeInt(2);
+            String andmebaasist = ServerMain.sql.getstring("select password from users where username = ?", username);
+            if (andmebaasist.length() ==0) {
+                dos.writeInt(-1);
+                dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
+                return;
+            }
+            boolean passwordMatch = ServerPasswordCrypto.verifyUserPassword(password, andmebaasist);
+            if (passwordMatch) {
+                dos.writeInt(1);
+                dos.writeUTF("OK");
+                login = false;
+            } else {
+                dos.writeInt(-1);
+                dos.writeUTF("Vale parool");
+            }
 
-        // kui OK, siis salvestame sessioonitabelisse
-        dos.writeInt(2);
-        dos.writeInt(1);
-        dos.writeUTF("OK");
-        login = false;
+            // todo: kui OK, siis salvestame sessioonitabelisse
+
+
+        } // sync
     } // doLogin
 
 
@@ -169,7 +191,7 @@ public class ServerGameConnectionHandler implements Runnable {
         dos.writeInt(7);
         dos.writeUTF("Jüri");
         dos.writeUTF("Mari");
-        
+
         // tuleks teha list kus on sees mängivad pooled ja mängu ID
 
     } // getRunningGames
@@ -178,7 +200,6 @@ public class ServerGameConnectionHandler implements Runnable {
     // todo    kutsele vastamine: sisuliselt sama kui kutse saatmine, aga teisel peab olema kutsutav minu,id.
     //         kui vastus õnnestub, siis mõlema staatuseks, et mängib.   lobby nimekirjast maha
     //                                                                   mängupaaride nimekirja sisse
-    
-    
-    
+
+
 } //ServerGameConnectionHandler class

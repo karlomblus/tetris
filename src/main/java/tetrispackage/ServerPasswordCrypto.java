@@ -11,7 +11,7 @@ import java.util.Random;
 
 
 // baseerub sellel koodil: http://www.appsdeveloperblog.com/encrypt-user-password-example-java/
-public class PasswordCrypto {
+public class ServerPasswordCrypto {
 
     private static byte[] hash(char[] password, byte[] salt) {
         PBEKeySpec spec = new PBEKeySpec(password, salt, 10000, 256);
