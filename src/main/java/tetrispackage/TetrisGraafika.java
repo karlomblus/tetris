@@ -3,6 +3,7 @@ package tetrispackage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -11,12 +12,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.util.*;
 
 
-public class TetrisGraafika extends Application{
+public class TetrisGraafika{
     private final int resoWidth = 450;
     private final int resoHeight = 600;
     final int ruuduSuurus = 15;
@@ -39,7 +41,7 @@ public class TetrisGraafika extends Application{
 
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S'};
         Random rand = new Random();
-        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.03), new EventHandler<ActionEvent>() {
             char randomTetromino = 'S';
             @Override
             public void handle(ActionEvent event) {
@@ -57,7 +59,12 @@ public class TetrisGraafika extends Application{
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
         });
-
+        peaLava.setOnCloseRequest((we) ->{
+                System.out.println("Tetris stage closed!");
+                Platform.exit();
+                //System.exit(0);
+            tickTime.stop();
+        });
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
         Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
@@ -84,6 +91,6 @@ public class TetrisGraafika extends Application{
     }
 
     public void begin(){
-        launch();
+        //launch();
     }
 }
