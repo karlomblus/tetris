@@ -4,18 +4,37 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 
 public class ServerGameConnectionHandler implements Runnable {
 
     // siin tegeleme sissetulnud mängu ühendustega
     // esialgu faken mingi kasutajaskonna ja sisu
 
-    Socket socket;
-    boolean connected = true; // kui see maha keeratakse, siis on sessioon läbi
-    boolean login = true;  // kasutaja on logimisfaasis
+    DataOutputStream dos; // selle useri data output
+    private Socket socket;
+    private boolean connected = true; // kui see maha keeratakse, siis on sessioon läbi
+    private boolean login = true;  // kasutaja on logimisfaasis
+    private List<ServerGameConnectionHandler> players; // siin on kõik mängijad
+    private int status = 0;   // 1: lobbys  2: mängib 3: ???
+    private int userid = 0;       // mängija userID
+    private String username = "";
 
-    ServerGameConnectionHandler(Socket socket) {
+    ServerGameConnectionHandler(Socket socket, List<ServerGameConnectionHandler> players) {
         this.socket = socket;
+        this.players = players;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public int getUserid() {
+        return userid;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     @Override
@@ -24,7 +43,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
         try (DataInputStream dis = new DataInputStream(socket.getInputStream());
              DataOutputStream dos = new DataOutputStream(socket.getOutputStream())) {
-
+            this.dos = dos;
             while (connected) {
                 int command = dis.readInt();
 
@@ -63,12 +82,14 @@ public class ServerGameConnectionHandler implements Runnable {
 
         } catch (SocketException e) {
             // Kas siis võin ilma põhjuseta kinni püüda kui ma ei taha, et see edasi throwtakse ning tahan lihtsalt viisakalt olukorda lõpetada?
-            System.out.println("Teine pool sulges ootamatult socketi, teeme siis sama");
+            ServerMain.debug("Teine pool sulges ootamatult socketi, teeme siis sama");
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
             try {
-                System.out.println("Sulgeme socketi");
+                players.remove(this);
+                ServerMain.debug("Sulgeme socketi");
+                ServerMain.debug(6, "Allesjäänud mängijad: " + players);
                 socket.close();
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -102,6 +123,8 @@ public class ServerGameConnectionHandler implements Runnable {
                 // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
                 dos.writeInt(1);
                 dos.writeUTF("OK, kasutaja loodud, oled sisselogitud");
+                userid = result;
+                this.username = username;
                 login = false;
             } else {
                 dos.writeInt(-1);
@@ -114,16 +137,18 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         synchronized (dos) {
             dos.writeInt(2);
-            String andmebaasist = ServerMain.sql.getstring("select password from users where username = ?", username);
-            if (andmebaasist.length() ==0) {
+            String[] andmebaasist = ServerMain.sql.query(2, "select id,password from users where username = ?", username);
+            if (andmebaasist[0].length() == 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
                 return;
             }
-            boolean passwordMatch = ServerPasswordCrypto.verifyUserPassword(password, andmebaasist);
+            boolean passwordMatch = ServerPasswordCrypto.verifyUserPassword(password, andmebaasist[1]);
             if (passwordMatch) {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
+                userid = Integer.parseInt(andmebaasist[0]);
+                this.username = username;
                 login = false;
             } else {
                 dos.writeInt(-1);
@@ -138,46 +163,56 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
     private void getUserList(DataOutputStream dos) throws Exception {
-        // todo: reaalne userlist. Hetkel fakeme data
-        dos.writeInt(3);
-        dos.writeInt(1);
-        dos.writeUTF("Juhan");
-        dos.writeInt(3);
-        dos.writeInt(2);
-        dos.writeUTF("Kalle");
-        dos.writeInt(3);
-        dos.writeInt(3);
-        dos.writeUTF("Malle");
-        dos.writeInt(3);
-        dos.writeInt(4);
-        dos.writeUTF("Theo");
-        dos.writeInt(3);
-        dos.writeInt(5);
-        dos.writeUTF("Karl");
-        dos.writeInt(3);
-        dos.writeInt(8);
-        dos.writeUTF("Jüri");
-        dos.writeInt(3);
-        dos.writeInt(12);
-        dos.writeUTF("Mari");
 
-        // variant1:  loeme mälust ette kasutajate listi.  vist on mõtekam
-        // variant2: loeme sql-ist listi ette (teadmata, kas see on õige)
+        for (ServerGameConnectionHandler player : players) {
+            dos.writeInt(3);
+            dos.writeInt(player.getUserid());
+            dos.writeUTF(player.getUsername());
 
-        login = false;
+        }
+
+        // fakeme lisadatat, et testides asi tühi poleks
+        dos.writeInt(3);
+        dos.writeInt(998);
+        dos.writeUTF("Fake1");
+        dos.writeInt(3);
+        dos.writeInt(999);
+        dos.writeUTF("Fake2");
+        dos.writeInt(3);
+        dos.writeInt(1000);
+        dos.writeUTF("Fake3");
+
     } // getUserList
 
 
     private void doLogout(DataOutputStream dos) throws Exception {
-        // todo: reaalne
-        // kustutame kasutaja sessioonilistist
-        // eemaldame ta sisseloginud kasutajate listist
+        // while lõpetatakse ära, socketi sulgemisel võetakse ta ka sessioonilistist maha
         connected = false;
     } // doLogout
 
+    public DataOutputStream getDos() {
+        return dos;
+    }
+
+    public boolean isLogin() {
+        return login;
+    }
+
     private void saveChatmessage(DataOutputStream dos, String message) throws Exception {
         //todo: salvestame sql-i
-        // saadame kõigile seesolijatele välja
+
+        ServerMain.debug(8, "lobbychatmessage " + username + ": " + message);
+        for (ServerGameConnectionHandler player : players) {
+            DataOutputStream dos2 = player.getDos();
+            synchronized (dos2) {
+                if (!player.isLogin()) { // kui kasutaja on juba sisse loginud
+                    dos2.writeInt(5);
+                    dos2.writeUTF(username);
+                    dos2.writeUTF(message);
+                    //ServerMain.debug(9, "lobbychatmessage " + username + " -> " + player.getUsername() + " : " + message);
+                }
+            } // sync
+        } // iter
 
     } // saveChatmessage
 
@@ -201,5 +236,9 @@ public class ServerGameConnectionHandler implements Runnable {
     //         kui vastus õnnestub, siis mõlema staatuseks, et mängib.   lobby nimekirjast maha
     //                                                                   mängupaaride nimekirja sisse
 
+
+    public String toString() {
+        return username + ": Nimi " + username + " login: " + login + " status " + status;
+    }
 
 } //ServerGameConnectionHandler class
