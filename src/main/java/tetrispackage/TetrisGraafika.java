@@ -24,7 +24,6 @@ public class TetrisGraafika extends Application{
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     Tetromino tetromino;
-    private boolean tetrisRunning = false;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     public void start(Stage peaLava) {
@@ -84,14 +83,7 @@ public class TetrisGraafika extends Application{
         peaLava.show();  // lava tehakse nähtavaks
     }
 
-    private void begin(){
+    public void begin(){
         launch();
-        tetrisRunning = true;
-    }
-    public void runTetris(){
-        if (tetrisRunning == false){
-            begin();
-        }
-
     }
 }
