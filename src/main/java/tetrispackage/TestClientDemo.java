@@ -34,16 +34,11 @@ public class TestClientDemo {
             dos.writeUTF("UusParool");
             loesisendit(dis);
 
-            System.out.println("ootame lõpmatuseni kuni tuleb chatmessage");
-            System.out.println(dis.readInt());
-            System.out.println(dis.readUTF());
-            System.out.println(dis.readUTF());
 
+            System.out.println("Küsime userlisti");
+            dos.writeInt(3);
+            loesisendit(dis);
 
-            //System.out.println("Küsime userlisti");
-            //dos.writeInt(3);
-            //loesisendit(dis);
-/*
             System.out.println("Ütleme chatis tere");
             dos.writeInt(5);
             dos.writeUTF("Tere kes te kõik siin olete (esimene kasutaja)");
@@ -73,7 +68,7 @@ public class TestClientDemo {
                 Thread.sleep(1000);
                 loesisendit(dis);
             }
-*/
+
 
 
             Thread.sleep(20000); // ootame serveri vastuse ära enne kui toru maha viskame; ei ole hea viis
