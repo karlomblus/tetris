@@ -1,4 +1,4 @@
-package main.java.tetrispackage;
+package tetrispackage;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -13,8 +13,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 //TODO Theo, tegin natuke ümber et seda classi oma lobbys kasutada. Kui tahad näiteks oma tetrist eraldi testida, siis lisa muuda public Scene showTetris tagasi public void start, ja eemdalda lõpust return stseen1.
 //TODO ja lisa classi taha uuesti extent Application
@@ -27,10 +26,10 @@ public class TetrisGraafika extends Application{
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     Tetromino tetromino;
+    private boolean tetrisRunning = false;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
-    @Override
-    public void start(Stage peaLava) throws Exception {
+    public void start(Stage peaLava) {
         Group juur = new Group(); // luuakse juur
         for (int i = 0; i < mitukuubikutPikkuses; i++) {
             for (int j = 0; j < mitukuubikutLaiuses; j++) {
@@ -39,14 +38,21 @@ public class TetrisGraafika extends Application{
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
-
         tetromino = new Tetromino(ristkülik);
+
+        char[] possibleTetrominos = {'I', 'O', 'Z', 'S'};
+        Random rand = new Random();
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+            char randomTetromino = 'S';
             @Override
             public void handle(ActionEvent event) {
                 tetromino.tick();
                 if (tetromino.isDrawingAllowed()) {
-                    tetromino.draw('S');
+                    if (tetromino.getDrawingTurns() == 2) {
+                        randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                    }
+                    tetromino.draw(randomTetromino);
+
                 }
             }
         }));
@@ -57,28 +63,38 @@ public class TetrisGraafika extends Application{
 
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
-        Scene stseen1 = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
-        stseen1.setOnKeyPressed(event -> {
+        Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
+        tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
-            if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
-                tetromino.moveRight();
-            }
-            if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
-                tetromino.moveLeft();
+            if (tetromino.isDrawingAllowed() == false) {
+                if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
+                    tetromino.moveRight();
+                }
+                if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
+                    tetromino.moveLeft();
+                }
+
             }
 
         });
-        stseen1.setOnKeyReleased(event ->
+        tetrisStseen.setOnKeyReleased(event ->
                 currentActiveKeys.put(event.getCode(), false)
         );
 
         peaLava.setTitle("Tetris");  // lava tiitelribale pannakse tekst
-        peaLava.setScene(stseen1);  // lavale lisatakse stseen
-        peaLava.showAndWait();  // lava tehakse nähtavaks
 
+        peaLava.setScene(tetrisStseen);  // lavale lisatakse stseen
+        peaLava.show();  // lava tehakse nähtavaks
     }
 
-    public static void go() {
+    private void begin(){
         launch();
+        tetrisRunning = true;
+    }
+    public void runTetris(){
+        if (tetrisRunning == false){
+            begin();
+        }
+
     }
 }

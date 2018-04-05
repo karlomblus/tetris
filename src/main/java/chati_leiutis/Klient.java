@@ -1,4 +1,4 @@
-package main.java.chati_leiutis;
+package chati_leiutis;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -20,11 +20,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
-import main.java.tetrispackage.TetrisGraafika;
+import tetrispackage.TetrisGraafika;
 
-import javax.swing.text.StyledEditorKit;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
@@ -106,6 +104,7 @@ public class Klient extends Application {
 
         //TODO pole kindel kas selline lahendus on okei, aga töötab hetkel.
         Button singleplayerbtn = new Button("Singpleplayer");
+        TetrisGraafika tetris = new TetrisGraafika();
         singleplayerbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -114,11 +113,11 @@ public class Klient extends Application {
                         TetrisGraafika tetris = new TetrisGraafika();
                         Stage lava = new Stage();
                         tetris.start(lava);
+
                     } catch (Exception e) {
-                        throw new RuntimeException();
-                    }
+                        throw new RuntimeException(e);
                 }
-            }
+            }}
         });
 
         StackPane stackPane = new StackPane();

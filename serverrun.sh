@@ -1,6 +1,7 @@
 git pull
+rm out/server/*
+rm out/server/tetrispackage/*
 cd src/main/java/tetrispackage
-javac ServerMain.java -d ../../../../out/server
+javac Server*.java -d ../../../../out/server
 cd ../../../../out/server
-java ServerMain 
-
+java -cp ~/tetris/out/mysql-connector-java-5.1.46/mysql-connector-java-5.1.46-bin.jar:. tetrispackage.ServerMain

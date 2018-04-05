@@ -1,14 +1,22 @@
-package main.java.tetrispackage;
+package tetrispackage;
 
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerMain {
+    public static ServerSQL sql;
+
     public static void main(String[] args) throws Exception {
 
-System.out.println("Server alustab");
+        System.out.println("Server alustab");
+        sql = new ServerSQL();
+        System.out.println("Mysql connected");
 
+
+        // plan: weebiserver täiesti eraldi
         // tekitame mingi hulga threade weebi ühendustega tegelemiseks
+        // lisaks kuulan ka porti 80
+        // kui tuleb ühendus, annan selle esimesele vabale threadile (ei hakka igakord uut tegema)
 
         // connectioni peale tekitan threadi ja ServerGameConnectionHandler tegeleb
         try (ServerSocket gameServerSocket = new ServerSocket(54321)) {
@@ -17,15 +25,15 @@ System.out.println("Server alustab");
                 // wait for an incoming connection
                 Socket gameSocket = gameServerSocket.accept();
                 debug("Uus connection accepted");
-                Thread connectionHandler = new Thread(new ServerGameConnectionHandler(gameSocket));
+                ServerGameConnectionHandler connection = new ServerGameConnectionHandler(gameSocket);
+                Thread connectionHandler = new Thread(connection);
                 connectionHandler.start();
 
             } // while
         } // try
 
 
-        // lisaks kuulan ka porti 80
-        // kui tuleb ühendus, annan selle esimesele vabale threadile (ei hakka igakord uut tegema)
+
 
 
     } // main
@@ -37,11 +45,11 @@ System.out.println("Server alustab");
     } // error
 
 
-    public static void debug(String msg) throws Exception {
-      debug(5,msg);
-  }
+    public static void debug(String msg) {
+        debug(3, msg);
+    }
 
-    public static void debug(int debuglevel, String msg) throws Exception {
+    public static void debug(int debuglevel, String msg) {
         System.out.println("DEBUG: " + msg);
         //todo: logime 
     } // error

@@ -1,4 +1,4 @@
-package main.java.chati_leiutis;
+package chati_leiutis;
 
 import javafx.application.Application;
 
