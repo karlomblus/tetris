@@ -19,18 +19,15 @@ public class TestFX extends Application {
     @Override
     public void start(Stage peaLava) throws Exception {
 
-        TetrisGraafika tetris = new TetrisGraafika();
-
 
         Button nupp1 = new Button("Run");
         nupp1.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent event) {
                 System.out.println("nupuvajutus");
 
-                    Stage stage = new Stage();
-
-                    tetris.start(stage);
-                
+                TetrisGraafika tetris = new TetrisGraafika();
+                Stage stage = new Stage();
+                tetris.start(stage);
 
 
             }
