@@ -147,6 +147,31 @@ public class ServerSQL {
             return response;
 
         }
-    }
+    } // getstring
+
+    public String[] query(int mitu,String... args) throws Exception {
+        synchronized (conn) {
+
+            PreparedStatement preparedStatement = conn.prepareStatement(args[0]);
+            String[] response = new String[mitu];
+            for (int i = 1; i < args.length; i++) {
+                preparedStatement.setString(i, args[i]);
+            }
+            ResultSet rs = preparedStatement.executeQuery();
+
+            if (rs.next()) {
+                for (int i = 0; i < mitu; i++) {
+                    response[i] = rs.getString(i+1);
+                }
+
+            }
+            if (preparedStatement != null) {
+                preparedStatement.close();
+            }
+            return response;
+
+        }
+    } // query
+
 
 }

@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
-public class TestClientDemo {
+public class TestClientDemo2 {
     public static void main(String[] args) throws Exception {
 
         System.out.println("Ühendume serveriga");
@@ -12,34 +12,23 @@ public class TestClientDemo {
         try (DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
              DataInputStream dis = new DataInputStream(socket.getInputStream())) {
 
-            //System.out.println("Loome uue konto");
-            //dos.writeInt(1); // konto loomise käsk
-            //dos.writeUTF("UusUsername");
-            //dos.writeUTF("UusParool");
-/*
-            System.out.println("Logime sisse vale kasutajakontoga");
-            dos.writeInt(2);
-            dos.writeUTF("UusUsername3333");
-            dos.writeUTF("UusParool3333");
 
-            System.out.println("Logime sisse vale parooliga");
-            dos.writeInt(2);
-            dos.writeUTF("UusUsername");
-            dos.writeUTF("UusParool3333");
-*/
 
             System.out.println("Logime sisse õige parooliga");
             dos.writeInt(2);
-            dos.writeUTF("UusUsername");
+            dos.writeUTF("TeineTest");
             dos.writeUTF("UusParool");
 
 
             loesisendit(dis);
-/*
+
             System.out.println("Küsime userlisti");
             dos.writeInt(3);
 
-            loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
+            loesisendit(dis);
+
+
+            /*
 
             System.out.println("Ütleme chatis tere");
             dos.writeInt(5);
@@ -51,18 +40,18 @@ public class TestClientDemo {
             dos.writeInt(6);
 
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
-
-
 */
             Thread.sleep(1000);
             loesisendit(dis);
             Thread.sleep(1000);
             loesisendit(dis);
-            Thread.sleep(20000); // ootame serveri vastuse ära enne kui toru maha viskame; ei ole hea viis
+
+            Thread.sleep(20000); // jääme natueseks ajaks passima
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
 
-            System.out.println("Ütleme viisakalt bye");
+            System.out.println("Logout");
             dos.writeInt(4);
+
 
         } finally {
             socket.close();
