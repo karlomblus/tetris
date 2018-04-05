@@ -109,15 +109,17 @@ public class Klient extends Application {
         singleplayerbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(!tetrisrunning){
-                Platform.runLater(() -> {
+                if (!tetrisrunning) {
                     try {
+                        TetrisGraafika tetris = new TetrisGraafika();
                         tetrisrunning = true;
-                        new TetrisGraafika().start(new Stage());
+                        tetris.runTetris();
+
                     } catch (Exception e) {
-                        throw new RuntimeException();
+                        throw new RuntimeException(e);
                     }
-                });}
+
+                }
             }
         });
 
