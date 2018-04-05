@@ -12,13 +12,14 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import main.java.chati_leiutis.Klient;
 
 import java.util.HashMap;
 import java.util.Map;
 
-
+//TODO Theo, tegin natuke ümber et seda classi oma lobbys kasutada. Kui tahad näiteks oma tetrist eraldi testida, siis lisa muuda public Scene showTetris tagasi public void start, ja eemdalda lõpust return stseen1.
+//TODO ja lisa classi taha uuesti extent Application
 public class TetrisGraafika extends Application{
+
     private final int resoWidth = 450;
     private final int resoHeight = 600;
     final int ruuduSuurus = 15;
@@ -74,9 +75,10 @@ public class TetrisGraafika extends Application{
         peaLava.setTitle("Tetris");  // lava tiitelribale pannakse tekst
         peaLava.setScene(stseen1);  // lavale lisatakse stseen
         peaLava.showAndWait();  // lava tehakse nähtavaks
+
     }
 
-    public static void main(String[] args) {
+    public static void go() {
         launch();
     }
 }

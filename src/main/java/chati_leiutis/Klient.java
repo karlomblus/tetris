@@ -34,7 +34,6 @@ public class Klient extends Application {
     TextArea ekraan;
     static String nimi;
     boolean tetrisrunning = false;
-    TetrisGraafika tetris = new TetrisGraafika();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -66,7 +65,6 @@ public class Klient extends Application {
         int h = 800;
         Stage primaryStage = new Stage();
         Socket socket = new Socket("localhost", 5000);
-
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
         this.out = output;
 
@@ -111,15 +109,15 @@ public class Klient extends Application {
         singleplayerbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                if(!tetrisrunning){
-                Platform.runLater(() -> {
+                if (!tetrisrunning) {
                     try {
-                        tetrisrunning = true;
-                        new TetrisGraafika().start(new Stage());
+                        TetrisGraafika tetris = new TetrisGraafika();
+                        Stage lava = new Stage();
+                        tetris.start(lava);
                     } catch (Exception e) {
                         throw new RuntimeException();
                     }
-                });}
+                }
             }
         });
 
@@ -197,6 +195,9 @@ public class Klient extends Application {
         } catch (Exception ex) {
             throw new RuntimeException();
         }
+    }
+    public void go() throws Exception{
+        launch();
     }
 
     public static void main(String[] args) throws Exception {
