@@ -106,14 +106,15 @@ public class Klient extends Application {
 
         //TODO pole kindel kas selline lahendus on okei, aga töötab hetkel.
         Button singleplayerbtn = new Button("Singpleplayer");
+        TetrisGraafika tetris = new TetrisGraafika();
         singleplayerbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (!tetrisrunning) {
                     try {
-                        TetrisGraafika tetris = new TetrisGraafika();
                         tetrisrunning = true;
-                        tetris.runTetris();
+                        Stage lava = new Stage();
+                        tetris.start(lava);
 
                     } catch (Exception e) {
                         throw new RuntimeException(e);
