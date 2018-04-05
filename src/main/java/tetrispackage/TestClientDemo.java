@@ -8,7 +8,7 @@ public class TestClientDemo {
     public static void main(String[] args) throws Exception {
 
         System.out.println("Ühendume serveriga");
-        Socket socket = new Socket("127.0.0.1", 54321);
+        Socket socket = new Socket("tetris.carlnet.ee", 54321);
         try (DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
              DataInputStream dis = new DataInputStream(socket.getInputStream())) {
 

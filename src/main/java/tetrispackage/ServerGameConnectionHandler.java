@@ -2,7 +2,6 @@ package tetrispackage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
@@ -195,17 +194,23 @@ public class ServerGameConnectionHandler implements Runnable {
         return dos;
     }
 
+    public boolean isLogin() {
+        return login;
+    }
 
     private void saveChatmessage(DataOutputStream dos, String message) throws Exception {
         //todo: salvestame sql-i
 
+        ServerMain.debug(8, "lobbychatmessage " + username + ": " + message);
         for (ServerGameConnectionHandler player : players) {
             DataOutputStream dos2 = player.getDos();
             synchronized (dos2) {
-                dos2.writeInt(5);
-                dos2.writeUTF(username);
-                dos2.writeUTF(message);
-                ServerMain.debug(9,"lobbychatmessage " + username + " -> " + player.getUsername()+" : "+ message);
+                if (!player.isLogin()) { // kui kasutaja on juba sisse loginud
+                    dos2.writeInt(5);
+                    dos2.writeUTF(username);
+                    dos2.writeUTF(message);
+                    //ServerMain.debug(9, "lobbychatmessage " + username + " -> " + player.getUsername() + " : " + message);
+                }
             } // sync
         } // iter
 
