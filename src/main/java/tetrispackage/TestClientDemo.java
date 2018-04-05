@@ -32,32 +32,50 @@ public class TestClientDemo {
             dos.writeInt(2);
             dos.writeUTF("UusUsername");
             dos.writeUTF("UusParool");
-
-
             loesisendit(dis);
+
+            System.out.println("ootame lõpmatuseni kuni tuleb chatmessage");
+            System.out.println(dis.readInt());
+            System.out.println(dis.readUTF());
+            System.out.println(dis.readUTF());
+
+
+            //System.out.println("Küsime userlisti");
+            //dos.writeInt(3);
+            //loesisendit(dis);
 /*
-            System.out.println("Küsime userlisti");
-            dos.writeInt(3);
-
-            loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
-
             System.out.println("Ütleme chatis tere");
             dos.writeInt(5);
-            dos.writeUTF("Tere kes te kõik siin olete");
+            dos.writeUTF("Tere kes te kõik siin olete (esimene kasutaja)");
+            loesisendit(dis);
+            Thread.sleep(500);
 
-            loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
+            dos.writeInt(5);
+            dos.writeUTF("Tere2 kes te kõik siin olete (esimene kasutaja)");
+            loesisendit(dis);
+            Thread.sleep(500);
+
+            dos.writeInt(5);
+            dos.writeUTF("Tere3 kes te kõik siin olete (esimene kasutaja)");
+            loesisendit(dis);
+            Thread.sleep(500);
+            dos.writeInt(5);
+            dos.writeUTF("Tere4 kes te kõik siin olete (esimene kasutaja)");
+            loesisendit(dis);
+            Thread.sleep(500);
 
             System.out.println("Küsime olemasolevaid mänge, et neid kuskil kuvada");
             dos.writeInt(6);
 
-            loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
+            loesisendit(dis);
 
-
+            for (int i = 0; i < 5; i++) {
+                Thread.sleep(1000);
+                loesisendit(dis);
+            }
 */
-            Thread.sleep(1000);
-            loesisendit(dis);
-            Thread.sleep(1000);
-            loesisendit(dis);
+
+
             Thread.sleep(20000); // ootame serveri vastuse ära enne kui toru maha viskame; ei ole hea viis
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
 
@@ -73,6 +91,7 @@ public class TestClientDemo {
 
     private static void loesisendit(DataInputStream dis) throws Exception {
         System.out.println("Loeme serveri vastust");
+
         while (dis.available() > 0) {  // seda konstruktsiooni ei soovitatud vist üldse kasutada
             int servervastus = dis.readInt();
             switch (servervastus) {
@@ -84,6 +103,9 @@ public class TestClientDemo {
                     break;
                 case 3:
                     System.out.println("Userlist: uid: " + dis.readInt() + ", name: " + dis.readUTF());
+                    break;
+                case 5:
+                    System.out.println("Chatmessage: user: " + dis.readUTF() + ", message: " + dis.readUTF());
                     break;
                 case 6:
                     System.out.println("Running games: id: " + dis.readInt() + ", players: " + dis.readUTF() + " ja " + dis.readUTF());

@@ -27,6 +27,12 @@ public class TestClientDemo2 {
 
             loesisendit(dis);
 
+            // kirjutame chatti
+            dos.writeInt(5);
+            dos.writeUTF("TeineTest tahab ka midagi öelda");
+            dos.writeInt(5);
+            dos.writeUTF("TeineTest Ütleb veel midagi");
+
 
             /*
 
@@ -73,6 +79,9 @@ public class TestClientDemo2 {
                     break;
                 case 3:
                     System.out.println("Userlist: uid: " + dis.readInt() + ", name: " + dis.readUTF());
+                    break;
+                case 5:
+                    System.out.println("Chatmessage: user: " + dis.readUTF() + ", message: " + dis.readUTF());
                     break;
                 case 6:
                     System.out.println("Running games: id: " + dis.readInt() + ", players: " + dis.readUTF() + " ja " + dis.readUTF());

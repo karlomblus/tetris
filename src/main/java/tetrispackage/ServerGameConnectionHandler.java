@@ -11,6 +11,7 @@ public class ServerGameConnectionHandler implements Runnable {
     // siin tegeleme sissetulnud mängu ühendustega
     // esialgu faken mingi kasutajaskonna ja sisu
 
+    DataOutputStream dos; // selle useri data output
     private Socket socket;
     private boolean connected = true; // kui see maha keeratakse, siis on sessioon läbi
     private boolean login = true;  // kasutaja on logimisfaasis
@@ -42,7 +43,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
         try (DataInputStream dis = new DataInputStream(socket.getInputStream());
              DataOutputStream dos = new DataOutputStream(socket.getOutputStream())) {
-
+            this.dos = dos;
             while (connected) {
                 int command = dis.readInt();
 
@@ -88,7 +89,7 @@ public class ServerGameConnectionHandler implements Runnable {
             try {
                 players.remove(this);
                 ServerMain.debug("Sulgeme socketi");
-                ServerMain.debug(6,"Allesjäänud mängijad: "+ players);
+                ServerMain.debug(6, "Allesjäänud mängijad: " + players);
                 socket.close();
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -123,7 +124,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 dos.writeInt(1);
                 dos.writeUTF("OK, kasutaja loodud, oled sisselogitud");
                 userid = result;
-                this.username=username;
+                this.username = username;
                 login = false;
             } else {
                 dos.writeInt(-1);
@@ -147,7 +148,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
                 userid = Integer.parseInt(andmebaasist[0]);
-                this.username=username;
+                this.username = username;
                 login = false;
             } else {
                 dos.writeInt(-1);
@@ -170,7 +171,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
         }
 
-        // todo: reaalne userlist. Hetkel fakeme data
+        // fakeme lisadatat, et testides asi tühi poleks
         dos.writeInt(3);
         dos.writeInt(998);
         dos.writeUTF("Fake1");
@@ -181,23 +182,31 @@ public class ServerGameConnectionHandler implements Runnable {
         dos.writeInt(1000);
         dos.writeUTF("Fake3");
 
-        // variant1:  loeme mälust ette kasutajate listi.  vist on mõtekam
-        // variant2: loeme sql-ist listi ette (teadmata, kas see on õige)
-
-        login = false;
     } // getUserList
 
 
     private void doLogout(DataOutputStream dos) throws Exception {
-        // todo: reaalne
-        // kustutame kasutaja sessioonilistist
-        // eemaldame ta sisseloginud kasutajate listist
+        // while lõpetatakse ära, socketi sulgemisel võetakse ta ka sessioonilistist maha
         connected = false;
     } // doLogout
+
+    public DataOutputStream getDos() {
+        return dos;
+    }
 
     private void saveChatmessage(DataOutputStream dos, String message) throws Exception {
         //todo: salvestame sql-i
         // saadame kõigile seesolijatele välja
+
+        for (ServerGameConnectionHandler player : players) {
+            DataOutputStream dos2 = player.getDos();
+            synchronized (dos2) {
+                dos.writeInt(5);
+                dos.writeUTF(username);
+                dos.writeUTF(message);
+                ServerMain.debug(9,"lobbychatmessage " + username + " -> " + player.getUsername()+" : "+ message);
+            } // sync
+        } // iter
 
     } // saveChatmessage
 
@@ -222,10 +231,8 @@ public class ServerGameConnectionHandler implements Runnable {
     //                                                                   mängupaaride nimekirja sisse
 
 
-
-
     public String toString() {
-        return  username+": Nimi " + username+ " login: " + login + " status " + status;
+        return username + ": Nimi " + username + " login: " + login + " status " + status;
     }
 
 } //ServerGameConnectionHandler class
