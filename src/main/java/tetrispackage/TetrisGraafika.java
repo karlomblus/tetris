@@ -15,8 +15,6 @@ import javafx.util.Duration;
 
 import java.util.*;
 
-//TODO Theo, tegin natuke ümber et seda classi oma lobbys kasutada. Kui tahad näiteks oma tetrist eraldi testida, siis lisa muuda public Scene showTetris tagasi public void start, ja eemdalda lõpust return stseen1.
-//TODO ja lisa classi taha uuesti extent Application
 public class TetrisGraafika extends Application{
 
     private final int resoWidth = 450;
