@@ -43,6 +43,20 @@ public class Klient extends Application {
         this.out = out;
     }
 
+    public void handleIncomingInput(Integer type){
+        switch (type){
+            case 1:
+                //todo do something2...regamine
+            case 2:
+                //todo do smth...sisselogimine
+            case 3:
+                //todo do smth...lobby usertlist/keegi logis sisse
+            case 4:
+                //todo do smth...lobbyst logiti välja
+            case 5:
+                //todo keegi ütles midagi:chatmessage
+        }
+    }
     public void recieveMessage(String message) {
         if (message.equals("logout")) {
             cont = false;

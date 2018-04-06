@@ -21,7 +21,7 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 < 4 i: userid s: username   # lobbyst logis välja
 > 4                         # do logout
 > 5 s: chatmessage          # kirjuta midagi lobby chatti
-< 5 i: userid s:username s: chatmessage          # lobby chatti ütles keegi midagi    (kas useri info on oluline või võib message sees olla)?
+< 5 i: userid s:username s: chatmessage          # lobby chatti ütles keegi midagi    (kas useri info on oluline või võib message sees olla)? Esialgu las olla message sees: Näiteks user+"<< "+message...
 > 6  # get current running games
 < 6 i: gameid s: username1 s: username2
 
