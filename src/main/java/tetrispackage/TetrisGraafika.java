@@ -1,5 +1,4 @@
 package tetrispackage;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -12,11 +11,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.*;
 
 public class TetrisGraafika {
-    
+
     private final int resoWidth = 450;
     private final int resoHeight = 600;
     final int ruuduSuurus = 15;
@@ -61,7 +59,7 @@ public class TetrisGraafika {
         peaLava.setOnCloseRequest((we) -> {
             System.out.println("Tetris stage closed!");
             Platform.exit();
-            //System.exit(0);
+            //PlatformImpl.tkExit()
             tickTime.stop();
         });
         tickTime.setCycleCount(Timeline.INDEFINITE);
