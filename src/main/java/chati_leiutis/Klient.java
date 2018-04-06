@@ -1,10 +1,7 @@
 package chati_leiutis;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.Observable;
 import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -63,6 +60,7 @@ public class Klient extends Application {
         int h = 800;
         Stage primaryStage = new Stage();
         Socket socket = new Socket("localhost", 5000);
+
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
         this.out = output;
 
@@ -103,21 +101,19 @@ public class Klient extends Application {
         ImageView pilt = new ImageView(chatImage);
 
         //TODO pole kindel kas selline lahendus on okei, aga töötab hetkel.
-        Button singleplayerbtn = new Button("Singpleplayer");
+        Button singleplayerbtn = new Button("Singleplayer");
         TetrisGraafika tetris = new TetrisGraafika();
-        singleplayerbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                if (!tetrisrunning) {
-                    try {
-                        TetrisGraafika tetris = new TetrisGraafika();
-                        Stage lava = new Stage();
-                        tetris.start(lava);
+        singleplayerbtn.setOnMouseClicked((MouseEvent) -> {
+            if (!tetrisrunning) {
+                try {
+                    tetrisrunning = true;
+                    Stage lava = new Stage();
+                    tetris.start(lava);
 
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
                 }
-            }}
+            }
         });
 
         StackPane stackPane = new StackPane();
@@ -173,12 +169,9 @@ public class Klient extends Application {
         comp.getChildren().add(namelabel);
         comp.getChildren().add(nameField);
         Button niminupp = new Button("Log in");
-        niminupp.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                nimi = nameField.getText();
-                newStage.close();
-            }
+        niminupp.setOnMouseClicked((event) -> {
+            nimi = nameField.getText();
+            newStage.close();
         });
         Scene stageScene = new Scene(comp, 300, 300);
         comp.getChildren().add(niminupp);
@@ -194,9 +187,6 @@ public class Klient extends Application {
         } catch (Exception ex) {
             throw new RuntimeException();
         }
-    }
-    public void go() throws Exception{
-        launch();
     }
 
     public static void main(String[] args) throws Exception {
