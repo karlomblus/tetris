@@ -29,15 +29,15 @@ public class TetrisGraafika {
         for (int i = 0; i < mitukuubikutPikkuses; i++) {
             for (int j = 0; j < mitukuubikutLaiuses; j++) {
                 ristkülik[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
-                ristkülik[i][j].setStroke(Color.RED);
+                ristkülik[i][j].setStroke(Color.LIGHTGRAY);
                 juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
         tetromino = new Tetromino(ristkülik);
 
-        char[] possibleTetrominos = {'I', 'O', 'Z', 'S'};
+        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T'};
         Random rand = new Random();
-        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.03), new EventHandler<ActionEvent>() {
+        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
             char randomTetromino = 'S';
 
             @Override
@@ -74,7 +74,9 @@ public class TetrisGraafika {
                 if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
                     tetromino.moveLeft();
                 }
-
+            }
+            if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
+                tetromino.rotate();
             }
 
         });
