@@ -37,8 +37,8 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 
 < 105 s: chatmessage                 # teine mängija ütles midagi
 > 105 s: chatmessage                 # mängija ütles midagi
-< 106 s/i(?): teinemängija           # mängija kutsub sind mängima. aksepteerimiseks vasta kutsele nagu saadaks kutse
-> 106 s/i(?): teinemängija           # kutsume teise mängija mängima / vastame kutsele
+
+# 106 -> 6-7  (kuna need käsud on lobby sees tegelmiseks, siis võiks nummeratsioonis ka lobby asjade sees olla)
 
 
 
