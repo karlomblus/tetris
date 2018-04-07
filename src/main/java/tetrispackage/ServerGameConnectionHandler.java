@@ -30,7 +30,7 @@ public class ServerGameConnectionHandler implements Runnable {
     }
 
     public int getUserid() {
-        return ;
+        return userid;
     }
 
     public String getUsername() {
