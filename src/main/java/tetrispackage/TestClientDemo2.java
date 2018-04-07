@@ -1,7 +1,5 @@
 package tetrispackage;
 
-import javafx.application.Application;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

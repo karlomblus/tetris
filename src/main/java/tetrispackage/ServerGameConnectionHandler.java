@@ -3,6 +3,7 @@ package tetrispackage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
@@ -137,6 +138,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 userid = result;
                 this.username = username;
                 login = false;
+                sendLoginmessageToAll();
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutaja lisamine andmebaasi ebaõnnestus");
@@ -170,18 +172,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 userid = Integer.parseInt(andmebaasist[0]);
                 this.username = username;
                 login = false;
-
-                for (ServerGameConnectionHandler player : players) {
-                    DataOutputStream dos2 = player.getDos();
-                    synchronized (dos2) {
-                        if (!player.isLogin()) { // kõigile sisseloginutele
-                            dos2.writeInt(3);
-                            dos2.writeInt(userid);
-                            dos2.writeUTF(username);
-                        }
-                    } // sync
-                } // iter
-
+                sendLoginmessageToAll();
 
             } else {
                 dos.writeInt(-1);
@@ -194,6 +185,20 @@ public class ServerGameConnectionHandler implements Runnable {
 
         } // sync
     } // doLogin
+
+    // saadab kõigile teate, et see kasujaja logis sisse
+    private void sendLoginmessageToAll() throws IOException {
+        for (ServerGameConnectionHandler player : players) {
+            DataOutputStream dos2 = player.getDos();
+            synchronized (dos2) {
+                if (!player.isLogin()) { // kõigile sisseloginutele
+                    dos2.writeInt(3);
+                    dos2.writeInt(userid);
+                    dos2.writeUTF(username);
+                }
+            } // sync
+        } // iter
+    }
 
 
     private void getUserList(DataOutputStream dos) throws Exception {
