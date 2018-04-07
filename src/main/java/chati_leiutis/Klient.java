@@ -30,6 +30,8 @@ public class Klient extends Application {
     static String nimi;
     TextField konsool;
     ClientThread listener;
+    PasswordField userpasswordField;
+    TextField usernamefield;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -59,9 +61,7 @@ public class Klient extends Application {
 
     public void sendSomething(Integer type) throws IOException {
         if (connected) {
-            //temporary names/pswrd for testing
-            String tempnimi = "Ingo";
-            String temppassword = "ingopass";
+            //temp id(testing)
             int tempid = 7;
 
             out.flush();
@@ -70,11 +70,11 @@ public class Klient extends Application {
             switch (type) {
                 case 1:
                     out.writeInt(type);
-                    logIn_or_Register(tempnimi, temppassword);
+                    logIn_or_Register();
                     break;
                 case 2:
                     out.writeInt(type);
-                    logIn_or_Register(tempnimi, temppassword);
+                    logIn_or_Register();
                     break;
                 case 3:
                     out.writeInt(type);
@@ -98,11 +98,12 @@ public class Klient extends Application {
         }
     }
 
-    public void logIn_or_Register(String username, String password) throws IOException {
-        out.writeUTF(username);
-        System.out.println("saatsin nime");
-        out.writeUTF(password);
-        System.out.println("saatsin pswrd");
+    public void logIn_or_Register() throws IOException {
+        //nimi
+        out.writeUTF(usernamefield.getText());
+        out.writeUTF(userpasswordField.getText());
+        userpasswordField.clear();
+        usernamefield.clear();
     }
 
     public void recieveMessage(int userID, String username, String message) {
@@ -233,6 +234,8 @@ public class Klient extends Application {
         nameField.setPromptText("Enter your name here...");
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter your password here");
+        usernamefield = nameField;
+        userpasswordField = passwordField;
 
         comp.getChildren().add(namelabel);
         comp.getChildren().add(nameField);
@@ -262,6 +265,9 @@ public class Klient extends Application {
         nameField.setPromptText("Enter your name here...");
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter your password here");
+        usernamefield = nameField;
+        userpasswordField = passwordField;
+
 
         comp.getChildren().add(namelabel);
         comp.getChildren().add(nameField);
@@ -274,7 +280,6 @@ public class Klient extends Application {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
             newStage.close();
         });
 
