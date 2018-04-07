@@ -2,6 +2,7 @@ package tetrispackage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
@@ -48,7 +49,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 int command = dis.readInt();
 
                 if (login) {
-
+                    ServerMain.debug(6,"kasutajalt (LOGIN) "+username+ " tuli command: " +command);
                     switch (command) {
                         case 1: // uue konto registreerimine
                             createAccount(dos, dis.readUTF(), dis.readUTF());
@@ -62,6 +63,7 @@ public class ServerGameConnectionHandler implements Runnable {
                     continue;
                 } // login
 
+                ServerMain.debug(6,"kasutajalt "+username+ " tuli command: " +command);
                 switch (command) {
                     case 3: // get userlist
                         getUserList(dos);
@@ -80,10 +82,11 @@ public class ServerGameConnectionHandler implements Runnable {
                 } // command switch
             } // while connected
 
-        } catch (SocketException e) {
+        } catch (SocketException | EOFException e) {
             // Kas siis võin ilma põhjuseta kinni püüda kui ma ei taha, et see edasi throwtakse ning tahan lihtsalt viisakalt olukorda lõpetada?
             ServerMain.debug("Teine pool sulges ootamatult socketi, teeme siis sama");
         } catch (Exception e) {
+            ServerMain.debug(1,"Tuli sisse ootamatu exception, sureme maha");
             throw new RuntimeException(e);
         } finally {
             try {
@@ -107,11 +110,18 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
         synchronized (dos) {
+            if(username.length()<2) {
+                dos.writeInt(-1);
+                dos.writeUTF("Kasutajanimi liiga lühike");
+                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " liiga lühike.");
+                return;
+            }
             String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
             dos.writeInt(1);
             if (uid.length() > 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Valitud kasutajanimi on juba olemas");
+                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " on juba olemas.");
                 return;
             }
 
@@ -123,12 +133,14 @@ public class ServerGameConnectionHandler implements Runnable {
                 // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
                 dos.writeInt(1);
                 dos.writeUTF("OK, kasutaja loodud, oled sisselogitud");
+                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " loodud.");
                 userid = result;
                 this.username = username;
                 login = false;
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutaja lisamine andmebaasi ebaõnnestus");
+                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " lisamine baasi ebaõnnestus.");
             }
         } // sync
     } // createAccount
@@ -137,22 +149,44 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         synchronized (dos) {
             dos.writeInt(2);
+            if(username.length()<2) {
+                dos.writeInt(-1);
+                dos.writeUTF("Kasutajanimi liiga lühike");
+                ServerMain.debug(5,"dologin: Kasutajanimi " + username+ " liiga lühike.");
+                return;
+            }
             String[] andmebaasist = ServerMain.sql.query(2, "select id,password from users where username = ?", username);
             if (andmebaasist[0].length() == 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
+                ServerMain.debug(5,"dologin: Kasutajanime " + username+ " ei ole.");
                 return;
             }
             boolean passwordMatch = ServerPasswordCrypto.verifyUserPassword(password, andmebaasist[1]);
             if (passwordMatch) {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
+                ServerMain.debug(5,"dologin: Kasutajanimi " + username+ " OK, loggedin.");
                 userid = Integer.parseInt(andmebaasist[0]);
                 this.username = username;
                 login = false;
+
+                for (ServerGameConnectionHandler player : players) {
+                    DataOutputStream dos2 = player.getDos();
+                    synchronized (dos2) {
+                        if (!player.isLogin()) { // kõigile sisseloginutele
+                            dos2.writeInt(3);
+                            dos2.writeInt(userid);
+                            dos2.writeUTF(username);
+                        }
+                    } // sync
+                } // iter
+
+
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Vale parool");
+                ServerMain.debug(5,"dologin: Kasutajanimi " + username+ " parool on vale.");
             }
 
             // todo: kui OK, siis salvestame sessioonitabelisse
@@ -188,6 +222,18 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogout(DataOutputStream dos) throws Exception {
         // while lõpetatakse ära, socketi sulgemisel võetakse ta ka sessioonilistist maha
         connected = false;
+        ServerMain.debug(5, "dologout: " + username);
+        for (ServerGameConnectionHandler player : players) {
+            DataOutputStream dos2 = player.getDos();
+            synchronized (dos2) {
+                if (!player.isLogin() && player!=this) { // kõigile sisseloginutele peale enda
+                    dos2.writeInt(4);
+                    dos2.writeInt(userid);
+                    dos2.writeUTF(username);
+                }
+            } // sync
+        } // iter
+
     } // doLogout
 
     public DataOutputStream getDos() {
@@ -239,7 +285,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
     public String toString() {
-        return username + ": Nimi " + username + " login: " + login + " status " + status;
+        return "\n"+userid + ": Nimi " + username + " login: " + login + " status " + status;
     }
 
 } //ServerGameConnectionHandler class

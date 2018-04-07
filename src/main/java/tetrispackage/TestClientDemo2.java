@@ -1,5 +1,8 @@
 package tetrispackage;
 
+import javafx.application.Application;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -81,7 +84,7 @@ public class TestClientDemo2 {
                     System.out.println("Userlist: uid: " + dis.readInt() + ", name: " + dis.readUTF());
                     break;
                 case 5:
-                    System.out.println("Chatmessage: user: " + dis.readUTF() + ", message: " + dis.readUTF());
+                    System.out.println("Chatmessage: uid "+dis.readInt()+", user: " + dis.readUTF() + ", message: " + dis.readUTF());
                     break;
                 case 6:
                     System.out.println("Running games: id: " + dis.readInt() + ", players: " + dis.readUTF() + " ja " + dis.readUTF());
