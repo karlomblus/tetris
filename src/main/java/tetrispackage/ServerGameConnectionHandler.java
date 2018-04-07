@@ -18,18 +18,16 @@ public class ServerGameConnectionHandler implements Runnable {
     private boolean connected = true; // kui see maha keeratakse, siis on sessioon läbi
     private boolean login = true;  // kasutaja on logimisfaasis
     private List<ServerGameConnectionHandler> players; // siin on kõik mängijad
-    private int status = 0;   // 1: lobbys  2: mängib 3: ???
     private int userid = 0;       // mängija userID
     private String username = "";
+    private int invitedUID = 0; // id, keda ma olen mängima kutsunud.
+    private int opponentID = 0; // kellega ta mängib
 
     ServerGameConnectionHandler(Socket socket, List<ServerGameConnectionHandler> players) {
         this.socket = socket;
         this.players = players;
     }
 
-    public int getStatus() {
-        return status;
-    }
 
     public int getUserid() {
         return userid;
@@ -50,7 +48,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 int command = dis.readInt();
 
                 if (login) {
-                    ServerMain.debug(6,"kasutajalt (LOGIN) "+username+ " tuli command: " +command);
+                    ServerMain.debug(6, "kasutajalt (LOGIN) " + username + " tuli command: " + command);
                     switch (command) {
                         case 1: // uue konto registreerimine
                             createAccount(dos, dis.readUTF(), dis.readUTF());
@@ -64,7 +62,7 @@ public class ServerGameConnectionHandler implements Runnable {
                     continue;
                 } // login
 
-                ServerMain.debug(6,"kasutajalt "+username+ " tuli command: " +command);
+                ServerMain.debug(6, "kasutajalt " + username + " tuli command: " + command);
                 switch (command) {
                     case 3: // get userlist
                         getUserList(dos);
@@ -78,6 +76,9 @@ public class ServerGameConnectionHandler implements Runnable {
                     case 6: // get running games
                         getRunningGames(dos);
                         break;
+                    case 7:
+                        inviteToGame(dis.readInt());
+                        break;
                     default:
                         ServerMain.error("Tuli sisse tundmatu/lubamatu command: " + command);
                 } // command switch
@@ -87,7 +88,7 @@ public class ServerGameConnectionHandler implements Runnable {
             // Kas siis võin ilma põhjuseta kinni püüda kui ma ei taha, et see edasi throwtakse ning tahan lihtsalt viisakalt olukorda lõpetada?
             ServerMain.debug("Teine pool sulges ootamatult socketi, teeme siis sama");
         } catch (Exception e) {
-            ServerMain.debug(1,"Tuli sisse ootamatu exception, sureme maha");
+            ServerMain.debug(1, "Tuli sisse ootamatu exception, sureme maha");
             throw new RuntimeException(e);
         } finally {
             try {
@@ -111,10 +112,10 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
         synchronized (dos) {
-            if(username.length()<2) {
+            if (username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike");
-                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " liiga lühike.");
+                ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " liiga lühike.");
                 return;
             }
             String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
@@ -122,7 +123,7 @@ public class ServerGameConnectionHandler implements Runnable {
             if (uid.length() > 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Valitud kasutajanimi on juba olemas");
-                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " on juba olemas.");
+                ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " on juba olemas.");
                 return;
             }
 
@@ -134,7 +135,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
                 dos.writeInt(1);
                 dos.writeUTF("OK, kasutaja loodud, oled sisselogitud");
-                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " loodud.");
+                ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " loodud.");
                 userid = result;
                 this.username = username;
                 login = false;
@@ -142,7 +143,7 @@ public class ServerGameConnectionHandler implements Runnable {
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutaja lisamine andmebaasi ebaõnnestus");
-                ServerMain.debug(5,"createaccount: Kasutajanimi " + username+ " lisamine baasi ebaõnnestus.");
+                ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " lisamine baasi ebaõnnestus.");
             }
         } // sync
     } // createAccount
@@ -151,24 +152,24 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         synchronized (dos) {
             dos.writeInt(2);
-            if(username.length()<2) {
+            if (username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike");
-                ServerMain.debug(5,"dologin: Kasutajanimi " + username+ " liiga lühike.");
+                ServerMain.debug(5, "dologin: Kasutajanimi " + username + " liiga lühike.");
                 return;
             }
             String[] andmebaasist = ServerMain.sql.query(2, "select id,password from users where username = ?", username);
             if (andmebaasist[0].length() == 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
-                ServerMain.debug(5,"dologin: Kasutajanime " + username+ " ei ole.");
+                ServerMain.debug(5, "dologin: Kasutajanime " + username + " ei ole.");
                 return;
             }
             boolean passwordMatch = ServerPasswordCrypto.verifyUserPassword(password, andmebaasist[1]);
             if (passwordMatch) {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
-                ServerMain.debug(5,"dologin: Kasutajanimi " + username+ " OK, loggedin.");
+                ServerMain.debug(5, "dologin: Kasutajanimi " + username + " OK, loggedin.");
                 userid = Integer.parseInt(andmebaasist[0]);
                 this.username = username;
                 login = false;
@@ -177,7 +178,7 @@ public class ServerGameConnectionHandler implements Runnable {
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Vale parool");
-                ServerMain.debug(5,"dologin: Kasutajanimi " + username+ " parool on vale.");
+                ServerMain.debug(5, "dologin: Kasutajanimi " + username + " parool on vale.");
             }
 
             // todo: kui OK, siis salvestame sessioonitabelisse
@@ -231,7 +232,7 @@ public class ServerGameConnectionHandler implements Runnable {
         for (ServerGameConnectionHandler player : players) {
             DataOutputStream dos2 = player.getDos();
             synchronized (dos2) {
-                if (!player.isLogin() && player!=this) { // kõigile sisseloginutele peale enda
+                if (!player.isLogin() && player != this) { // kõigile sisseloginutele peale enda
                     dos2.writeInt(4);
                     dos2.writeInt(userid);
                     dos2.writeUTF(username);
@@ -283,14 +284,52 @@ public class ServerGameConnectionHandler implements Runnable {
 
     } // getRunningGames
 
-    // todo:   mängu kutsumine  : saadame teisele kasutajale kutse. endale jätame meelde, et oleme kutsunud Y
-    // todo    kutsele vastamine: sisuliselt sama kui kutse saatmine, aga teisel peab olema kutsutav minu,id.
-    //         kui vastus õnnestub, siis mõlema staatuseks, et mängib.   lobby nimekirjast maha
-    //                                                                   mängupaaride nimekirja sisse
 
+    public int getInvitedUID() {
+        return invitedUID;
+    }
+
+    public void setOpponentID(int opponentID) {
+        this.opponentID = opponentID;
+    }
+
+    private void inviteToGame(int invitedUID) throws Exception {
+        ServerMain.debug(5, "invitetogame: " + username + " kutsub " + invitedUID + " mängima");
+        for (ServerGameConnectionHandler player : players) {
+            // leidsime mängija, ta tahab minuga ka mängida. anname mõlemale teada
+            if (player.getUserid() == invitedUID && player.getInvitedUID() == invitedUID) {
+                // see mängija kutsus mind ka mängima, seega aksepteerime mängu ja anname mõlemale teada
+                ServerMain.debug(6, "inviteToGame: " + username + " aksepteerib " + player.getUsername());
+                synchronized (dos) {
+                    dos.writeInt(8);
+                    dos.writeInt(player.getUserid());
+                    dos.writeInt(999); // todo: siia leida õige mänguID
+                    opponentID = player.getUserid();
+                } // sync  teade mulle
+                DataOutputStream dos2 = player.getDos();
+                synchronized (dos2) {
+                    dos2.writeInt(8);
+                    dos2.writeInt(userid);
+                    dos2.writeInt(999); // todo: siia leida õige mänguID
+                    player.setOpponentID(userid);
+                } // sync teade teisele
+            }
+            // leidsime mängija, anname talle teada
+            else if (player.getUserid() == invitedUID) {
+                ServerMain.debug(6, "inviteToGame: " + username + " kutsub " + player.getUsername());
+                this.invitedUID = invitedUID;
+                DataOutputStream dos2 = player.getDos();
+                synchronized (dos2) {
+                    dos2.writeInt(7);
+                    dos2.writeInt(userid);
+                    dos2.writeUTF(username);
+                } // sync teade teisele
+            }
+        }
+    } // inviteToGame
 
     public String toString() {
-        return "\n"+userid + ": Nimi " + username + " login: " + login + " status " + status;
+        return "\n" + userid + ": Nimi " + username + " login: " + login +  " invite: " + invitedUID+ "opponent: " + opponentID;
     }
 
 } //ServerGameConnectionHandler class
