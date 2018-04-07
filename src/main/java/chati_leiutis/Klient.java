@@ -23,31 +23,30 @@ import java.io.IOException;
 import java.net.Socket;
 
 public class Klient extends Application {
-    boolean running = false;
-    boolean cont = true;
+    boolean connected = false;
     Socket connection;
     DataOutputStream out;
     TextArea ekraan;
     static String nimi;
-    boolean tetrisrunning = false;
     TextField konsool;
+    ClientThread listener;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         //todo socketite tegemise võiks vist logini juurde viia
-        Socket socket = new Socket("tetris.carlnet.ee", 54321);
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-        DataInputStream input = new DataInputStream(socket.getInputStream());
-        this.connection = socket;
-        this.out = output;
-        System.out.println("Connection to tetris.calnet.ee established...");
+        try (Socket socket = new Socket("tetris.carlnet.ee", 54321);
+             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+             DataInputStream input = new DataInputStream(socket.getInputStream())) {
+            this.connection = socket;
+            this.out = output;
+            System.out.println("Connection to tetris.calnet.ee established...");
 
-        Thread clienthread = new Thread(new ClientThread(socket, this, input));
-        clienthread.start();
-        running = true;
-        showLogIn();
-        showLobby();
-        while (cont) {
+            listener = new ClientThread(socket, this, input);
+            Thread clienthread = new Thread(listener);
+            clienthread.start();
+            connected = true;
+            showLogIn();
+            showLobby();
         }
     }
 
@@ -59,29 +58,43 @@ public class Klient extends Application {
     }
 
     public void sendSomething(Integer type) throws IOException {
-        //temporary names/pswrd for testing
-        String tempnimi = "Ingo";
-        String temppassword = "ingopass";
-        int tempid = 7;
+        if (connected) {
+            //temporary names/pswrd for testing
+            String tempnimi = "Ingo";
+            String temppassword = "ingopass";
+            int tempid = 7;
 
-        out.write(type);
-        System.out.println("Saatsin " + type);
-        //vastavalt prokokollile:
-        switch (type) {
-            case 1:
-                logIn_or_Register(tempnimi, temppassword);
-            case 2:
-                logIn_or_Register(tempnimi, temppassword);
-            case 3:
-                //jääme ootama userlisti
-            case 4:
-                //väljalogimine
-            case 5:
-                sendandclear(konsool);
-            case 6:
-                //ootame tagasi käivate mängude listi
-            default:
-                // ei tee midagi
+            out.flush();
+            System.out.println("Saatsin " + type);
+            //vastavalt prokokollile:
+            switch (type) {
+                case 1:
+                    out.writeInt(type);
+                    logIn_or_Register(tempnimi, temppassword);
+                    break;
+                case 2:
+                    out.writeInt(type);
+                    logIn_or_Register(tempnimi, temppassword);
+                    break;
+                case 3:
+                    out.writeInt(type);
+                    //jääme ootama userlisti
+                    break;
+                case 4:
+                    out.writeInt(type);
+                    //väljalogimine
+                    break;
+                case 5:
+                    out.writeInt(type);
+                    sendAndClearField(konsool);
+                    break;
+                case 6:
+                    out.writeInt(type);
+                    //ootame tagasi käivate mängude listi
+                    break;
+                default:
+                    // ei tee midagi
+            }
         }
     }
 
@@ -93,13 +106,7 @@ public class Klient extends Application {
     }
 
     public void recieveMessage(int userID, String username, String message) {
-        if (message.equals("logout")) {
-            cont = false;
-            System.exit(0);
-        }//TODO halb?, midagi paremat peaks välja mõtlema)
-        else {
             ekraan.appendText(username + ">> " + message + "\n");
-        }
     }
 
     public void showLobby() throws Exception {
@@ -180,8 +187,17 @@ public class Klient extends Application {
 
         messagefield.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
+                //kui kirjutame logout, siis logime välja
                 try {
-                    sendSomething(5);
+                    if (messagefield.getText().equals("logout")) {
+                        sendSomething(4);
+                        messagefield.clear();
+                        ekraan.appendText("You have been disconnected...");
+                        listener.shutDown();
+                        out.close();
+                        connected = false;
+                    } else
+                        sendSomething(5);
                 } catch (Exception e3) {
                     throw new RuntimeException(e3);
                 }
@@ -272,7 +288,7 @@ public class Klient extends Application {
         nupudkõrvuti.getChildren().addAll(login_nupp, registreerimis_nupp);
         comp.getChildren().add(nupudkõrvuti);
         newStage.setScene(stageScene);
-        newStage.show();
+        newStage.showAndWait();
     }
 
     public void sendMessage(String msg) throws Exception {
@@ -280,7 +296,7 @@ public class Klient extends Application {
         out.flush();
     }
 
-    public void sendandclear(TextField ekraan) {
+    public void sendAndClearField(TextField ekraan) {
         try {
             out.writeUTF(ekraan.getText());
             out.flush();
