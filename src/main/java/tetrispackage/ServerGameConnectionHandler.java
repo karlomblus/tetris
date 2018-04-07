@@ -259,6 +259,7 @@ public class ServerGameConnectionHandler implements Runnable {
             synchronized (dos2) {
                 if (!player.isLogin()) { // kui kasutaja on juba sisse loginud
                     dos2.writeInt(5);
+
                     dos2.writeInt(userid);
                     dos2.writeUTF(username);
                     dos2.writeUTF(message);
