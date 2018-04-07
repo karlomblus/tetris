@@ -48,7 +48,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 int command = dis.readInt();
 
                 if (login) {
-                    ServerMain.debug(6, "kasutajalt (LOGIN) " + username + " tuli command: " + command);
+                    //ServerMain.debug(6, "kasutajalt (LOGIN) " + username + " tuli command: " + command);
                     switch (command) {
                         case 1: // uue konto registreerimine
                             createAccount(dos, dis.readUTF(), dis.readUTF());
@@ -62,7 +62,7 @@ public class ServerGameConnectionHandler implements Runnable {
                     continue;
                 } // login
 
-                ServerMain.debug(6, "kasutajalt " + username + " tuli command: " + command);
+                //ServerMain.debug(6, "kasutajalt " + username + " tuli command: " + command);
                 switch (command) {
                     case 3: // get userlist
                         getUserList(dos);
@@ -134,12 +134,12 @@ public class ServerGameConnectionHandler implements Runnable {
             if (result > 0) {
                 // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
                 dos.writeInt(1);
-                dos.writeUTF("OK, kasutaja loodud, oled sisselogitud");
+                dos.writeUTF("OK, kasutaja loodud, Ingo tahab, et logiksid eraldi sisse");
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " loodud.");
-                userid = result;
-                this.username = username;
-                login = false;
-                sendLoginmessageToAll();
+                //userid = result;
+                //this.username = username;
+                //login = false;
+                //sendLoginmessageToAll();
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutaja lisamine andmebaasi ebaõnnestus");
