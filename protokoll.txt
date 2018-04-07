@@ -1,4 +1,4 @@
-
+>
 Karli nägemus võrguprotokollist.
 
 Lihtsuse huvideks võiks kasutada DataInputStream/DataOutputStream-i, siis ei pea ise leiutama andmepakettide mõõtude pärast.
@@ -24,8 +24,9 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 < 5 i: userid s:username s: chatmessage          # lobby chatti ütles keegi midagi    (kas useri info on oluline või võib message sees olla)? Esialgu las olla message sees: Näiteks user+"<< "+message...
 > 6  # get current running games
 < 6 i: gameid s: username1 s: username2
-
-peaks vist piisavalt olema, et esimene lobby vaade ära teha?
+> 7 i: userid               # saadad userile userID kutse mängida
+< 7 i: userid s: username   # userid/username saadab sulle kutse mängida. aksepteerimiseks saada kutse vastu (rida eespool)
+< 8 i: userid i: gameid     # server ütleb, et teil algab mäng (kahepoolne kutse toimis)
 
 
 < 100 i: tickid  # serveri "tiks", et klotsid langeks. ID, et neil vahet teha
