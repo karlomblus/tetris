@@ -101,30 +101,28 @@ public class Tetromino {
         }
         System.out.println("Rotate triggered!");
         int minI = activeRectCoordI.get(0);
-        for (int i : activeRectCoordI) {
-            if (i < minI) {
-                minI = i;
-            }
-        }
         int minJ = activeRectCoordJ.get(0);
-        for (int j : activeRectCoordJ) {
-            if (j < minJ) {
-                minJ = j;
+        for (int i = 0; i < activeRectCoordI.size(); i++) {
+            if (activeRectCoordI.get(i) < minI) {
+                minI = activeRectCoordI.get(i);
+            }
+            if (activeRectCoordJ.get(i) < minJ) {
+                minJ = activeRectCoordJ.get(i);
             }
         }
         // We know that all of the active blocks are of the same type of tetromino
-        if (tetrominoType != 'i' && tetrominoType != 'o') {
-            char[][] matrix = {{'P', 'P', 'P'},
-                    {'P', 'P', 'P'},
-                    {'P', 'P', 'P'}};
+        if (tetrominoType != 'O') {
+            char[][] matrix = {{'P', 'P', 'P'}, {'P', 'P', 'P'}, {'P', 'P', 'P'}};
+            //matrix = new char[][] {"PPP".toCharArray(), "PPP".toCharArray()};
+            if (tetrominoType == 'I') {
+                matrix = new char[][] {"PPPP".toCharArray(), "PPPP".toCharArray(), "PPPP".toCharArray(), "PPPP".toCharArray()};
+            }
             for (int i = 0; i < activeRectCoordI.size(); i++) {
+                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
                 matrix[activeRectCoordI.get(i) - minI][activeRectCoordJ.get(i) - minJ] = 'A';
             }
             transponeeri(matrix);
             vahetaRead(matrix);
-            for (int k = 0; k < activeRectCoordI.size(); k++) {
-                setRectStatusAt(activeRectCoordI.get(k), activeRectCoordJ.get(k), 'P');
-            }
             int i = 0;
             for (int r = 0; r < matrix.length; r++) {
                 for (int v = 0; v < matrix[r].length; v++) {

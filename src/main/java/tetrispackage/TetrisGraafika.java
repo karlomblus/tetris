@@ -11,6 +11,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.sql.Time;
 import java.util.*;
 
 public class TetrisGraafika {
@@ -78,7 +80,6 @@ public class TetrisGraafika {
             if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
                 tetromino.rotate();
             }
-
         });
         tetrisStseen.setOnKeyReleased(event ->
                 currentActiveKeys.put(event.getCode(), false)
