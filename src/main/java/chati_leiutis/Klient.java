@@ -50,12 +50,12 @@ public class Klient extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         //todo socketite tegemise võiks vist logini juurde viia
-        try (Socket socket = new Socket("localhost", 54321);
+        try (Socket socket = new Socket("tetris.carlnet.ee", 54321);
              DataOutputStream output = new DataOutputStream(socket.getOutputStream());
              DataInputStream input = new DataInputStream(socket.getInputStream())) {
             this.connection = socket;
             this.out = output;
-            System.out.println("Connection to tetris.calnet.ee established...");
+            System.out.println("Connection to tetris.carlnet.ee established...");
 
             listener = new ClientThread(socket, this, input, toLoginorNot);
             Thread clienthread = new Thread(listener);
