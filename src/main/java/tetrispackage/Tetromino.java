@@ -15,6 +15,7 @@ public class Tetromino {
     private Color activeTetrominoColor;
     private Rectangle[][] ruudud;
     private boolean allActiveToPassive = false;
+    private  boolean allFallingToPassive = false;
     private char tetrominoType;
     private int tetrominoRotationTracker = 0;
 
@@ -113,9 +114,209 @@ public class Tetromino {
             for (int i = 0; i < ruudud[0].length; i++) {
                 setRectStatusAt(filledRowNumber, i, 'B');
             }
+            setAllAboveToFalling(filledRowNumber);
         }
         return isFilled;
     }
+    void setAllAboveToFalling (int deletedRow){
+        for (int i = 0; i < deletedRow; i++) {
+            for (int j = 0; j < ruudud[0].length; j++) {
+                if (getRectStatusAt(i, j) == 'P')
+                setRectStatusAt(i ,j, 'F');
+            }
+        }
+    }
+
+
+    private void transponeeri(char[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = i; j < matrix[i].length; j++) {
+                char ajutine = matrix[i][j];
+                matrix[i][j] = matrix[j][i];
+                matrix[j][i] = ajutine;
+            }
+        }
+        System.out.println("Transponeeritud:");
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                System.out.print(matrix[i][j]);
+            }
+            System.out.println();
+        }
+    }
+
+    private void vahetaRead(char[][] matrix) {
+        for (int i = 0; i < matrix.length / 2; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                char ajutine = matrix[i][j];
+                matrix[i][j] = matrix[(matrix.length - 1) - i][j];
+                matrix[(matrix.length - 1) - i][j] = ajutine;
+            }
+        }
+        System.out.println("Read vahetatud:");
+        for (int k = 0; k < matrix.length; k++) {
+            for (int l = 0; l < matrix[k].length; l++) {
+                System.out.print(matrix[k][l]);
+            }
+            System.out.println();
+        }
+    }
+
+    void tick() {
+        List<Integer> activeRectCoordI = new ArrayList<>();
+        List<Integer> activeRectCoordJ = new ArrayList<>();
+        List<Integer> fallingRectCoordI = new ArrayList<>();
+        List<Integer> fallingRectCoordJ = new ArrayList<>();
+        for (int i = ruudud.length - 1; i >= 0; i--) {  //Find all active blocks and check if all active blocks need to be set to passive
+            for (int j = ruudud[i].length - 1; j >= 0; j--) {
+                if (getRectStatusAt(i, j) == 'A') {
+                    activeRectCoordI.add(i); //remember where the active blocks are
+                    activeRectCoordJ.add(j);
+                    if (i + 1 == ruudud.length || getRectStatusAt(i + 1, j) == 'P') {
+                        allActiveToPassive = true;
+                    }
+                }
+                if (getRectStatusAt(i, j) == 'F') {
+                    fallingRectCoordI.add(i); //remember where the falling blocks are
+                    fallingRectCoordJ.add(j);
+                    if (i + 1 == ruudud.length || getRectStatusAt(i + 1, j) == 'P') {
+                        allFallingToPassive = true;
+                    }
+                }
+            }
+        }
+        if (allActiveToPassive) {
+            System.out.println("All active to passive!");
+            for (int k = 0; k < ruudud.length; k++) {
+                for (int l = 0; l < ruudud[k].length; l++) {
+                    if (getRectStatusAt(k, l) == 'A') {
+                        setRectStatusAt(k, l, 'P');
+                    }
+                }
+            }
+            drawingTurns = 2;
+            allowTetrominoDrawing = true;
+            allActiveToPassive = false;
+        } else if (!allActiveToPassive) {
+            for (int i = 0; i < activeRectCoordI.size(); i++) {
+                setRectStatusAt(activeRectCoordI.get(i) + 1, activeRectCoordJ.get(i), 'A');
+                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
+            }
+        }
+        if (allFallingToPassive){
+            System.out.println("All falling to passive!OOOOOOOOOOOOOOO");
+            for (int k = 0; k < ruudud.length; k++) {
+                for (int l = 0; l < ruudud[k].length; l++) {
+                    if (getRectStatusAt(k, l) == 'F') {
+                        setRectStatusAt(k, l, 'P');
+                    }
+                }
+            }
+            allFallingToPassive = false;
+        }
+        else if (!allFallingToPassive) {
+            for (int i = 0; i < fallingRectCoordI.size(); i++) {
+                setRectStatusAt(fallingRectCoordI.get(i) + 1, fallingRectCoordJ.get(i), 'F');
+                ruudud[fallingRectCoordI.get(i)+1][fallingRectCoordJ.get(i)].setFill
+                        (ruudud[fallingRectCoordI.get(i)][fallingRectCoordJ.get(i)].getFill());
+                ruudud[fallingRectCoordI.get(i)+1][fallingRectCoordJ.get(i)].setStroke
+                        (ruudud[fallingRectCoordI.get(i)][fallingRectCoordJ.get(i)].getStroke());
+                setRectStatusAt(fallingRectCoordI.get(i), fallingRectCoordJ.get(i), 'B');
+            }
+        }
+    }
+
+    //Tetriminos I O T J L S Z
+    void draw(char tetrominoType) {
+        this.tetrominoType = tetrominoType;
+
+        drawingTurns -= 1;
+        tetrominoRotationTracker = 0;
+        if (tetrominoType == 'I') {
+            int i = 0;
+            int j = 0;
+            activeTetrominoColor = Color.CYAN;
+            for (; j < 4; j++) {
+                setRectStatusAt(i, j, 'A');
+            }
+            drawingTurns -= 1;
+        } else if (tetrominoType == 'O') {
+            activeTetrominoColor = Color.YELLOW;
+            setRectStatusAt(0, 0, 'A');
+            setRectStatusAt(0, 1, 'A');
+        } else if (tetrominoType == 'Z') {
+            if (drawingTurns == 1) {
+                activeTetrominoColor = Color.RED;
+                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, 2, 'A');
+            } else {
+                setRectStatusAt(0, 0, 'A');
+                setRectStatusAt(0, 1, 'A');
+            }
+        } else if (tetrominoType == 'S') {
+            activeTetrominoColor = Color.LIME;
+            if (drawingTurns == 1) {
+                setRectStatusAt(0, 0, 'A');
+                setRectStatusAt(0, 1, 'A');
+            } else {
+                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, 2, 'A');
+            }
+        } else if (tetrominoType == 'T') {
+            activeTetrominoColor = Color.PURPLE;
+            if (drawingTurns == 1) {
+                setRectStatusAt(0, 0, 'A');
+                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, 2, 'A');
+
+            } else {
+                setRectStatusAt(0, 1, 'A');
+            }
+        }
+        else if (tetrominoType == 'L') {
+            activeTetrominoColor = Color.ORANGE;
+            if (drawingTurns == 0) {
+                setRectStatusAt(0, 2, 'A');
+
+            } else {
+                setRectStatusAt(0, 0, 'A');
+                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, 2, 'A');
+            }
+        }
+        else if (tetrominoType == 'J') {
+            activeTetrominoColor = Color.BLUE;
+            if (drawingTurns == 0) {
+                setRectStatusAt(0, 0, 'A');
+
+            } else {
+                setRectStatusAt(0, 0, 'A');
+                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, 2, 'A');
+            }
+        }
+        if (drawingTurns == 0) {
+            System.out.println("TetriminoDrawing false!");
+            setDrawingPermission(false);
+        }
+    }
+
+    public void setDrawingPermission(boolean allowTetrominoDrawing) {
+        this.allowTetrominoDrawing = allowTetrominoDrawing;
+    }
+
+    public boolean isDrawingAllowed() {
+        return allowTetrominoDrawing;
+    }
+
+    public int getDrawingTurns() {
+        return drawingTurns;
+    }
+
+    public void setDrawingTurns(int drawingTurns) {
+        this.drawingTurns = drawingTurns;
+    }
+
     void rotateLeft() {
         if (tetrominoType == 'O'){
             return;
@@ -382,7 +583,7 @@ public class Tetromino {
             if (changedActiveRectCoordI.get(i) < 0 || changedActiveRectCoordJ.get(i) < 0
                     || changedActiveRectCoordI.get(i) >= ruudud.length ||
                     changedActiveRectCoordJ.get(i) >= ruudud[0].length ||
-            getRectStatusAt(changedActiveRectCoordI.get(i),changedActiveRectCoordJ.get(i)) == 'P'){
+                    getRectStatusAt(changedActiveRectCoordI.get(i),changedActiveRectCoordJ.get(i)) == 'P'){
                 canRotate = false;
             }
         }
@@ -399,167 +600,5 @@ public class Tetromino {
                 setRectStatusAt(changedActiveRectCoordI.get(i), changedActiveRectCoordJ.get(i), 'A');
             }
         }
-    }
-
-    private void transponeeri(char[][] matrix) {
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = i; j < matrix[i].length; j++) {
-                char ajutine = matrix[i][j];
-                matrix[i][j] = matrix[j][i];
-                matrix[j][i] = ajutine;
-            }
-        }
-        System.out.println("Transponeeritud:");
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                System.out.print(matrix[i][j]);
-            }
-            System.out.println();
-        }
-    }
-
-    private void vahetaRead(char[][] matrix) {
-        for (int i = 0; i < matrix.length / 2; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                char ajutine = matrix[i][j];
-                matrix[i][j] = matrix[(matrix.length - 1) - i][j];
-                matrix[(matrix.length - 1) - i][j] = ajutine;
-            }
-        }
-        System.out.println("Read vahetatud:");
-        for (int k = 0; k < matrix.length; k++) {
-            for (int l = 0; l < matrix[k].length; l++) {
-                System.out.print(matrix[k][l]);
-            }
-            System.out.println();
-        }
-    }
-
-    void tick() {
-        List<Integer> activeRectCoordI = new ArrayList<>();
-        List<Integer> activeRectCoordJ = new ArrayList<>();
-        for (int i = ruudud.length - 1; i >= 0; i--) {  //Find all active blocks and check if all active blocks need to be set to passive
-            for (int j = ruudud[i].length - 1; j >= 0; j--) {
-                if (getRectStatusAt(i, j) == 'A') {
-                    activeRectCoordI.add(i); //remember where the active blocks are
-                    activeRectCoordJ.add(j);
-                    if (i + 1 == ruudud.length || getRectStatusAt(i + 1, j) == 'P') {
-                        allActiveToPassive = true;
-                    }
-
-                }
-            }
-        }
-        if (allActiveToPassive) {
-            System.out.println("All active to passive!");
-            for (int k = 0; k < ruudud.length; k++) {
-                for (int l = 0; l < ruudud[k].length; l++) {
-                    if (getRectStatusAt(k, l) == 'A') {
-                        setRectStatusAt(k, l, 'P');
-                    }
-                }
-            }
-            drawingTurns = 2;
-            allowTetrominoDrawing = true;
-            allActiveToPassive = false;
-        } else if (!allActiveToPassive) {
-            for (int i = 0; i < activeRectCoordI.size(); i++) {
-                setRectStatusAt(activeRectCoordI.get(i) + 1, activeRectCoordJ.get(i), 'A');
-                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
-            }
-
-
-        }
-    }
-
-    //Tetriminos I O T J L S Z
-    void draw(char tetrominoType) {
-        this.tetrominoType = tetrominoType;
-
-        drawingTurns -= 1;
-        tetrominoRotationTracker = 0;
-        if (tetrominoType == 'I') {
-            int i = 0;
-            int j = 0;
-            activeTetrominoColor = Color.CYAN;
-            for (; j < 4; j++) {
-                setRectStatusAt(i, j, 'A');
-            }
-            drawingTurns -= 1;
-        } else if (tetrominoType == 'O') {
-            activeTetrominoColor = Color.YELLOW;
-            setRectStatusAt(0, 0, 'A');
-            setRectStatusAt(0, 1, 'A');
-        } else if (tetrominoType == 'Z') {
-            if (drawingTurns == 1) {
-                activeTetrominoColor = Color.RED;
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
-            } else {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-            }
-        } else if (tetrominoType == 'S') {
-            activeTetrominoColor = Color.LIME;
-            if (drawingTurns == 1) {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-            } else {
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
-            }
-        } else if (tetrominoType == 'T') {
-            activeTetrominoColor = Color.PURPLE;
-            if (drawingTurns == 1) {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
-
-            } else {
-                setRectStatusAt(0, 1, 'A');
-            }
-        }
-        else if (tetrominoType == 'L') {
-            activeTetrominoColor = Color.ORANGE;
-            if (drawingTurns == 0) {
-                setRectStatusAt(0, 2, 'A');
-
-            } else {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
-            }
-        }
-        else if (tetrominoType == 'J') {
-            activeTetrominoColor = Color.BLUE;
-            if (drawingTurns == 0) {
-                setRectStatusAt(0, 0, 'A');
-
-            } else {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
-            }
-        }
-        if (drawingTurns == 0) {
-            System.out.println("TetriminoDrawing false!");
-            setDrawingPermission(false);
-        }
-    }
-
-    public void setDrawingPermission(boolean allowTetrominoDrawing) {
-        this.allowTetrominoDrawing = allowTetrominoDrawing;
-    }
-
-    public boolean isDrawingAllowed() {
-        return allowTetrominoDrawing;
-    }
-
-    public int getDrawingTurns() {
-        return drawingTurns;
-    }
-
-    public void setDrawingTurns(int drawingTurns) {
-        this.drawingTurns = drawingTurns;
     }
 }
