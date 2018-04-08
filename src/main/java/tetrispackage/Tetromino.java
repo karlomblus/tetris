@@ -13,9 +13,10 @@ public class Tetromino {
     private int drawingTurns = 2;
     private boolean allowTetrominoDrawing = true;
     private Color activeTetrominoColor;
-    Rectangle[][] ruudud;
+    private Rectangle[][] ruudud;
     private boolean allActiveToPassive = false;
-    char tetrominoType;
+    private char tetrominoType;
+    private int tetrominoRotationTracker = 0;
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -33,9 +34,11 @@ public class Tetromino {
     public void setRectStatusAt(int i, int j, char status) {
         rectToStatus.put(ruudud[i].length * i + j, status);
         if (status == 'B') {
-            ruudud[i][j].setFill(Color.DARKKHAKI);
+            ruudud[i][j].setFill(Color.BLANCHEDALMOND);
+            ruudud[i][j].setStroke(Color.WHITE);
         } else if (status == 'A') {
             ruudud[i][j].setFill(activeTetrominoColor);
+            ruudud[i][j].setStroke(Color.BLACK);
         }
     }
 
@@ -84,8 +87,39 @@ public class Tetromino {
             }
         }
     }
-
-    void rotate() {
+    boolean isRowFilled(){
+        boolean isFilled = true;
+        int filledRowNumber = 0;
+        int foundPassiveBlocksinRow = 0;
+        for (int i = 0; i < ruudud.length; i++) {
+            for (int j = 0; j < ruudud[0].length; j++) {
+                if (getRectStatusAt(i, j) == 'P'){
+                    foundPassiveBlocksinRow += 1;
+                }
+            }
+            if (foundPassiveBlocksinRow == ruudud[0].length){
+                isFilled = true;
+                filledRowNumber = i;
+                break;
+            }
+            else{
+                foundPassiveBlocksinRow = 0;
+                isFilled = false;
+            }
+        }
+        if (isFilled == true){
+            System.out.println("Filled row found!AAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println("Filled row: " + filledRowNumber);
+            for (int i = 0; i < ruudud[0].length; i++) {
+                setRectStatusAt(filledRowNumber, i, 'B');
+            }
+        }
+        return isFilled;
+    }
+    void rotateLeft() {
+        if (tetrominoType == 'O'){
+            return;
+        }
         List<Integer> activeRectCoordI = new ArrayList<>();
         List<Integer> activeRectCoordJ = new ArrayList<>();
         for (int i = 0; i < ruudud.length; i++) {  //Find all active blocks
@@ -99,46 +133,272 @@ public class Tetromino {
                 }
             }
         }
-        System.out.println("Rotate triggered!");
-        int minI = activeRectCoordI.get(0);
-        int minJ = activeRectCoordJ.get(0);
-        for (int i = 0; i < activeRectCoordI.size(); i++) {
-            if (activeRectCoordI.get(i) < minI) {
-                minI = activeRectCoordI.get(i);
+        List<Integer> changedActiveRectCoordI = new ArrayList<>();
+        List<Integer> changedActiveRectCoordJ = new ArrayList<>();
+        boolean canRotate = true;
+        System.out.println("Rotate left triggered");
+        if (tetrominoType == 'S'){
+            if (tetrominoRotationTracker == 0) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1) - 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
             }
-            if (activeRectCoordJ.get(i) < minJ) {
-                minJ = activeRectCoordJ.get(i);
+            else if (tetrominoRotationTracker == 1){
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
+            }
+            else if (tetrominoRotationTracker == 2){
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2) + 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
+            }
+            else if (tetrominoRotationTracker == 3){
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 2);
             }
         }
-        // We know that all of the active blocks are of the same type of tetromino
-        if (tetrominoType != 'O') {
-            char[][] matrix = {{'P', 'P', 'P'}, {'P', 'P', 'P'}, {'P', 'P', 'P'}};
-            //matrix = new char[][] {"PPP".toCharArray(), "PPP".toCharArray()};
-            if (tetrominoType == 'I') {
-                matrix = new char[][] {"PPPP".toCharArray(), "PPPP".toCharArray(), "PPPP".toCharArray(), "PPPP".toCharArray()};
+        if (tetrominoType == 'Z') {
+            if (tetrominoRotationTracker == 0) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 2);
+            } else if (tetrominoRotationTracker == 1) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 2);
+            } else if (tetrominoRotationTracker == 2) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
+            } else if (tetrominoRotationTracker == 3) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
+            }
+        }
+        if (tetrominoType == 'T') {
+            if (tetrominoRotationTracker == 0) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 1);
+            } else if (tetrominoRotationTracker == 1) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
+            } else if (tetrominoRotationTracker == 2) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
+            } else if (tetrominoRotationTracker == 3) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 1);
+            }
+        }
+        if (tetrominoType == 'L') {
+            if (tetrominoRotationTracker == 0) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 1);
+            } else if (tetrominoRotationTracker == 1) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
+                changedActiveRectCoordI.add(activeRectCoordI.get(1) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1) - 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 1);
+            } else if (tetrominoRotationTracker == 2) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 1);
+            } else if (tetrominoRotationTracker == 3) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2) - 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
+            }
+        }
+        if (tetrominoType == 'J') {
+            if (tetrominoRotationTracker == 0) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 1);
+            } else if (tetrominoRotationTracker == 1) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2) + 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 1);
+            } else if (tetrominoRotationTracker == 2) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 1);
+            } else if (tetrominoRotationTracker == 3) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1) - 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 1);
+            }
+        }
+        else if (tetrominoType == 'I') {
+            if (tetrominoRotationTracker == 0) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2) - 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) + 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 2);
+            }
+            else if (tetrominoRotationTracker == 1){
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1));
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 2);
+
+            }
+            else if (tetrominoRotationTracker == 2) {
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) - 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1) + 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(2));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 1);
+            }
+            else if (tetrominoRotationTracker == 3){
+                changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 2);
+                changedActiveRectCoordI.add(activeRectCoordI.get(1));
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(1) - 1);
+                changedActiveRectCoordI.add(activeRectCoordI.get(2) - 1);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
+                changedActiveRectCoordI.add(activeRectCoordI.get(3) - 2);
+                changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 1);
+            }
+        }
+        for (int i = 0; i < changedActiveRectCoordI.size(); i++) {
+            if (changedActiveRectCoordI.get(i) < 0 || changedActiveRectCoordJ.get(i) < 0
+                    || changedActiveRectCoordI.get(i) >= ruudud.length ||
+                    changedActiveRectCoordJ.get(i) >= ruudud[0].length ||
+            getRectStatusAt(changedActiveRectCoordI.get(i),changedActiveRectCoordJ.get(i)) == 'P'){
+                canRotate = false;
+            }
+        }
+        System.out.println("Can rotate: " + canRotate);
+        if (canRotate) {
+            tetrominoRotationTracker += 1;
+            if (tetrominoRotationTracker == 4){
+                tetrominoRotationTracker = 0;
             }
             for (int i = 0; i < activeRectCoordI.size(); i++) {
                 setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
-                matrix[activeRectCoordI.get(i) - minI][activeRectCoordJ.get(i) - minJ] = 'A';
             }
-            transponeeri(matrix);
-            vahetaRead(matrix);
-            int i = 0;
-            for (int r = 0; r < matrix.length; r++) {
-                for (int v = 0; v < matrix[r].length; v++) {
-                    if (matrix[r][v] == 'A') {
-                        activeRectCoordI.set(i, r + minI);
-                        activeRectCoordJ.set(i, v + minJ);
-                        i += 1;
-                    }
-                }
-            }
-            for (int o = 0; o < activeRectCoordI.size(); o++) {
-                setRectStatusAt(activeRectCoordI.get(o), activeRectCoordJ.get(o), 'A');
-
+            for (int i = 0; i < changedActiveRectCoordI.size(); i++) {
+                setRectStatusAt(changedActiveRectCoordI.get(i), changedActiveRectCoordJ.get(i), 'A');
             }
         }
-
     }
 
     private void transponeeri(char[][] matrix) {
@@ -165,13 +425,13 @@ public class Tetromino {
                 matrix[i][j] = matrix[(matrix.length - 1) - i][j];
                 matrix[(matrix.length - 1) - i][j] = ajutine;
             }
-            System.out.println("Read vahetatud:");
-            for (int k = 0; k < matrix.length; k++) {
-                for (int l = 0; l < matrix[k].length; l++) {
-                    System.out.print(matrix[k][l]);
-                }
-                System.out.println();
+        }
+        System.out.println("Read vahetatud:");
+        for (int k = 0; k < matrix.length; k++) {
+            for (int l = 0; l < matrix[k].length; l++) {
+                System.out.print(matrix[k][l]);
             }
+            System.out.println();
         }
     }
 
@@ -215,7 +475,9 @@ public class Tetromino {
     //Tetriminos I O T J L S Z
     void draw(char tetrominoType) {
         this.tetrominoType = tetrominoType;
+
         drawingTurns -= 1;
+        tetrominoRotationTracker = 0;
         if (tetrominoType == 'I') {
             int i = 0;
             int j = 0;
@@ -249,7 +511,30 @@ public class Tetromino {
         } else if (tetrominoType == 'T') {
             activeTetrominoColor = Color.PURPLE;
             if (drawingTurns == 1) {
+                setRectStatusAt(0, 0, 'A');
                 setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, 2, 'A');
+
+            } else {
+                setRectStatusAt(0, 1, 'A');
+            }
+        }
+        else if (tetrominoType == 'L') {
+            activeTetrominoColor = Color.ORANGE;
+            if (drawingTurns == 0) {
+                setRectStatusAt(0, 2, 'A');
+
+            } else {
+                setRectStatusAt(0, 0, 'A');
+                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, 2, 'A');
+            }
+        }
+        else if (tetrominoType == 'J') {
+            activeTetrominoColor = Color.BLUE;
+            if (drawingTurns == 0) {
+                setRectStatusAt(0, 0, 'A');
+
             } else {
                 setRectStatusAt(0, 0, 'A');
                 setRectStatusAt(0, 1, 'A');

@@ -11,8 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.sql.Time;
 import java.util.*;
 
 public class TetrisGraafika {
@@ -37,24 +35,23 @@ public class TetrisGraafika {
         }
         tetromino = new Tetromino(ristkülik);
 
-        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T'};
+        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
-        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
+        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
             char randomTetromino = 'S';
 
             @Override
             public void handle(ActionEvent event) {
                 tetromino.tick();
+                tetromino.isRowFilled();
                 if (tetromino.isDrawingAllowed()) {
                     if (tetromino.getDrawingTurns() == 2) {
                         randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
                     }
                     tetromino.draw(randomTetromino);
-
                 }
             }
         }));
-
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
         });
@@ -78,7 +75,7 @@ public class TetrisGraafika {
                 }
             }
             if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
-                tetromino.rotate();
+                tetromino.rotateLeft();
             }
         });
         tetrisStseen.setOnKeyReleased(event ->

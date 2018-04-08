@@ -114,7 +114,7 @@ public class ServerGameConnectionHandler implements Runnable {
         synchronized (dos) {
             if (username.length() < 2) {
                 dos.writeInt(-1);
-                dos.writeUTF("Kasutajanimi liiga lühike");
+                dos.writeUTF("Kasutajanimi liiga lühike: "+username.length());
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " liiga lühike.");
                 return;
             }
@@ -330,7 +330,7 @@ public class ServerGameConnectionHandler implements Runnable {
     } // inviteToGame
 
     public String toString() {
-        return "\n" + userid + ": Nimi " + username + " login: " + login +  " invite: " + invitedUID+ "opponent: " + opponentID;
+        return "\n" + userid + ": Nimi " + username + " login: " + login +  " invite: " + invitedUID+ " opponent: " + opponentID;
     }
 
 } //ServerGameConnectionHandler class
