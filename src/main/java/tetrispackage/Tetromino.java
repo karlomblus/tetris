@@ -87,6 +87,35 @@ public class Tetromino {
             }
         }
     }
+    boolean isRowFilled(){
+        boolean isFilled = true;
+        int filledRowNumber = 0;
+        int foundPassiveBlocksinRow = 0;
+        for (int i = 0; i < ruudud.length; i++) {
+            for (int j = 0; j < ruudud[0].length; j++) {
+                if (getRectStatusAt(i, j) == 'P'){
+                    foundPassiveBlocksinRow += 1;
+                }
+            }
+            if (foundPassiveBlocksinRow == ruudud[0].length){
+                isFilled = true;
+                filledRowNumber = i;
+                break;
+            }
+            else{
+                foundPassiveBlocksinRow = 0;
+                isFilled = false;
+            }
+        }
+        if (isFilled == true){
+            System.out.println("Filled row found!AAAAAAAAAAAAAAAAAAAAAA");
+            System.out.println("Filled row: " + filledRowNumber);
+            for (int i = 0; i < ruudud[0].length; i++) {
+                setRectStatusAt(filledRowNumber, i, 'B');
+            }
+        }
+        return isFilled;
+    }
     void rotateLeft() {
         if (tetrominoType == 'O'){
             return;

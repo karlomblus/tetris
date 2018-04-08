@@ -35,7 +35,7 @@ public class TetrisGraafika {
         }
         tetromino = new Tetromino(ristkülik);
 
-        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T'};
+        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
             char randomTetromino = 'S';
@@ -43,6 +43,7 @@ public class TetrisGraafika {
             @Override
             public void handle(ActionEvent event) {
                 tetromino.tick();
+                tetromino.isRowFilled();
                 if (tetromino.isDrawingAllowed()) {
                     if (tetromino.getDrawingTurns() == 2) {
                         randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
