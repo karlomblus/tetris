@@ -73,10 +73,18 @@ public class TetrisGraafika {
                 if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
                     tetromino.moveLeft();
                 }
+                if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
+                    tetromino.rotateLeft();
+                }
+                if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
+                    boolean keepticking = true;
+                    do{
+                        keepticking = tetromino.tick();
+                    }
+                    while(keepticking);
+                }
             }
-            if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
-                tetromino.rotateLeft();
-            }
+
         });
         tetrisStseen.setOnKeyReleased(event ->
                 currentActiveKeys.put(event.getCode(), false)

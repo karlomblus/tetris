@@ -162,11 +162,12 @@ public class Tetromino {
         }
     }
 
-    void tick() {
+    boolean tick() { //returns false if Active blocks reached bottom
         List<Integer> activeRectCoordI = new ArrayList<>();
         List<Integer> activeRectCoordJ = new ArrayList<>();
         List<Integer> fallingRectCoordI = new ArrayList<>();
         List<Integer> fallingRectCoordJ = new ArrayList<>();
+        boolean keepTicking = true;
         for (int i = ruudud.length - 1; i >= 0; i--) {  //Find all active blocks and check if all active blocks need to be set to passive
             for (int j = ruudud[i].length - 1; j >= 0; j--) {
                 if (getRectStatusAt(i, j) == 'A') {
@@ -197,6 +198,7 @@ public class Tetromino {
             drawingTurns = 2;
             allowTetrominoDrawing = true;
             allActiveToPassive = false;
+            keepTicking = false;
         } else if (!allActiveToPassive) {
             for (int i = 0; i < activeRectCoordI.size(); i++) {
                 setRectStatusAt(activeRectCoordI.get(i) + 1, activeRectCoordJ.get(i), 'A');
@@ -224,6 +226,7 @@ public class Tetromino {
                 setRectStatusAt(fallingRectCoordI.get(i), fallingRectCoordJ.get(i), 'B');
             }
         }
+        return keepTicking;
     }
 
     //Tetriminos I O T J L S Z
@@ -232,67 +235,68 @@ public class Tetromino {
 
         drawingTurns -= 1;
         tetrominoRotationTracker = 0;
+        int j = (ruudud[0].length / 2) - 2;
+        System.out.println(tetrominoType + " THIS IS THE...");
         if (tetrominoType == 'I') {
             int i = 0;
-            int j = 0;
             activeTetrominoColor = Color.CYAN;
-            for (; j < 4; j++) {
-                setRectStatusAt(i, j, 'A');
+            for (int l = 0; l < 4; l++) {
+                setRectStatusAt(i, j + l, 'A');
             }
             drawingTurns -= 1;
         } else if (tetrominoType == 'O') {
             activeTetrominoColor = Color.YELLOW;
-            setRectStatusAt(0, 0, 'A');
-            setRectStatusAt(0, 1, 'A');
+            setRectStatusAt(0, j, 'A');
+            setRectStatusAt(0, j + 1, 'A');
         } else if (tetrominoType == 'Z') {
             if (drawingTurns == 1) {
                 activeTetrominoColor = Color.RED;
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
             } else {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
             }
         } else if (tetrominoType == 'S') {
             activeTetrominoColor = Color.LIME;
             if (drawingTurns == 1) {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
             } else {
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
             }
         } else if (tetrominoType == 'T') {
             activeTetrominoColor = Color.PURPLE;
             if (drawingTurns == 1) {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
 
             } else {
-                setRectStatusAt(0, 1, 'A');
+                setRectStatusAt(0, j + 1, 'A');
             }
         }
         else if (tetrominoType == 'L') {
             activeTetrominoColor = Color.ORANGE;
             if (drawingTurns == 0) {
-                setRectStatusAt(0, 2, 'A');
+                setRectStatusAt(0, j + 2, 'A');
 
             } else {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
             }
         }
         else if (tetrominoType == 'J') {
             activeTetrominoColor = Color.BLUE;
             if (drawingTurns == 0) {
-                setRectStatusAt(0, 0, 'A');
+                setRectStatusAt(0, j, 'A');
 
             } else {
-                setRectStatusAt(0, 0, 'A');
-                setRectStatusAt(0, 1, 'A');
-                setRectStatusAt(0, 2, 'A');
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
             }
         }
         if (drawingTurns == 0) {
