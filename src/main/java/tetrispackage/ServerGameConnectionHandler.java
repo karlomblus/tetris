@@ -112,13 +112,19 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
         synchronized (dos) {
-            if (username.length() < 2) {
+            if (username==null || username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike: "+username.length());
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " liiga lühike.");
                 return;
             }
-            String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
+            if (password==null || password.length() < 3) {
+                dos.writeInt(-1);
+                dos.writeUTF("Parool liiga lühike");
+                ServerMain.debug(5, "createaccount: Kasutaja " + username + " parool puudu.");
+                return;
+
+                String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
             dos.writeInt(1);
             if (uid.length() > 0) {
                 dos.writeInt(-1);
@@ -152,10 +158,16 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         synchronized (dos) {
             dos.writeInt(2);
-            if (username.length() < 2) {
+            if (username==null || username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike");
                 ServerMain.debug(5, "dologin: Kasutajanimi " + username + " liiga lühike.");
+                return;
+            }
+            if (password==null || password.length() < 1) {
+                dos.writeInt(-1);
+                dos.writeUTF("Parool liiga lühike");
+                ServerMain.debug(5, "dologin: Kasutajan " + username + " parool puudu.");
                 return;
             }
             String[] andmebaasist = ServerMain.sql.query(2, "select id,password from users where username = ?", username);
