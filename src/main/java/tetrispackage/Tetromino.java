@@ -18,6 +18,7 @@ public class Tetromino {
     private  boolean allFallingToPassive = false;
     private char tetrominoType;
     private int tetrominoRotationTracker = 0;
+    private boolean gameOver = false;
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -195,6 +196,12 @@ public class Tetromino {
                     }
                 }
             }
+            for (int i = 0; i < ruudud[0].length; i++) {
+                if (activeRectCoordI.get(0) == 0){
+                    gameOver = true;
+                    System.out.println("GAME OVER!");
+                }
+            }
             drawingTurns = 2;
             allowTetrominoDrawing = true;
             allActiveToPassive = false;
@@ -206,7 +213,7 @@ public class Tetromino {
             }
         }
         if (allFallingToPassive){
-            System.out.println("All falling to passive!OOOOOOOOOOOOOOO");
+            System.out.println("All falling to passive!");
             for (int k = 0; k < ruudud.length; k++) {
                 for (int l = 0; l < ruudud[k].length; l++) {
                     if (getRectStatusAt(k, l) == 'F') {
@@ -236,7 +243,6 @@ public class Tetromino {
         drawingTurns -= 1;
         tetrominoRotationTracker = 0;
         int j = (ruudud[0].length / 2) - 2;
-        System.out.println(tetrominoType + " THIS IS THE...");
         if (tetrominoType == 'I') {
             int i = 0;
             activeTetrominoColor = Color.CYAN;
@@ -604,5 +610,8 @@ public class Tetromino {
                 setRectStatusAt(changedActiveRectCoordI.get(i), changedActiveRectCoordJ.get(i), 'A');
             }
         }
+    }
+    boolean gameStateOver(){
+        return gameOver;
     }
 }

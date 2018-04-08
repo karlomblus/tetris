@@ -61,6 +61,9 @@ public class TetrisGraafika {
             //PlatformImpl.tkExit()
             tickTime.stop();
         });
+        if (tetromino.gameStateOver()){
+            tickTime.stop();
+        }
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
         Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
