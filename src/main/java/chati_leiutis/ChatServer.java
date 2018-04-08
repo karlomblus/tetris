@@ -1,6 +1,4 @@
-package main.java.chati_leiutis;
-
-import main.java.chati_leiutis.ChatThread;
+package chati_leiutis;
 
 import java.io.IOException;
 import java.net.ServerSocket;

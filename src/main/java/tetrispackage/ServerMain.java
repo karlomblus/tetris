@@ -2,12 +2,14 @@ package tetrispackage;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServerMain {
     public static ServerSQL sql;
 
     public static void main(String[] args) throws Exception {
-
+        List<ServerGameConnectionHandler> players = new ArrayList<>();
         System.out.println("Server alustab");
         sql = new ServerSQL();
         System.out.println("Mysql connected");
@@ -25,7 +27,12 @@ public class ServerMain {
                 // wait for an incoming connection
                 Socket gameSocket = gameServerSocket.accept();
                 debug("Uus connection accepted");
-                ServerGameConnectionHandler connection = new ServerGameConnectionHandler(gameSocket);
+                ServerGameConnectionHandler connection = new ServerGameConnectionHandler(gameSocket,players);
+                synchronized (players){
+                    debug("Lisame mängija");
+                    players.add(connection);
+                    ServerMain.debug(6,"Kõik mängijad: "+ players);
+                }
                 Thread connectionHandler = new Thread(connection);
                 connectionHandler.start();
 

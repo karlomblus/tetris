@@ -1,81 +1,64 @@
 package tetrispackage;
 
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
-public class TestClientDemo {
+public class TestClientDemo2 {
     public static void main(String[] args) throws Exception {
 
         System.out.println("Ühendume serveriga");
-        Socket socket = new Socket("tetris.carlnet.ee", 54321);
+        Socket socket = new Socket("127.0.0.1", 54321);
         try (DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
              DataInputStream dis = new DataInputStream(socket.getInputStream())) {
 
-            //System.out.println("Loome uue konto");
-            //dos.writeInt(1); // konto loomise käsk
-            //dos.writeUTF("UusUsername");
-            //dos.writeUTF("UusParool");
-/*
-            System.out.println("Logime sisse vale kasutajakontoga");
-            dos.writeInt(2);
-            dos.writeUTF("UusUsername3333");
-            dos.writeUTF("UusParool3333");
 
-            System.out.println("Logime sisse vale parooliga");
-            dos.writeInt(2);
-            dos.writeUTF("UusUsername");
-            dos.writeUTF("UusParool3333");
-*/
 
             System.out.println("Logime sisse õige parooliga");
             dos.writeInt(2);
-            dos.writeUTF("UusUsername");
+            dos.writeUTF("TeineTest");
             dos.writeUTF("UusParool");
-            loesisendit(dis);
 
+
+            loesisendit(dis);
 
             System.out.println("Küsime userlisti");
             dos.writeInt(3);
+
             loesisendit(dis);
+
+            // kirjutame chatti
+            dos.writeInt(5);
+            dos.writeUTF("TeineTest tahab ka midagi öelda");
+            dos.writeInt(5);
+            dos.writeUTF("TeineTest Ütleb veel midagi");
+
+
+            /*
 
             System.out.println("Ütleme chatis tere");
             dos.writeInt(5);
-            dos.writeUTF("Tere kes te kõik siin olete (esimene kasutaja)");
-            loesisendit(dis);
-            Thread.sleep(500);
+            dos.writeUTF("Tere kes te kõik siin olete");
 
-            dos.writeInt(5);
-            dos.writeUTF("Tere2 kes te kõik siin olete (esimene kasutaja)");
-            loesisendit(dis);
-            Thread.sleep(500);
-
-            dos.writeInt(5);
-            dos.writeUTF("Tere3 kes te kõik siin olete (esimene kasutaja)");
-            loesisendit(dis);
-            Thread.sleep(500);
-            dos.writeInt(5);
-            dos.writeUTF("Tere4 kes te kõik siin olete (esimene kasutaja)");
-            loesisendit(dis);
-            Thread.sleep(500);
+            loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
 
             System.out.println("Küsime olemasolevaid mänge, et neid kuskil kuvada");
             dos.writeInt(6);
 
+            loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
+*/
+            Thread.sleep(1000);
+            loesisendit(dis);
+            Thread.sleep(1000);
             loesisendit(dis);
 
-            for (int i = 0; i < 5; i++) {
-                Thread.sleep(1000);
-                loesisendit(dis);
-            }
-
-
-
-            Thread.sleep(20000); // ootame serveri vastuse ära enne kui toru maha viskame; ei ole hea viis
+            Thread.sleep(20000); // jääme natueseks ajaks passima
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
 
-            System.out.println("Ütleme viisakalt bye");
+            System.out.println("Logout");
             dos.writeInt(4);
+
 
         } finally {
             socket.close();
@@ -86,7 +69,6 @@ public class TestClientDemo {
 
     private static void loesisendit(DataInputStream dis) throws Exception {
         System.out.println("Loeme serveri vastust");
-
         while (dis.available() > 0) {  // seda konstruktsiooni ei soovitatud vist üldse kasutada
             int servervastus = dis.readInt();
             switch (servervastus) {
