@@ -1,12 +1,10 @@
 package chati_leiutis;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -19,21 +17,39 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import tetrispackage.TetrisGraafika;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 public class Klient extends Application {
-    static boolean cont = true;
+    boolean connected = false;
+    Socket connection;
     DataOutputStream out;
     TextArea ekraan;
     static String nimi;
-    boolean tetrisrunning = false;
+    TextField konsool;
+    ClientThread listener;
+    PasswordField userpasswordField;
+    TextField usernamefield;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        showLogIn();
-        showLobby();
-        out.writeUTF("logout");
+        //todo socketite tegemise võiks vist logini juurde viia
+        try (Socket socket = new Socket("tetris.carlnet.ee", 54321);
+             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+             DataInputStream input = new DataInputStream(socket.getInputStream())) {
+            this.connection = socket;
+            this.out = output;
+            System.out.println("Connection to tetris.calnet.ee established...");
+
+            listener = new ClientThread(socket, this, input);
+            Thread clienthread = new Thread(listener);
+            clienthread.start();
+            connected = true;
+            showLogIn();
+            showLobby();
+        }
     }
 
     public Klient() {
@@ -43,28 +59,55 @@ public class Klient extends Application {
         this.out = out;
     }
 
-    public void handleIncomingInput(Integer type){
-        switch (type){
-            case 1:
-                //todo do something2...regamine
-            case 2:
-                //todo do smth...sisselogimine
-            case 3:
-                //todo do smth...lobby usertlist/keegi logis sisse
-            case 4:
-                //todo do smth...lobbyst logiti välja
-            case 5:
-                //todo keegi ütles midagi:chatmessage
+    public void sendSomething(Integer type) throws IOException {
+        if (connected) {
+            //temp id(testing)
+            int tempid = 7;
+
+            out.flush();
+            System.out.println("Saatsin " + type);
+            //vastavalt prokokollile:
+            switch (type) {
+                case 1:
+                    out.writeInt(type);
+                    logIn_or_Register();
+                    break;
+                case 2:
+                    out.writeInt(type);
+                    logIn_or_Register();
+                    break;
+                case 3:
+                    out.writeInt(type);
+                    //jääme ootama userlisti
+                    break;
+                case 4:
+                    out.writeInt(type);
+                    //väljalogimine
+                    break;
+                case 5:
+                    out.writeInt(type);
+                    sendAndClearField(konsool);
+                    break;
+                case 6:
+                    out.writeInt(type);
+                    //ootame tagasi käivate mängude listi
+                    break;
+                default:
+                    // ei tee midagi
+            }
         }
     }
-    public void recieveMessage(String message) {
-        if (message.equals("logout")) {
-            cont = false;
-            System.exit(0);
-        }//TODO halb?, midagi paremat peaks välja mõtlema)
-        else {
-            ekraan.appendText(nimi + ">> " + message + "\n");
-        }
+
+    public void logIn_or_Register() throws IOException {
+        //nimi
+        out.writeUTF(usernamefield.getText());
+        out.writeUTF(userpasswordField.getText());
+        userpasswordField.clear();
+        usernamefield.clear();
+    }
+
+    public void recieveMessage(int userID, String username, String message) {
+            ekraan.appendText(username + ">> " + message + "\n");
     }
 
     public void showLobby() throws Exception {
@@ -72,13 +115,6 @@ public class Klient extends Application {
         int w = 900;
         int h = 800;
         Stage primaryStage = new Stage();
-        Socket socket = new Socket("localhost", 5000);
-
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-        this.out = output;
-
-        Thread clienthread = new Thread(new ClientThread(socket, this));
-        clienthread.start();
 
         Group juur = new Group();
         TextArea messagearea = new TextArea();
@@ -107,6 +143,7 @@ public class Klient extends Application {
         messagefield.setPromptText("Enter message here...");
         messagefield.setFont(labelfont);
         messagefield.setPrefWidth((w / 3.5) * 3);
+        konsool = messagefield;
 
         //pilt
 
@@ -117,15 +154,14 @@ public class Klient extends Application {
         Button singleplayerbtn = new Button("Singleplayer");
         TetrisGraafika tetris = new TetrisGraafika();
         singleplayerbtn.setOnMouseClicked((MouseEvent) -> {
-            if (!tetrisrunning) {
-                try {
-                    tetrisrunning = true;
-                    Stage lava = new Stage();
-                    tetris.start(lava);
 
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+            try {
+                Stage lava = new Stage();
+                tetris.start(lava);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+
             }
         });
 
@@ -142,13 +178,30 @@ public class Klient extends Application {
         sendbtn.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                sendandclear(messagefield);
+                try {
+                    sendSomething(5);
+                } catch (Exception e2) {
+                    throw new RuntimeException(e2);
+                }
             }
         });
 
         messagefield.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
-                sendandclear(messagefield);
+                //kui kirjutame logout, siis logime välja
+                try {
+                    if (messagefield.getText().equals("logout")) {
+                        sendSomething(4);
+                        messagefield.clear();
+                        ekraan.appendText("You have been disconnected...");
+                        listener.shutDown();
+                        out.close();
+                        connected = false;
+                    } else
+                        sendSomething(5);
+                } catch (Exception e3) {
+                    throw new RuntimeException(e3);
+                }
             }
         });
         VBox outervbox = new VBox();
@@ -173,26 +226,82 @@ public class Klient extends Application {
         primaryStage.showAndWait();
     }
 
-    public static void showLogIn() {
+    public void showRegistration() {
         Stage newStage = new Stage();
         VBox comp = new VBox();
-        Label namelabel = new Label("Enter your name below:");
+        Label namelabel = new Label("Enter your credentials below:");
         TextField nameField = new TextField();
         nameField.setPromptText("Enter your name here...");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter your password here");
+        usernamefield = nameField;
+        userpasswordField = passwordField;
+
         comp.getChildren().add(namelabel);
         comp.getChildren().add(nameField);
-        Button niminupp = new Button("Log in");
-        niminupp.setOnMouseClicked((event) -> {
-            nimi = nameField.getText();
+        Button registernupp = new Button("Register and close");
+        registernupp.setOnMouseClicked((event) -> {
+            try {
+                //registreering
+                sendSomething(1);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             newStage.close();
         });
+        Scene stageScene = new Scene(comp, 250, 270);
+        comp.getChildren().add(passwordField);
+        comp.getChildren().add(registernupp);
+        newStage.setScene(stageScene);
+        newStage.show();
+    }
+
+    public void showLogIn() {
+        Stage newStage = new Stage();
+        VBox comp = new VBox();
+        HBox nupudkõrvuti = new HBox();
+        Label namelabel = new Label("Enter your credentials below:");
+        TextField nameField = new TextField();
+        nameField.setPromptText("Enter your name here...");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter your password here");
+        usernamefield = nameField;
+        userpasswordField = passwordField;
+
+
+        comp.getChildren().add(namelabel);
+        comp.getChildren().add(nameField);
+        Button login_nupp = new Button("Log in");
+        login_nupp.setOnMouseClicked((event) -> {
+            nimi = nameField.getText();
+            try {
+                //logime sisse
+                sendSomething(2);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            newStage.close();
+        });
+
+        Button registreerimis_nupp = new Button("Register new user");
+        registreerimis_nupp.setOnMouseClicked((event) -> {
+            showRegistration();
+        });
+
         Scene stageScene = new Scene(comp, 300, 300);
-        comp.getChildren().add(niminupp);
+        comp.getChildren().add(passwordField);
+        nupudkõrvuti.getChildren().addAll(login_nupp, registreerimis_nupp);
+        comp.getChildren().add(nupudkõrvuti);
         newStage.setScene(stageScene);
         newStage.showAndWait();
     }
 
-    public void sendandclear(TextField ekraan) {
+    public void sendMessage(String msg) throws Exception {
+        out.writeUTF(msg);
+        out.flush();
+    }
+
+    public void sendAndClearField(TextField ekraan) {
         try {
             out.writeUTF(ekraan.getText());
             out.flush();
