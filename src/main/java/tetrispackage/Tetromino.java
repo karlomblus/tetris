@@ -199,8 +199,11 @@ public class Tetromino {
             for (int i = 0; i < ruudud[0].length; i++) {
                 if (activeRectCoordI.get(0) == 0){
                     gameOver = true;
-                    System.out.println("GAME OVER!");
                 }
+            }
+            if (gameOver){
+                System.out.println("Game over!");
+                return false;
             }
             drawingTurns = 2;
             allowTetrominoDrawing = true;

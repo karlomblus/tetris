@@ -42,13 +42,15 @@ public class TetrisGraafika {
 
             @Override
             public void handle(ActionEvent event) {
-                tetromino.tick();
-                tetromino.isRowFilled();
-                if (tetromino.isDrawingAllowed()) {
-                    if (tetromino.getDrawingTurns() == 2) {
-                        randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                if (!tetromino.gameStateOver()) {
+                    tetromino.tick();
+                    tetromino.isRowFilled();
+                    if (tetromino.isDrawingAllowed()) {
+                        if (tetromino.getDrawingTurns() == 2) {
+                            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                        }
+                        tetromino.draw(randomTetromino);
                     }
-                    tetromino.draw(randomTetromino);
                 }
             }
         }));
@@ -61,15 +63,12 @@ public class TetrisGraafika {
             //PlatformImpl.tkExit()
             tickTime.stop();
         });
-        if (tetromino.gameStateOver()){
-            tickTime.stop();
-        }
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
         Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
-            if (tetromino.isDrawingAllowed() == false) {
+            if (!tetromino.isDrawingAllowed() && !tetromino.gameStateOver()) {
                 if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
                     tetromino.moveRight();
                 }
@@ -81,10 +80,10 @@ public class TetrisGraafika {
                 }
                 if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
                     boolean keepticking = true;
-                    do{
-                        keepticking = tetromino.tick();
-                    }
-                    while(keepticking);
+                        do {
+                            keepticking = tetromino.tick();
+                        }
+                        while (keepticking);
                 }
             }
 
