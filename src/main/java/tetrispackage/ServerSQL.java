@@ -9,7 +9,7 @@ public class ServerSQL {
     public ServerSQL() throws Exception {
 
         try {
-            conn = DriverManager.getConnection("jdbc:mysql://tetris.carlnet.ee:33060/tetris?user=tetris&password=oopprojekt");
+            conn = DriverManager.getConnection("jdbc:mysql://tetris.carlnet.ee:33060/tetris?user=tetris&password=oopprojekt&autoReconnect=true");
         } catch (SQLException ex) {
 
             ServerMain.debug("SQLException: " + ex.getMessage());

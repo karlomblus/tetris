@@ -106,20 +106,24 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
     private void createAccount(DataOutputStream dos, String username, String password) throws Exception {
-        // todo: reaalne konto loomine. kui OK, siis logime kasutaja sisse
-        // kontrollime, kas sql-is on nimi juba olemas
-        // kui ei ole, siis lisame. õnnestumisel märgime logimisperioodi lõppenuks
-
 
         synchronized (dos) {
-            if (username.length() < 2) {
+            dos.writeInt(1);
+            if (username==null || username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike: "+username.length());
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " liiga lühike.");
                 return;
             }
-            String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
-            dos.writeInt(1);
+            if (password==null || password.length() < 3) {
+                dos.writeInt(-1);
+                dos.writeUTF("Parool liiga lühike");
+                ServerMain.debug(5, "createaccount: Kasutaja " + username + " parool puudu.");
+                return;
+            }
+
+                String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
+
             if (uid.length() > 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Valitud kasutajanimi on juba olemas");
@@ -152,10 +156,16 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         synchronized (dos) {
             dos.writeInt(2);
-            if (username.length() < 2) {
+            if (username==null || username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike");
                 ServerMain.debug(5, "dologin: Kasutajanimi " + username + " liiga lühike.");
+                return;
+            }
+            if (password==null || password.length() < 1) {
+                dos.writeInt(-1);
+                dos.writeUTF("Parool liiga lühike");
+                ServerMain.debug(5, "dologin: Kasutajan " + username + " parool puudu.");
                 return;
             }
             String[] andmebaasist = ServerMain.sql.query(2, "select id,password from users where username = ?", username);
