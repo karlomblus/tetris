@@ -34,9 +34,11 @@ public class Tetromino {
     public void setRectStatusAt(int i, int j, char status) {
         rectToStatus.put(ruudud[i].length * i + j, status);
         if (status == 'B') {
-            ruudud[i][j].setFill(Color.DARKKHAKI);
+            ruudud[i][j].setFill(Color.BLANCHEDALMOND);
+            ruudud[i][j].setStroke(Color.WHITE);
         } else if (status == 'A') {
             ruudud[i][j].setFill(activeTetrominoColor);
+            ruudud[i][j].setStroke(Color.BLACK);
         }
     }
 
@@ -86,6 +88,9 @@ public class Tetromino {
         }
     }
     void rotateLeft() {
+        if (tetrominoType == 'O'){
+            return;
+        }
         List<Integer> activeRectCoordI = new ArrayList<>();
         List<Integer> activeRectCoordJ = new ArrayList<>();
         for (int i = 0; i < ruudud.length; i++) {  //Find all active blocks
@@ -441,6 +446,7 @@ public class Tetromino {
     //Tetriminos I O T J L S Z
     void draw(char tetrominoType) {
         this.tetrominoType = tetrominoType;
+
         drawingTurns -= 1;
         tetrominoRotationTracker = 0;
         if (tetrominoType == 'I') {
