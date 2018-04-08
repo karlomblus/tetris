@@ -1,19 +1,19 @@
 package chati_leiutis;
 
+import javafx.application.Platform;
+
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.BlockingQueue;
 
 public class ClientThread extends Thread {
     Socket socket;
     boolean cont = true;
     Klient client;
     DataInputStream in;
-
-    public void setCont(boolean cont) {
-        this.cont = cont;
-    }
+    BlockingQueue<Integer> tologinornot;
 
     public void shutDown() {
         try {
@@ -25,13 +25,14 @@ public class ClientThread extends Thread {
         }
     }
 
-    public ClientThread(Socket socket, Klient client, DataInputStream in) throws Exception {
+    public ClientThread(Socket socket, Klient client, DataInputStream in,BlockingQueue<Integer> tologinornot) throws Exception{
         this.socket = socket;
         this.client = client;
         this.in = in;
+        this.tologinornot = tologinornot;
     }
 
-    public void handleIncomingInput(Integer type) throws IOException {
+    public void handleIncomingInput(Integer type) throws Exception {
         System.out.println("input tüüp on " + type);
         switch (type) {
             case 1:
@@ -43,24 +44,38 @@ public class ClientThread extends Thread {
                 //todo teha midagi nende vastustega
                 break;
             case 2:
-
+                try{
                 //sisselogimise vastus: 1 -- OK, -1 == error
                 int loginreturnmessage = in.readInt();
                 String loginerrormessage = in.readUTF();
                 System.out.println(loginerrormessage);
                 System.out.println(loginreturnmessage);
+                if(loginreturnmessage == 1){
+                    tologinornot.put(1);
+                }
+                if(loginreturnmessage == -1){
+                    System.out.println(loginerrormessage);
+                    tologinornot.put(-1);
+                }
                 //todo nendega midagi teha
-                break;
+                break;}
+                catch (Exception e){
+                    tologinornot.put(0);
+                }
             case 3:
                 //keegi tuli chatti juurde?
                 int newuser_id = in.readInt();
+                System.out.println(newuser_id);
                 String newuser_name = in.readUTF();
+                System.out.println( newuser_name);
+                client.handleUserList(3,newuser_id,newuser_name);
                 break;
                 //todo panna need nimed listi, neid kasutada etc.
             case 4:
                 //keegi lahkus lobbist
                 int goneuser_id = in.readInt();
                 String goneuser_name = in.readUTF();
+                client.handleUserList(4,goneuser_id,goneuser_name);
                 break;
             case 5:
                 int sentuserID = in.readInt();
@@ -75,6 +90,9 @@ public class ClientThread extends Thread {
                 String username2 = in.readUTF();
                 break;
                 //todo teha midagi, panna listi etc...
+            default:
+                tologinornot.put(0);
+                break;
         }
     }
 
@@ -85,13 +103,15 @@ public class ClientThread extends Thread {
                     int incmsg = in.readInt();
                     System.out.println(incmsg);
                     this.handleIncomingInput(incmsg);
-            } catch (IOException e) {
-                System.out.println("closing thread");
+            } catch (Exception e) {
                 cont = false;
-                shutDown();
+                    System.exit(-1);
+                throw new RuntimeException(e);
             }
         }
         shutDown();
+        System.out.println("Error, viskame cliendi ka kinni");
+        System.exit(-1);
     }
 }
 
