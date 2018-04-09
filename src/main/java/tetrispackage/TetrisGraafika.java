@@ -37,7 +37,7 @@ public class TetrisGraafika {
 
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
-        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
             char randomTetromino = 'S';
 
             @Override
