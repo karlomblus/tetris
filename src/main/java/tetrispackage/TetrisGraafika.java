@@ -78,12 +78,15 @@ public class TetrisGraafika {
                 if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
                     tetromino.rotateLeft();
                 }
-                if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
+                if (currentActiveKeys.containsKey(KeyCode.SPACE) && currentActiveKeys.get(KeyCode.SPACE)) {
                     boolean keepticking = true;
                         do {
                             keepticking = tetromino.tick();
                         }
                         while (keepticking);
+                }
+                if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
+                    tetromino.tick();
                 }
             }
 
