@@ -15,8 +15,8 @@ import java.util.*;
 
 public class TetrisGraafika {
 
-    private final int resoWidth = 300;
-    private final int resoHeight = 450;
+    private final int resoWidth = 150;
+    private final int resoHeight = 330;
     final int ruuduSuurus = 15;
     final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
