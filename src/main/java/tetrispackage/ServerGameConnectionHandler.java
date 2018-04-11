@@ -317,7 +317,7 @@ public class ServerGameConnectionHandler implements Runnable {
         ServerMain.debug(5, "invitetogame: " + username + " kutsub " + invitedUID + " mängima");
         for (ServerGameConnectionHandler player : players) {
             // leidsime mängija, ta tahab minuga ka mängida. anname mõlemale teada
-            if (player.getUserid() == invitedUID && player.getInvitedUID() == invitedUID) {
+            if (player.getUserid() == invitedUID && player.getInvitedUID() == userid) {
                 // see mängija kutsus mind ka mängima, seega aksepteerime mängu ja anname mõlemale teada
                 ServerMain.debug(6, "inviteToGame: " + username + " aksepteerib " + player.getUsername());
                 synchronized (dos) {
