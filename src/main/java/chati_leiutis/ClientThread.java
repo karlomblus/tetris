@@ -25,7 +25,7 @@ public class ClientThread extends Thread {
         }
     }
 
-    public ClientThread(Socket socket, Klient client, DataInputStream in,BlockingQueue<Integer> tologinornot) throws Exception{
+    public ClientThread(Socket socket, Klient client, DataInputStream in, BlockingQueue<Integer> tologinornot) throws Exception {
         this.socket = socket;
         this.client = client;
         this.in = in;
@@ -44,22 +44,22 @@ public class ClientThread extends Thread {
                 //todo teha midagi nende vastustega
                 break;
             case 2:
-                try{
-                //sisselogimise vastus: 1 -- OK, -1 == error
-                int loginreturnmessage = in.readInt();
-                String loginerrormessage = in.readUTF();
-                System.out.println(loginerrormessage);
-                System.out.println(loginreturnmessage);
-                if(loginreturnmessage == 1){
-                    tologinornot.put(1);
-                }
-                if(loginreturnmessage == -1){
+                try {
+                    //sisselogimise vastus: 1 -- OK, -1 == error
+                    int loginreturnmessage = in.readInt();
+                    String loginerrormessage = in.readUTF();
                     System.out.println(loginerrormessage);
-                    tologinornot.put(-1);
-                }
-                //todo nendega midagi teha
-                break;}
-                catch (Exception e){
+                    System.out.println(loginreturnmessage);
+                    if (loginreturnmessage == 1) {
+                        tologinornot.put(1);
+                    }
+                    if (loginreturnmessage == -1) {
+                        System.out.println(loginerrormessage);
+                        tologinornot.put(-1);
+                    }
+                    //todo nendega midagi teha
+                    break;
+                } catch (Exception e) {
                     tologinornot.put(0);
                     break;
                 }
@@ -68,16 +68,16 @@ public class ClientThread extends Thread {
                 int newuser_id = in.readInt();
                 System.out.println(newuser_id);
                 String newuser_name = in.readUTF();
-                System.out.println( newuser_name);
-                Platform.runLater( () ->  client.handleUserList(3,newuser_id,newuser_name));
+                System.out.println(newuser_name);
+                Platform.runLater(() -> client.handleUserList(3, newuser_id, newuser_name));
 
                 break;
-                //todo panna need nimed listi, neid kasutada etc.
+            //todo panna need nimed listi, neid kasutada etc.
             case 4:
                 //keegi lahkus lobbist
                 int goneuser_id = in.readInt();
                 String goneuser_name = in.readUTF();
-                Platform.runLater( () ->   client.handleUserList(4,goneuser_id,goneuser_name));
+                Platform.runLater(() -> client.handleUserList(4, goneuser_id, goneuser_name));
 
                 break;
             case 5:
@@ -92,7 +92,12 @@ public class ClientThread extends Thread {
                 String username1 = in.readUTF();
                 String username2 = in.readUTF();
                 break;
-                //todo teha midagi, panna listi etc...
+            //todo teha midagi, panna listi etc...
+            case 7:
+                //tulev challenge
+                int challengerID = in.readInt();
+                String challengerName = in.readUTF();
+                Platform.runLater( () ->   client.showIncomingChallengeWindow(challengerID,challengerName));
             default:
                 tologinornot.put(0);
                 break;
@@ -102,10 +107,10 @@ public class ClientThread extends Thread {
     @Override
     public void run() {
         while (cont) {
-                try {
-                    int incmsg = in.readInt();
-                    System.out.println(incmsg);
-                    this.handleIncomingInput(incmsg);
+            try {
+                int incmsg = in.readInt();
+                System.out.println(incmsg);
+                this.handleIncomingInput(incmsg);
             } catch (Exception e) {
                 cont = false;
                 System.out.println("Socket kinni/ootasin muud sisendit serverilt");

@@ -35,6 +35,7 @@ public class Klient extends Application {
     private boolean lobbyOpen = false;
     private String nimi;
     private HashMap<Integer, String> online_users = new HashMap<>();
+    private HashMap<String, Integer> name_2_ID = new HashMap<>();
     private ObservableList<String> observableUsers;
     private Socket connection;
     private DataOutputStream out;
@@ -130,10 +131,9 @@ public class Klient extends Application {
         login_nupp.setOnMouseClicked((event) -> {
             nimi = nameField.getText();
             try {
-                if(connection == null|| connection.isClosed() ){
+                if (connection == null || connection.isClosed()) {
                     errorlabel.setText("Error, connection error. Please restart.");
-                }
-                else{
+                } else {
                     sendSomething(2);
                     int loginvastus = toLoginorNot.take();
                     switch (loginvastus) {
@@ -147,7 +147,8 @@ public class Klient extends Application {
                         case 0:
                             errorlabel.setText("Unexpected input, something went wrong.");
 
-                    }}
+                    }
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -207,7 +208,7 @@ public class Klient extends Application {
         ekraan = messagearea;
         observableUsers = FXCollections.observableArrayList(online_users.values());
         userListView.setItems(observableUsers);
-        userListView.setPrefSize((w / 4), (h / 4.5) * 3);
+        userListView.setPrefSize((w / 4), (h / 4.5) * 3 - 20);
 
         Font labelfont = new Font(16);
         Label userlabel = new Label("Users");
@@ -260,6 +261,22 @@ public class Klient extends Application {
             }
         });
 
+        Button challengeButton = new Button("Challenge");
+        challengeButton.setPrefWidth(w / 4);
+        challengeButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (!challengeOpen) {
+                    try {
+                        showOpenChallengeWindow(userListView.getSelectionModel().getSelectedItem());
+                        sendSomething(7);
+                    } catch (Exception e2) {
+                        throw new RuntimeException(e2);
+                    }
+                }
+            }
+        });
+
         StackPane stackPane = new StackPane();
         BorderPane border = new BorderPane();
 
@@ -307,7 +324,7 @@ public class Klient extends Application {
         VBox vbox2 = new VBox();
         HBox hbox2 = new HBox();
 
-        vbox.getChildren().addAll(userlabel, userListView);
+        vbox.getChildren().addAll(userlabel, userListView, challengeButton);
         vbox2.getChildren().addAll(chatlabel, messagearea);
         hbox.getChildren().addAll(vbox, vbox2);
         hbox.setSpacing(2);
@@ -321,6 +338,79 @@ public class Klient extends Application {
         primaryStage.setTitle("Client");
         primaryStage.centerOnScreen();
         primaryStage.showAndWait();
+    }
+
+    public void showOpenChallengeWindow(String user) {
+        challengeOpen = true;
+        Stage newStage = new Stage();
+        VBox comp = new VBox();
+        comp.setAlignment(Pos.CENTER);
+        Label messagelabel = new Label("Challenging " + user + ". Waiting for response...");
+
+        Button closebutton = new Button("Close");
+        closebutton.setOnMouseClicked((event) -> {
+            try {
+                newStage.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            newStage.close();
+        });
+
+        comp.getChildren().addAll(messagelabel, closebutton);
+        Scene stageScene = new Scene(comp, 250, 130);
+        newStage.setScene(stageScene);
+        newStage.show();
+    }
+
+    public void showIncomingChallengeWindow(Integer ID, String user) {
+        Stage newStage = new Stage();
+        VBox comp = new VBox();
+        comp.setAlignment(Pos.CENTER);
+        HBox hboxnupud = new HBox();
+        Label messagelaber = new Label("You have been challenged by " + user + "!");
+
+        Button acceptbutton = new Button("Accept");
+        Button declinebutton = new Button("Decline");
+
+        acceptbutton.setOnMouseClicked((event) -> {
+            try {
+                out.writeInt(7);
+                out.writeInt(ID);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            newStage.close();
+        });
+
+        declinebutton.setOnMouseClicked((event) -> {
+            try {
+                out.writeInt(8);
+                out.writeInt(ID);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            newStage.close();
+        });
+
+        hboxnupud.getChildren().addAll(acceptbutton, declinebutton);
+        comp.getChildren().addAll(messagelaber, hboxnupud);
+        Scene stageScene = new Scene(comp, 250, 270);
+
+        newStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+                try {
+                    out.writeInt(8);
+                    out.writeInt(ID);
+                    //connecter.getOut().close();
+                } catch (IOException e) {
+                    System.out.println("Error on closing challengedwindow)");
+                }
+            }
+        });
+
+        newStage.setScene(stageScene);
+        newStage.show();
     }
 
     public void sendSomething(Integer type) throws IOException {
@@ -355,6 +445,10 @@ public class Klient extends Application {
                 out.writeInt(type);
                 //ootame tagasi käivate mängude listi
                 break;
+            case 7:
+                out.writeInt(type);
+                String challengeeName = userListView.getSelectionModel().getSelectedItem();
+                out.writeInt(name_2_ID.get(challengeeName));
             default:
                 // ei tee midagi
         }
@@ -376,11 +470,13 @@ public class Klient extends Application {
             switch (type) {
                 case 3:
                     online_users.put(ID, name);
-                   // userListView.refresh();
+                    name_2_ID.put(name, ID);
+                    // userListView.refresh();
                     break;
                 case 4:
                     online_users.remove(ID, name);
-                   // userListView.refresh();
+                    name_2_ID.remove(name, ID);
+                    // userListView.refresh();
                     break;
             }
             if (lobbyOpen) {
@@ -425,7 +521,7 @@ public class Klient extends Application {
                 lobbyOpen = true;
                 showLobby();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Error connecting to server.");
             loggedIN = false;
             showLogIn();
