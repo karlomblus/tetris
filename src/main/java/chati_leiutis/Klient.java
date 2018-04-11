@@ -29,8 +29,9 @@ import java.util.concurrent.BlockingQueue;
 
 public class Klient extends Application {
     BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
+    boolean challengeOpen = false;
     boolean appRunning = true;
-    boolean connected = false;
+    boolean loggedIN = false;
     boolean lobbyOpen = false;
     String nimi;
     HashMap<Integer, String> online_users = new HashMap<>();
@@ -47,31 +48,6 @@ public class Klient extends Application {
 
     Stage loginwindow;
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-        //todo socketite tegemise võiks vist logini juurde viia
-        try (Socket socket = new Socket("tetris.carlnet.ee", 54321);
-             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-             DataInputStream input = new DataInputStream(socket.getInputStream())) {
-            this.connection = socket;
-            this.out = output;
-            System.out.println("Connection to tetris.carlnet.ee established...");
-
-            listener = new ClientThread(socket, this, input, toLoginorNot);
-            Thread clienthread = new Thread(listener);
-            clienthread.start();
-
-            //näitame loginekraani
-            while (appRunning) {
-                showLogIn();
-                if (connected) {
-                    lobbyOpen = true;
-                    showLobby();
-                }
-            }
-        }
-    }
-
     public Klient() {
     }
 
@@ -79,75 +55,129 @@ public class Klient extends Application {
         this.out = out;
     }
 
-    public void sendSomething(Integer type) throws IOException {
-        //temp id(testing)
-        int tempid = 7;
-        out.flush();
-        System.out.println("Saatsin " + type);
-        //vastavalt prokokollile:
-        switch (type) {
-            case 1:
-                out.writeInt(type);
-                String regname = regnamefield.getText();
-                String regpass = regpasswordfield.getText();
-                logIn_or_Register(regname, regpass);
-                break;
-            case 2:
-                out.writeInt(type);
-                String loginname = loginnamefield.getText();
-                String loginpass = loginpasswordfield.getText();
-                logIn_or_Register(loginname, loginpass);
-                break;
-            case 3:
-                out.writeInt(type);
-                //jääme ootama userlisti
-                break;
-            case 4:
-                out.writeInt(type);
-                //väljalogimine
-                break;
-            case 5:
-                out.writeInt(type);
-                sendAndClearField(konsool);
-                break;
-            case 6:
-                out.writeInt(type);
-                //ootame tagasi käivate mängude listi
-                break;
-            default:
-                // ei tee midagi
-        }
 
-    }
+    public void showRegistration() {
+        Stage newStage = new Stage();
+        VBox comp = new VBox();
+        Label namelabel = new Label("Enter your credentials below:");
+        TextField nameField = new TextField();
+        nameField.setPromptText("Enter your name here...");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter your password here");
+        regnamefield = nameField;
+        regpasswordfield = passwordField;
 
-    public void logIn_or_Register(String nimi, String parool) throws IOException {
-        //nimi
-        out.writeUTF(nimi);
-        out.writeUTF(parool);
-    }
-
-    public void recieveMessage(int userID, String username, String message) {
-        ekraan.appendText(username + ">> " + message + "\n");
-    }
-
-    public void handleUserList(Integer type, Integer ID, String name) {
-        if (connected) {
-            switch (type) {
-                case 3:
-                    online_users.put(ID, name);
-                    break;
-                case 4:
-                    online_users.remove(ID, name);
-                    break;
+        comp.getChildren().add(namelabel);
+        comp.getChildren().add(nameField);
+        Button registernupp = new Button("Register and close");
+        registernupp.setOnMouseClicked((event) -> {
+            try {
+                //registreering
+                sendSomething(1);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            if (lobbyOpen) {
-                listofusers.clear();
-                for (Integer id : online_users.keySet()) {
-                    String nameofid = online_users.get(id);
-                    listofusers.appendText(nameofid + "\n");
+            newStage.close();
+        });
+
+        Scene stageScene = new Scene(comp, 250, 270);
+        comp.getChildren().add(passwordField);
+        comp.getChildren().add(registernupp);
+        newStage.setScene(stageScene);
+        newStage.show();
+    }
+
+    public void showLogIn() {
+        Stage newStage = new Stage();
+        loginwindow = newStage;
+
+        BorderPane border = new BorderPane();
+        Button singleplayerbutton = new Button("Singleplayer");
+        singleplayerbutton.setFont(new Font(20));
+        border.setBottom(singleplayerbutton);
+        //Singeplayeri käivitamine
+        singleplayerbutton.setOnMouseClicked((MouseEvent) -> {
+
+            try {
+                TetrisGraafika tetris = new TetrisGraafika();
+                Stage lava = new Stage();
+                tetris.start(lava);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+
+            }
+        });
+
+        VBox comp = new VBox();
+        HBox nupudkõrvuti = new HBox();
+        Label namelabel = new Label("Enter your credentials below:");
+        Label errorlabel = new Label("");                       //siia läheb pärast errormessage
+        TextField nameField = new TextField();
+        nameField.setPromptText("Enter your name here...");
+        PasswordField passwordField = new PasswordField();
+        passwordField.setPromptText("Enter your password here");
+        loginnamefield = nameField;
+        loginpasswordfield = passwordField;
+
+        comp.getChildren().add(namelabel);
+        comp.getChildren().add(nameField);
+
+        Button login_nupp = new Button("Log in");
+
+        //login event- ootame blockqueuest vastust,vastavalt sellele tegutseme
+        login_nupp.setOnMouseClicked((event) -> {
+            nimi = nameField.getText();
+            try {
+                if(connection == null|| connection.isClosed() ){
+                    errorlabel.setText("Error, connection error. Please restart.");
                 }
+                else{
+                    sendSomething(2);
+                    int loginvastus = toLoginorNot.take();
+                    switch (loginvastus) {
+                        case 1:
+                            loggedIN = true;
+                            newStage.close();
+                            break;
+                        case -1:
+                            errorlabel.setText("Error. Please try again.");
+                            break;
+                        case 0:
+                            errorlabel.setText("Unexpected input, something went wrong.");
+
+                    }}
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-        }
+        });
+
+        Button registreerimis_nupp = new Button("Register new user");
+        registreerimis_nupp.setOnMouseClicked((event) -> {
+            showRegistration();
+        });
+
+        //kui ristist kinni panna, jätan seisma
+        newStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent we) {
+                System.out.println("Closing application...");
+                appRunning = false;
+                loggedIN = false;
+                //listener.shutDown();   kas seda rida on ikka vaja?
+                Platform.exit();
+            }
+        });
+        comp.getChildren().add(passwordField);
+        nupudkõrvuti.getChildren().addAll(login_nupp, registreerimis_nupp);
+        comp.getChildren().add(nupudkõrvuti);
+        comp.getChildren().add(errorlabel);
+
+        border.setCenter(comp);
+        border.setBottom(singleplayerbutton);
+        Scene stageScene = new Scene(border, 300, 300);
+
+        newStage.setScene(stageScene);
+        newStage.showAndWait();
     }
 
     public void showLobby() throws Exception {
@@ -160,8 +190,15 @@ public class Klient extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
                 System.out.println("Disconnecting...");
-                connected = false;
+                loggedIN = false;
                 lobbyOpen = false;
+                try {
+                    sendSomething(4);
+
+                    //connecter.getOut().close();
+                } catch (IOException e) {
+                    System.out.println("Socket juba kinni, jätkan välja logimist");
+                }
             }
         });
         Group juur = new Group();
@@ -246,9 +283,7 @@ public class Klient extends Application {
                         sendSomething(4);
                         messagefield.clear();
                         ekraan.appendText("You have been disconnected...");
-                        listener.shutDown();
-                        out.close();
-                        connected = false;
+                        loggedIN = false;
                     } else
                         sendSomething(5);
                 } catch (Exception e3) {
@@ -278,130 +313,72 @@ public class Klient extends Application {
         primaryStage.showAndWait();
     }
 
-    public void openLobby(Stage previousStage) throws Exception {
-        if (connected) {
-            showLobby();
-            previousStage.close();
+    public void sendSomething(Integer type) throws IOException {
+        System.out.println("Saatsin " + type);
+        //vastavalt prokokollile:
+        switch (type) {
+            case 1:
+                out.writeInt(type);
+                String regname = regnamefield.getText();
+                String regpass = regpasswordfield.getText();
+                logIn_or_Register(regname, regpass);
+                break;
+            case 2:
+                out.writeInt(type);
+                String loginname = loginnamefield.getText();
+                String loginpass = loginpasswordfield.getText();
+                logIn_or_Register(loginname, loginpass);
+                break;
+            case 3:
+                out.writeInt(type);
+                //jääme ootama userlisti
+                break;
+            case 4:
+                out.writeInt(type);
+                //väljalogimine
+                break;
+            case 5:
+                out.writeInt(type);
+                sendAndClearField(konsool);
+                break;
+            case 6:
+                out.writeInt(type);
+                //ootame tagasi käivate mängude listi
+                break;
+            default:
+                // ei tee midagi
         }
+
     }
 
-    public void showRegistration() {
-        Stage newStage = new Stage();
-        VBox comp = new VBox();
-        Label namelabel = new Label("Enter your credentials below:");
-        TextField nameField = new TextField();
-        nameField.setPromptText("Enter your name here...");
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter your password here");
-        regnamefield = nameField;
-        regpasswordfield = passwordField;
-
-        comp.getChildren().add(namelabel);
-        comp.getChildren().add(nameField);
-        Button registernupp = new Button("Register and close");
-        registernupp.setOnMouseClicked((event) -> {
-            try {
-                //registreering
-                sendSomething(1);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            newStage.close();
-        });
-
-        Scene stageScene = new Scene(comp, 250, 270);
-        comp.getChildren().add(passwordField);
-        comp.getChildren().add(registernupp);
-        newStage.setScene(stageScene);
-        newStage.show();
+    public void logIn_or_Register(String nimi, String parool) throws IOException {
+        //nimi
+        out.writeUTF(nimi);
+        out.writeUTF(parool);
     }
 
-    public void showLogIn() {
-        Stage newStage = new Stage();
-        loginwindow = newStage;
+    public void recieveMessage(int userID, String username, String message) {
+        ekraan.appendText(username + ">> " + message + "\n");
+    }
 
-        BorderPane border = new BorderPane();
-        Button singleplayerbutton = new Button("Singleplayer");
-        singleplayerbutton.setFont(new Font(20));
-        border.setBottom(singleplayerbutton);
-        singleplayerbutton.setOnMouseClicked((MouseEvent) -> {
-
-            try {
-                TetrisGraafika tetris = new TetrisGraafika();
-                Stage lava = new Stage();
-                tetris.start(lava);
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-
+    public void handleUserList(Integer type, Integer ID, String name) {
+        if (loggedIN) {
+            switch (type) {
+                case 3:
+                    online_users.put(ID, name);
+                    break;
+                case 4:
+                    online_users.remove(ID, name);
+                    break;
             }
-        });
-
-        VBox comp = new VBox();
-        HBox nupudkõrvuti = new HBox();
-        Label namelabel = new Label("Enter your credentials below:");
-        Label errorlabel = new Label("");                       //siia läheb pärast errormessage
-        TextField nameField = new TextField();
-        nameField.setPromptText("Enter your name here...");
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter your password here");
-        loginnamefield = nameField;
-        loginpasswordfield = passwordField;
-
-        comp.getChildren().add(namelabel);
-        comp.getChildren().add(nameField);
-
-        Button login_nupp = new Button("Log in");
-
-        //login event- ootame blockqueuest vastust,vastavalt sellele tegutseme
-        login_nupp.setOnMouseClicked((event) -> {
-            nimi = nameField.getText();
-            try {
-                sendSomething(2);
-                int loginvastus = toLoginorNot.take();
-                switch (loginvastus) {
-                    case 1:
-                        connected = true;
-                        newStage.close();
-                        break;
-                    case -1:
-                        errorlabel.setText("Error. Please try again.");
-                        break;
-                    default:
-                        errorlabel.setText("Unexpected input, something went wrong.");
-
+            if (lobbyOpen) {
+                listofusers.clear();
+                for (Integer id : online_users.keySet()) {
+                    String nameofid = online_users.get(id);
+                    listofusers.appendText(nameofid + "\n");
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
-        });
-
-        Button registreerimis_nupp = new Button("Register new user");
-        registreerimis_nupp.setOnMouseClicked((event) -> {
-            showRegistration();
-        });
-
-        //kui ristist kinni panna, jätn seisma
-        newStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent we) {
-                System.out.println("Closing application...");
-                appRunning = false;
-                connected = false;
-                listener.shutDown();
-                Platform.exit();
-            }
-        });
-        comp.getChildren().add(passwordField);
-        nupudkõrvuti.getChildren().addAll(login_nupp, registreerimis_nupp);
-        comp.getChildren().add(nupudkõrvuti);
-        comp.getChildren().add(errorlabel);
-
-        border.setCenter(comp);
-        border.setBottom(singleplayerbutton);
-        Scene stageScene = new Scene(border, 300, 300);
-
-        newStage.setScene(stageScene);
-        newStage.showAndWait();
+        }
     }
 
     public void sendAndClearField(TextField ekraan) {
@@ -414,8 +391,36 @@ public class Klient extends Application {
         }
     }
 
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+        //üritame käivitamisel ühenduse luua
+        try (Socket socket = new Socket("tetris.carlnet.ee", 54321);
+             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+             DataInputStream input = new DataInputStream(socket.getInputStream())) {
+            this.connection = socket;
+            this.out = output;
+            System.out.println("Connection to tetris.carlnet.ee established...");
+
+            listener = new ClientThread(connection, this, input, toLoginorNot);
+            Thread clienthread = new Thread(listener);
+            clienthread.start();
+            loggedIN = true;
+
+            //näitame loginekraani
+            showLogIn();
+            if (loggedIN) {
+                lobbyOpen = true;
+                showLobby();
+            }
+        }catch (Exception e){
+            System.out.println("Error connecting to server.");
+            loggedIN = false;
+            showLogIn();
+        }
+    }
+
     public static void main(String[] args) throws Exception {
         launch(args);
     }
-
 }
