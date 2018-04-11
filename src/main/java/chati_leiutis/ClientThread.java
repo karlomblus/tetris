@@ -61,6 +61,7 @@ public class ClientThread extends Thread {
                 break;}
                 catch (Exception e){
                     tologinornot.put(0);
+                    break;
                 }
             case 3:
                 //keegi tuli chatti juurde?
@@ -105,13 +106,11 @@ public class ClientThread extends Thread {
                     this.handleIncomingInput(incmsg);
             } catch (Exception e) {
                 cont = false;
-                    System.exit(-1);
-                throw new RuntimeException(e);
+                System.out.println("Socket kinni/ootasin muud sisendit serverilt");
+                //throw new RuntimeException(e);
             }
         }
         shutDown();
-        System.out.println("Error, viskame cliendi ka kinni");
-        System.exit(-1);
     }
 }
 
