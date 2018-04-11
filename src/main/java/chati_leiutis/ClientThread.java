@@ -69,14 +69,16 @@ public class ClientThread extends Thread {
                 System.out.println(newuser_id);
                 String newuser_name = in.readUTF();
                 System.out.println( newuser_name);
-                client.handleUserList(3,newuser_id,newuser_name);
+                Platform.runLater( () ->  client.handleUserList(3,newuser_id,newuser_name));
+
                 break;
                 //todo panna need nimed listi, neid kasutada etc.
             case 4:
                 //keegi lahkus lobbist
                 int goneuser_id = in.readInt();
                 String goneuser_name = in.readUTF();
-                client.handleUserList(4,goneuser_id,goneuser_name);
+                Platform.runLater( () ->   client.handleUserList(4,goneuser_id,goneuser_name));
+
                 break;
             case 5:
                 int sentuserID = in.readInt();
