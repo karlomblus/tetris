@@ -85,9 +85,9 @@ public class TetrisGraafika {
                         }
                         while (keepticking);
                 }
-                if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
+                /*if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
                     tetromino.tick();
-                }
+                }*/
             }
 
         });
