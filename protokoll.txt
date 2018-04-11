@@ -36,8 +36,8 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 
 ...
 
-< 105 i: kellelt s: chatmessage                 # teine mängija ütles midagi
-> 105 i: kellele s: chatmessage                 # mängija ütles midagi
+< 105 i: kellelt s: username  s: chatmessage    # teine mängija ütles midagi
+> 105 i: kellele s: chatmessage                 # mängija ütleb midagi
 
 # 106 -> 7-8  (kuna need käsud on lobby sees tegelmiseks, siis võiks nummeratsioonis ka lobby asjade sees olla)
 
