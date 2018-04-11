@@ -207,6 +207,7 @@ public class Klient extends Application {
         ekraan = messagearea;
         observableUsers = FXCollections.observableArrayList(online_users.values());
         userListView.setItems(observableUsers);
+        userListView.setPrefSize((w / 4), (h / 4.5) * 3);
 
         Font labelfont = new Font(16);
         Label userlabel = new Label("Users");
