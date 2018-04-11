@@ -2,6 +2,8 @@ package chati_leiutis;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -21,30 +23,29 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Klient extends Application {
-    BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
-    boolean challengeOpen = false;
-    boolean appRunning = true;
-    boolean loggedIN = false;
-    boolean lobbyOpen = false;
-    String nimi;
-    HashMap<Integer, String> online_users = new HashMap<>();
-    Socket connection;
-    DataOutputStream out;
-    TextArea ekraan;
-    TextArea listofusers;
-    TextField konsool;
-    PasswordField loginpasswordfield;
-    TextField loginnamefield;
-    PasswordField regpasswordfield;
-    TextField regnamefield;
-    ClientThread listener;
+    private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
+    private boolean challengeOpen = false;
+    private boolean appRunning = true;
+    private boolean loggedIN = false;
+    private boolean lobbyOpen = false;
+    private String nimi;
+    private HashMap<Integer, String> online_users = new HashMap<>();
+    private ObservableList<String> observableUsers;
+    private Socket connection;
+    private DataOutputStream out;
+    private TextArea ekraan;
+    private ListView<String> userListView = new ListView<>();
+    private TextField konsool;
+    private PasswordField loginpasswordfield;
+    private TextField loginnamefield;
+    private PasswordField regpasswordfield;
+    private TextField regnamefield;
+    private ClientThread listener;
 
     Stage loginwindow;
 
@@ -203,9 +204,9 @@ public class Klient extends Application {
         });
         Group juur = new Group();
         TextArea messagearea = new TextArea();
-        TextArea userlist = new TextArea();
         ekraan = messagearea;
-        listofusers = userlist;
+        observableUsers = FXCollections.observableArrayList(online_users.values());
+        userListView.setItems(observableUsers);
 
         Font labelfont = new Font(16);
         Label userlabel = new Label("Users");
@@ -215,15 +216,8 @@ public class Klient extends Application {
 
         //muudan aknad mitteklikitavaks
         messagearea.setEditable(false);
-        userlist.setEditable(false);
-
         messagearea.setWrapText(true);
-        userlist.setWrapText(true);
-
         messagearea.setPrefSize((w / 4) * 3, (h / 4.5) * 3);
-        userlist.setPrefSize((w / 4) - 2, (h / 4.5) * 3);
-
-        userlist.setPromptText("Users");
         messagearea.setPromptText("Messages...");
 
         //panen userid paika
@@ -253,6 +247,17 @@ public class Klient extends Application {
 
             }
         });
+        Button multiplayerbtn = new Button("Multiplayer");
+        multiplayerbtn.setOnMouseClicked((MouseEvent) -> {
+            try {
+                Stage lava = new Stage();
+                tetris.start(lava);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+
+            }
+        });
 
         StackPane stackPane = new StackPane();
         BorderPane border = new BorderPane();
@@ -260,6 +265,10 @@ public class Klient extends Application {
         border.setBottom(stackPane);
         stackPane.getChildren().add(pilt);
         stackPane.getChildren().add(singleplayerbtn);
+        stackPane.getChildren().add(multiplayerbtn);
+        stackPane.setAlignment(multiplayerbtn, Pos.BOTTOM_RIGHT);
+        stackPane.setAlignment(singleplayerbtn, Pos.BOTTOM_CENTER);
+
 
         //send nupp
         Button sendbtn = new Button("Send");
@@ -297,7 +306,7 @@ public class Klient extends Application {
         VBox vbox2 = new VBox();
         HBox hbox2 = new HBox();
 
-        vbox.getChildren().addAll(userlabel, userlist);
+        vbox.getChildren().addAll(userlabel, userListView);
         vbox2.getChildren().addAll(chatlabel, messagearea);
         hbox.getChildren().addAll(vbox, vbox2);
         hbox.setSpacing(2);
@@ -366,16 +375,18 @@ public class Klient extends Application {
             switch (type) {
                 case 3:
                     online_users.put(ID, name);
+                   // userListView.refresh();
                     break;
                 case 4:
                     online_users.remove(ID, name);
+                   // userListView.refresh();
                     break;
             }
             if (lobbyOpen) {
-                listofusers.clear();
+                observableUsers.clear();
                 for (Integer id : online_users.keySet()) {
                     String nameofid = online_users.get(id);
-                    listofusers.appendText(nameofid + "\n");
+                    observableUsers.add(nameofid);
                 }
             }
         }
