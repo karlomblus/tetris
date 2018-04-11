@@ -79,6 +79,15 @@ public class ServerGameConnectionHandler implements Runnable {
                     case 7:
                         inviteToGame(dis.readInt());
                         break;
+                    case 9:
+                        rejectInviteToGame(dis.readInt());
+                        break;
+                    case 101:
+                        receiveGamerMove(dis.readInt(), dis.readInt());
+                        break;
+                    case 105:
+                        privateChatmessage(dis.readInt(), dis.readUTF());
+                        break;
                     default:
                         ServerMain.error("Tuli sisse tundmatu/lubamatu command: " + command);
                 } // command switch
@@ -109,20 +118,20 @@ public class ServerGameConnectionHandler implements Runnable {
 
         synchronized (dos) {
             dos.writeInt(1);
-            if (username==null || username.length() < 2) {
+            if (username == null || username.length() < 2) {
                 dos.writeInt(-1);
-                dos.writeUTF("Kasutajanimi liiga lühike: "+username.length());
+                dos.writeUTF("Kasutajanimi liiga lühike: " + username.length());
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " liiga lühike.");
                 return;
             }
-            if (password==null || password.length() < 3) {
+            if (password == null || password.length() < 3) {
                 dos.writeInt(-1);
                 dos.writeUTF("Parool liiga lühike");
                 ServerMain.debug(5, "createaccount: Kasutaja " + username + " parool puudu.");
                 return;
             }
 
-                String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
+            String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
 
             if (uid.length() > 0) {
                 dos.writeInt(-1);
@@ -156,13 +165,13 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         synchronized (dos) {
             dos.writeInt(2);
-            if (username==null || username.length() < 2) {
+            if (username == null || username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike");
                 ServerMain.debug(5, "dologin: Kasutajanimi " + username + " liiga lühike.");
                 return;
             }
-            if (password==null || password.length() < 1) {
+            if (password == null || password.length() < 1) {
                 dos.writeInt(-1);
                 dos.writeUTF("Parool liiga lühike");
                 ServerMain.debug(5, "dologin: Kasutajan " + username + " parool puudu.");
@@ -335,12 +344,74 @@ public class ServerGameConnectionHandler implements Runnable {
                     dos2.writeInt(userid);
                     dos2.writeUTF(username);
                 } // sync teade teisele
-            }
-        }
+            } //
+        } // for kõik mängijad
     } // inviteToGame
 
-    public String toString() {
-        return "\n" + userid + ": Nimi " + username + " login: " + login +  " invite: " + invitedUID+ " opponent: " + opponentID;
+    private void rejectInviteToGame(int rejectTo) {
+        ServerMain.debug(5, "rejectInviteToGame: " + username + " saadab ID " + rejectTo + " pikalt");
+        for (ServerGameConnectionHandler player : players) {
+            // leidsime mängija, ja tal on veel kehtiv kutse mulle
+            if (player.getUserid() == rejectTo && player.getInvitedUID() == rejectTo) {
+                // see mängija kutsus mind ka mängima, seega aksepteerime mängu ja anname mõlemale teada
+                ServerMain.debug(6, "inviteToGame: " + username + " aksepteerib " + player.getUsername());
+
+                DataOutputStream dos2 = player.getDos();
+                synchronized (dos2) {
+                    try {
+                        dos2.writeInt(9);
+                        dos2.writeUTF(username);
+                        player.setInvitedUID(0); // lülitame teisel kutse minule välja, et peale pikaltsaatmist saaksime teda kutsuda mitte tema kutset acceptida
+                    } catch (Exception ignored) {
+                    } // kui see teade kohele ei lähe, siis on see täiesti tähtsusetu
+                } // sync teade teisele
+            }
+
+        } // for kõik mängijad
+    } // rejectInviteToGame
+
+    private void privateChatmessage(int toID, String message) {
+        ServerMain.debug(5, "privateChatmessage: " + username + " priv to " + toID);
+        for (ServerGameConnectionHandler player : players) {
+            // leidsime mängija, ja tal on veel kehtiv kutse mulle
+            if (player.getUserid() == toID) {
+                DataOutputStream dos2 = player.getDos();
+                synchronized (dos2) {
+                    try {
+                        dos2.writeInt(105);
+                        dos2.writeInt(userid);
+                        dos2.writeUTF(username);
+                        dos2.writeUTF(message);
+                    } catch (Exception ignored) {
+                    } // kui see teade kohele ei lähe, siis on see täiesti tähtsusetu
+                } // sync teade teisele
+            }
+        }
+    } // privateChatmessage
+
+
+    private void receiveGamerMove(int tickID, int action) throws Exception {
+        for (ServerGameConnectionHandler player : players) {
+                if (player.getUserid() == opponentID && !player.isLogin()) {
+                    DataOutputStream dos2 = player.getDos();
+                    synchronized (dos2) {
+                            dos2.writeInt(101);
+                            dos2.writeInt(tickID);
+                            dos2.writeInt(action);
+                            dos2.writeInt(userid);
+                    } // sync teade teisele
+            }
+        }
+    } // receiveGamerMove
+
+    public void setInvitedUID(int invitedUID) {
+        this.invitedUID = invitedUID;
     }
 
+    public String toString() {
+        return "\n" + userid + ": Nimi " + username + " login: " + login + " invite: " + invitedUID + " opponent: " + opponentID;
+    }
+
+
 } //ServerGameConnectionHandler class
+
