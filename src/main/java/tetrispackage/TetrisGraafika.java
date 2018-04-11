@@ -15,8 +15,8 @@ import java.util.*;
 
 public class TetrisGraafika {
 
-    private final int resoWidth = 450;
-    private final int resoHeight = 600;
+    private final int resoWidth = 150;
+    private final int resoHeight = 330;
     final int ruuduSuurus = 15;
     final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
@@ -37,18 +37,20 @@ public class TetrisGraafika {
 
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
-        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.1), new EventHandler<ActionEvent>() {
+        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
             char randomTetromino = 'S';
 
             @Override
             public void handle(ActionEvent event) {
-                tetromino.tick();
-                tetromino.isRowFilled();
-                if (tetromino.isDrawingAllowed()) {
-                    if (tetromino.getDrawingTurns() == 2) {
-                        randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                if (!tetromino.gameStateOver()) {
+                    tetromino.tick();
+                    tetromino.isRowFilled();
+                    if (tetromino.isDrawingAllowed()) {
+                        if (tetromino.getDrawingTurns() == 2) {
+                            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                        }
+                        tetromino.draw(randomTetromino);
                     }
-                    tetromino.draw(randomTetromino);
                 }
             }
         }));
@@ -66,17 +68,28 @@ public class TetrisGraafika {
         Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
-            if (tetromino.isDrawingAllowed() == false) {
+            if (!tetromino.isDrawingAllowed() && !tetromino.gameStateOver()) {
                 if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
                     tetromino.moveRight();
                 }
                 if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
                     tetromino.moveLeft();
                 }
+                if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
+                    tetromino.rotateLeft();
+                }
+                if (currentActiveKeys.containsKey(KeyCode.SPACE) && currentActiveKeys.get(KeyCode.SPACE)) {
+                    boolean keepticking = true;
+                        do {
+                            keepticking = tetromino.tick();
+                        }
+                        while (keepticking);
+                }
+                if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
+                    tetromino.tick();
+                }
             }
-            if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
-                tetromino.rotateLeft();
-            }
+
         });
         tetrisStseen.setOnKeyReleased(event ->
                 currentActiveKeys.put(event.getCode(), false)
