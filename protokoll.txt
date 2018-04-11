@@ -27,7 +27,8 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 > 7 i: userid               # saadad userile userID kutse mängida
 < 7 i: userid s: username   # userid/username saadab sulle kutse mängida. aksepteerimiseks saada kutse vastu (rida eespool)
 < 8 i: userid i: gameid     # server ütleb, et teil algab mäng (kahepoolne kutse toimis)
-
+> 9 i: userid               # klient keeldub kutsest
+< 9: i: userid s: username  # teiselt poolt tuleb tagasi keeldumine 
 
 < 100 i: tickid  # serveri "tiks", et klotsid langeks. ID, et neil vahet teha
 < 101 i: tickid i: action i: userid  # server saadab teise useri liigutuse. tickid: mis tiksu järel pidi see olemas
