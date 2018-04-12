@@ -7,33 +7,48 @@ import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import java.util.*;
 
-public class TetrisGraafika {
-
-    private final int resoWidth = 150;
+public class TetrisGraafikaMultiplayer {
+    private int numberOfPlayers = 2;
+    private final int resoWidth = 150 * 2;
     private final int resoHeight = 330;
     final int ruuduSuurus = 15;
-    final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
+    final int mitukuubikutLaiuses = resoWidth / ruuduSuurus / numberOfPlayers;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
-    private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    private Rectangle [][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    private Rectangle [][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+
     Tetromino tetromino;
+    Tetromino tetromino2;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     public void start(Stage peaLava) {
-        Group juur = new Group(); // luuakse juur
+        HBox hbox = new HBox(1);
+        Group localTetrisArea = new Group(); // luuakse localTetrisArea
+        Group opponentTetrisArea = new Group();
+
         for (int i = 0; i < mitukuubikutPikkuses; i++) {
             for (int j = 0; j < mitukuubikutLaiuses; j++) {
                 ristkülik[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
                 ristkülik[i][j].setStroke(Color.LIGHTGRAY);
-                juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
+                localTetrisArea.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
+            }
+        }
+        for (int i = 0; i < mitukuubikutPikkuses; i++) {
+            for (int j = 0; j < mitukuubikutLaiuses; j++) {
+                ristkülik2[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
+                ristkülik2[i][j].setStroke(Color.LIGHTGRAY);
+                opponentTetrisArea.getChildren().add(ristkülik2[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
         tetromino = new Tetromino(ristkülik);
+        tetromino2 = new Tetromino(ristkülik2);
 
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
@@ -54,6 +69,26 @@ public class TetrisGraafika {
                 }
             }
         }));
+        Random rand2 = new Random();
+        Timeline tickTime2 = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
+            char randomTetromino = 'S';
+
+            @Override
+            public void handle(ActionEvent event) {
+                if (!tetromino2.gameStateOver()) {
+                    tetromino2.tick();
+                    tetromino2.isRowFilled();
+                    if (tetromino2.isDrawingAllowed()) {
+                        if (tetromino2.getDrawingTurns() == 2) {
+                            randomTetromino = possibleTetrominos[rand2.nextInt(possibleTetrominos.length)];
+                        }
+                        tetromino2.draw(randomTetromino);
+                    }
+                }
+            }
+        }));
+        tickTime2.setCycleCount(Timeline.INDEFINITE);
+        tickTime2.play();
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
         });
@@ -63,12 +98,13 @@ public class TetrisGraafika {
             //PlatformImpl.tkExit()
             tickTime.stop();
         });
-        //tickTime.setCycleCount(Timeline.INDEFINITE);
+        tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
 
-        //tickTime.play();
+        hbox.getChildren().add(localTetrisArea);
+        hbox.getChildren().add(opponentTetrisArea);
 
-        Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
+        Scene tetrisStseen = new Scene(hbox, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
             if (!tetromino.isDrawingAllowed() && !tetromino.gameStateOver()) {
@@ -78,23 +114,21 @@ public class TetrisGraafika {
                 if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
                     tetromino.moveLeft();
                 }
+                if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
+                    tetromino.rotateLeft();
+                }
                 if (currentActiveKeys.containsKey(KeyCode.SPACE) && currentActiveKeys.get(KeyCode.SPACE)) {
                     boolean keepticking = true;
-                        do {
-                            keepticking = tetromino.tick();
-                        }
-                        while (keepticking);
+                    do {
+                        keepticking = tetromino.tick();
+                    }
+                    while (keepticking);
                 }
                 /*if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
                     tetromino.tick();
                 }*/
             }
-            if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
 
-                tickTime.setCycleCount(1);
-                tickTime.play();
-
-            }
 
         });
         tetrisStseen.setOnKeyReleased(event ->

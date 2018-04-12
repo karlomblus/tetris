@@ -102,8 +102,10 @@ public class Klient extends Application {
 
             try {
                 TetrisGraafika tetris = new TetrisGraafika();
+                TetrisGraafika tetris2 = new TetrisGraafika();
                 Stage lava = new Stage();
                 tetris.start(lava);
+                tetris2.start(lava);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
