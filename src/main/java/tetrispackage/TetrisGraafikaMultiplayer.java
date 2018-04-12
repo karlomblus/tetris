@@ -49,61 +49,25 @@ public class TetrisGraafikaMultiplayer {
         }
         tetromino = new Tetromino(ristkülik);
         tetromino2 = new Tetromino(ristkülik2);
-
-        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
-        Random rand = new Random();
-        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
-            char randomTetromino = 'S';
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (!tetromino.gameStateOver()) {
-                    tetromino.tick();
-                    tetromino.isRowFilled();
-                    if (tetromino.isDrawingAllowed()) {
-                        if (tetromino.getDrawingTurns() == 2) {
-                            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
-                        }
-                        tetromino.draw(randomTetromino);
-                    }
-                }
-            }
-        }));
-        Random rand2 = new Random();
-        Timeline tickTime2 = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
-            char randomTetromino = 'S';
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (!tetromino2.gameStateOver()) {
-                    tetromino2.tick();
-                    tetromino2.isRowFilled();
-                    if (tetromino2.isDrawingAllowed()) {
-                        if (tetromino2.getDrawingTurns() == 2) {
-                            randomTetromino = possibleTetrominos[rand2.nextInt(possibleTetrominos.length)];
-                        }
-                        tetromino2.draw(randomTetromino);
-                    }
-                }
-            }
-        }));
+        Timeline tickTime = createTimeline(Duration.seconds(0.2), tetromino);
+        Timeline tickTime2 = createTimeline(Duration.seconds(0.2), tetromino2);
         tickTime2.setCycleCount(Timeline.INDEFINITE);
         tickTime2.play();
-        peaLava.setOnShowing(event -> { //Do only once
-            //draw('I');
-        });
-        peaLava.setOnCloseRequest((we) -> {
-            System.out.println("Tetris stage closed!");
-            Platform.exit();
-            //PlatformImpl.tkExit()
-            tickTime.stop();
-        });
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
 
         hbox.getChildren().add(localTetrisArea);
         hbox.getChildren().add(opponentTetrisArea);
 
+        peaLava.setOnCloseRequest((we) -> {
+            System.out.println("Tetris stage closed!");
+            Platform.exit();
+            //PlatformImpl.tkExit()
+            tickTime.stop();
+        });
+        peaLava.setOnShowing(event -> { //Do only once
+            //draw('I');
+        });
         Scene tetrisStseen = new Scene(hbox, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
@@ -143,5 +107,27 @@ public class TetrisGraafikaMultiplayer {
 
     public void begin() {
         //launch();
+    }
+    Timeline createTimeline(Duration durationSeconds, Tetromino tetromino){
+        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
+        Random rand = new Random();
+        Timeline tickTime = new Timeline(new KeyFrame(durationSeconds, new EventHandler<ActionEvent>() {
+            char randomTetromino = 'S';
+
+            @Override
+            public void handle(ActionEvent event) {
+                if (!tetromino.gameStateOver()) {
+                    tetromino.tick();
+                    tetromino.isRowFilled();
+                    if (tetromino.isDrawingAllowed()) {
+                        if (tetromino.getDrawingTurns() == 2) {
+                            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                        }
+                        tetromino.draw(randomTetromino);
+                    }
+                }
+            }
+        }));
+        return tickTime;
     }
 }
