@@ -18,6 +18,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import tetrispackage.TetrisGraafika;
+import tetrispackage.TetrisGraafikaMultiplayer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -30,10 +31,9 @@ import java.util.concurrent.BlockingQueue;
 public class Klient extends Application {
     private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
     private boolean challengeOpen = false;
-    private boolean appRunning = true;
+    private boolean mpgameopen = false;
     private boolean loggedIN = false;
     private boolean lobbyOpen = false;
-    private String nimi;
     private HashMap<Integer, String> online_users = new HashMap<>();
     private HashMap<String, Integer> name_2_ID = new HashMap<>();
     private ObservableList<String> observableUsers;
@@ -47,8 +47,21 @@ public class Klient extends Application {
     private PasswordField regpasswordfield;
     private TextField regnamefield;
     private ClientThread listener;
-
+    private TetrisGraafikaMultiplayer multiplayerGame;
     Stage loginwindow;
+
+    public TetrisGraafikaMultiplayer getMultiplayerGame() {
+        return multiplayerGame;
+    }
+
+
+    public boolean isMpgameopen() {
+        return mpgameopen;
+    }
+
+    public void setMpgameopen(boolean mpgameopen) {
+        this.mpgameopen = mpgameopen;
+    }
 
     public Klient() {
     }
@@ -131,7 +144,6 @@ public class Klient extends Application {
 
         //login event- ootame blockqueuest vastust,vastavalt sellele tegutseme
         login_nupp.setOnMouseClicked((event) -> {
-            nimi = nameField.getText();
             try {
                 if (connection == null || connection.isClosed()) {
                     errorlabel.setText("Error, connection error. Please restart.");
@@ -165,7 +177,6 @@ public class Klient extends Application {
         newStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
                 System.out.println("Closing application...");
-                appRunning = false;
                 loggedIN = false;
                 //listener.shutDown();   kas seda rida on ikka vaja?
                 Platform.exit();
@@ -342,6 +353,13 @@ public class Klient extends Application {
         primaryStage.showAndWait();
     }
 
+    public void showMultiplayer(Integer opponentID) {
+        TetrisGraafikaMultiplayer mp = new TetrisGraafikaMultiplayer();
+        multiplayerGame = mp;
+        Stage mpstage = new Stage();
+        mp.start(mpstage,this,opponentID);
+    }
+
     public void showOpenChallengeWindow(String user) {
         challengeOpen = true;
         Stage newStage = new Stage();
@@ -387,7 +405,7 @@ public class Klient extends Application {
 
         declinebutton.setOnMouseClicked((event) -> {
             try {
-                out.writeInt(8);
+                out.writeInt(9);
                 out.writeInt(ID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -401,12 +419,14 @@ public class Klient extends Application {
 
         newStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
-                try {
-                    out.writeInt(8);
-                    out.writeInt(ID);
-                    //connecter.getOut().close();
-                } catch (IOException e) {
-                    System.out.println("Error on closing challengedwindow)");
+                if (challengeOpen) {
+                    try {
+                        out.writeInt(9);
+                        out.writeInt(ID);
+                        //connecter.getOut().close();
+                    } catch (IOException e) {
+                        System.out.println("Error on closing challengedwindow)");
+                    }
                 }
             }
         });
@@ -451,6 +471,15 @@ public class Klient extends Application {
                 out.writeInt(type);
                 String challengeeName = userListView.getSelectionModel().getSelectedItem();
                 out.writeInt(name_2_ID.get(challengeeName));
+                break;
+            case 9:
+                //todo keeldumine
+                break;
+            case 105:
+                out.writeInt(105);
+                out.writeInt(multiplayerGame.getOpponentID());
+                out.writeUTF(multiplayerGame.sendMessageandclearMP());
+                break;
             default:
                 // ei tee midagi
         }

@@ -74,8 +74,4 @@ public class ChatServer implements Runnable {
         clienthread.start();
     }
 
-
-    public static void main(String[] args) throws Exception {
-        ChatServer server = new ChatServer(5000);
-    }
 }

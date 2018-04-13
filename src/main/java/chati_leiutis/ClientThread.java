@@ -1,7 +1,11 @@
 package chati_leiutis;
 
 import javafx.application.Platform;
+import javafx.stage.Stage;
+import tetrispackage.TetrisGraafika;
+import tetrispackage.TetrisGraafikaMultiplayer;
 
+import java.awt.*;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -17,8 +21,8 @@ public class ClientThread extends Thread {
 
     public void shutDown() {
         try {
-            socket.close();
             in.close();
+            socket.close();
             cont = false;
         } catch (Exception e) {
             throw new RuntimeException();
@@ -97,8 +101,30 @@ public class ClientThread extends Thread {
                 //tulev challenge
                 int challengerID = in.readInt();
                 String challengerName = in.readUTF();
-                Platform.runLater( () ->   client.showIncomingChallengeWindow(challengerID,challengerName));
+                Platform.runLater(() -> client.showIncomingChallengeWindow(challengerID, challengerName));
+                break;
+            case 8:
+                int ID = in.readInt();
+                int startinggameID = in.readInt();
+                if (!client.isMpgameopen()) {
+                    System.out.println("Starting game with " + ID + " with a game ID of " + startinggameID);
+                    //alustan mängu, andes kaasa vastase ID
+                    Platform.runLater(() -> client.showMultiplayer(ID));
+                }
+                client.setMpgameopen(true);
+                //võeti challenge vastu
+
+                break;
+            case 9:
+                //todo kui vastane keeldub kutsest
+            case 105:
+                //sissetulev mängu chat message
+                in.readInt();
+                String name = in.readUTF();
+                String privatemessage = in.readUTF();
+                client.getMultiplayerGame().addNewMessage(name,privatemessage);
             default:
+                if(tologinornot.size() == 0)
                 tologinornot.put(0);
                 break;
         }

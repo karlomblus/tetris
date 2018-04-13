@@ -1,4 +1,6 @@
 package tetrispackage;
+
+import chati_leiutis.Klient;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -6,12 +8,17 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+//import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 
 public class TetrisGraafikaMultiplayer {
@@ -21,18 +28,56 @@ public class TetrisGraafikaMultiplayer {
     final int ruuduSuurus = 15;
     final int mitukuubikutLaiuses = resoWidth / ruuduSuurus / numberOfPlayers;
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
-    private Rectangle [][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
-    private Rectangle [][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
 
     Tetromino tetromino;
     Tetromino tetromino2;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
-    public void start(Stage peaLava) {
+    //chati
+    TextArea chatWindow;
+    private Integer opponentID;
+
+    //lisasin client, et kasutada Klient klassi meetodeid
+    public void start(Stage peaLava, Klient client, Integer opponentID) {
+        this.opponentID = opponentID;
         HBox hbox = new HBox(1);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
 
+        //chati kood
+
+        VBox mpChatVbox = new VBox();
+        TextArea messagearea = new TextArea();
+        chatWindow = messagearea;
+        //muudan aknad mitteklikitavaks
+        messagearea.setEditable(false);
+        messagearea.setWrapText(true);
+        messagearea.setPrefSize(140, 300);
+        messagearea.setPromptText("Messages...");
+        messagearea.setMouseTransparent(true);
+        messagearea.setFocusTraversable(false);
+
+        TextField writearea = new TextField();
+        writearea.setPromptText("Type your message here...");
+        writearea.setPrefWidth(200);
+
+        writearea.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+
+                writearea.clear();
+                try {
+                    client.sendSomething(105);
+                }catch(IOException error){
+                    messagearea.appendText("Socket kinni. Ei saanud saata.");
+                }
+            }
+        });
+
+        mpChatVbox.getChildren().addAll(messagearea, writearea);
+
+        //chati koodi lõpp
         for (int i = 0; i < mitukuubikutPikkuses; i++) {
             for (int j = 0; j < mitukuubikutLaiuses; j++) {
                 ristkülik[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
@@ -58,6 +103,7 @@ public class TetrisGraafikaMultiplayer {
 
         hbox.getChildren().add(localTetrisArea);
         hbox.getChildren().add(opponentTetrisArea);
+        hbox.getChildren().add(mpChatVbox);
 
         peaLava.setOnCloseRequest((we) -> {
             System.out.println("Tetris stage closed!");
@@ -68,7 +114,7 @@ public class TetrisGraafikaMultiplayer {
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
         });
-        Scene tetrisStseen = new Scene(hbox, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
+        Scene tetrisStseen = new Scene(hbox, resoWidth + 140, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
             if (!tetromino.isDrawingAllowed() && !tetromino.gameStateOver()) {
@@ -108,7 +154,8 @@ public class TetrisGraafikaMultiplayer {
     public void begin() {
         //launch();
     }
-    Timeline createTimeline(Duration durationSeconds, Tetromino tetromino){
+
+    Timeline createTimeline(Duration durationSeconds, Tetromino tetromino) {
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
         Timeline tickTime = new Timeline(new KeyFrame(durationSeconds, new EventHandler<ActionEvent>() {
@@ -129,5 +176,17 @@ public class TetrisGraafikaMultiplayer {
             }
         }));
         return tickTime;
+    }
+    public void addNewMessage(String name, String message){
+        chatWindow.appendText(name + ">> " + message + "\n");
+    }
+    public String sendMessageandclearMP(){
+        String toReturn = chatWindow.getText();
+        //chatWindow.clear();
+        return toReturn;
+    }
+
+    public Integer getOpponentID() {
+        return opponentID;
     }
 }
