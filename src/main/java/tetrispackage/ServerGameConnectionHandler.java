@@ -315,6 +315,11 @@ public class ServerGameConnectionHandler implements Runnable {
 
     private void inviteToGame(int invitedUID) throws Exception {
         ServerMain.debug(5, "invitetogame: " + username + " kutsub " + invitedUID + " mängima");
+
+        if (invitedUID == 0) {
+            this.invitedUID = 0;
+            return;
+        }
         for (ServerGameConnectionHandler player : players) {
             // leidsime mängija, ta tahab minuga ka mängida. anname mõlemale teada
             if (player.getUserid() == invitedUID && player.getInvitedUID() == userid) {
@@ -392,14 +397,14 @@ public class ServerGameConnectionHandler implements Runnable {
 
     private void receiveGamerMove(int tickID, int action) throws Exception {
         for (ServerGameConnectionHandler player : players) {
-                if (player.getUserid() == opponentID && !player.isLogin()) {
-                    DataOutputStream dos2 = player.getDos();
-                    synchronized (dos2) {
-                            dos2.writeInt(101);
-                            dos2.writeInt(tickID);
-                            dos2.writeInt(action);
-                            dos2.writeInt(userid);
-                    } // sync teade teisele
+            if (player.getUserid() == opponentID && !player.isLogin()) {
+                DataOutputStream dos2 = player.getDos();
+                synchronized (dos2) {
+                    dos2.writeInt(101);
+                    dos2.writeInt(tickID);
+                    dos2.writeInt(action);
+                    dos2.writeInt(userid);
+                } // sync teade teisele
             }
         }
     } // receiveGamerMove

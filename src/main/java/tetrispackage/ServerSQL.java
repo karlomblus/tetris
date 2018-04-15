@@ -8,14 +8,18 @@ public class ServerSQL {
 
     public ServerSQL() throws Exception {
 
+        ServerConfig cfg = new ServerConfig();
+
+
         try {
-            conn = DriverManager.getConnection("jdbc:mysql://tetris.carlnet.ee:33060/tetris?user=tetris&password=oopprojekt&autoReconnect=true");
+            conn = DriverManager.getConnection(cfg.getProperty("sqluri","jdbc:mysql://localhost:3306/test?user=test&autoReconnect=true"));
         } catch (SQLException ex) {
 
             ServerMain.debug("SQLException: " + ex.getMessage());
             ServerMain.debug("SQLState: " + ex.getSQLState());
             ServerMain.debug("VendorError: " + ex.getErrorCode());
             ServerMain.error("SQL ühendumine katki");
+           throw new RuntimeException(ex);
         }
 
     }
