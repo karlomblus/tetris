@@ -1,5 +1,4 @@
 git pull
-rm out/server/*
 rm out/server/tetrispackage/*
 cd src/main/java/tetrispackage
 javac Server*.java -d ../../../../out/server
