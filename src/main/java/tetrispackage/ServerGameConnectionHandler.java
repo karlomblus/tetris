@@ -22,10 +22,12 @@ public class ServerGameConnectionHandler implements Runnable {
     private String username = "";
     private int invitedUID = 0; // id, keda ma olen mängima kutsunud.
     private int opponentID = 0; // kellega ta mängib
+    private ServerSQL sql;
 
-    ServerGameConnectionHandler(Socket socket, List<ServerGameConnectionHandler> players) {
+    ServerGameConnectionHandler(Socket socket, List<ServerGameConnectionHandler> players, ServerSQL sql) {
         this.socket = socket;
         this.players = players;
+        this.sql=sql;
     }
 
 
@@ -131,7 +133,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 return;
             }
 
-            String uid = ServerMain.sql.getstring("select id from users where username = ?", username);
+            String uid = sql.getstring("select id from users where username = ?", username);
 
             if (uid.length() > 0) {
                 dos.writeInt(-1);
@@ -142,7 +144,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
             String hashedPassword = ServerPasswordCrypto.generateSecurePassword(password);
-            int result = ServerMain.sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
+            int result = sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
 
             if (result > 0) {
                 // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
@@ -177,7 +179,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 ServerMain.debug(5, "dologin: Kasutajan " + username + " parool puudu.");
                 return;
             }
-            String[] andmebaasist = ServerMain.sql.query(2, "select id,password from users where username = ?", username);
+            String[] andmebaasist = sql.query(2, "select id,password from users where username = ?", username);
             if (andmebaasist[0].length() == 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
@@ -315,6 +317,11 @@ public class ServerGameConnectionHandler implements Runnable {
 
     private void inviteToGame(int invitedUID) throws Exception {
         ServerMain.debug(5, "invitetogame: " + username + " kutsub " + invitedUID + " mängima");
+
+        if (invitedUID == 0) {
+            this.invitedUID = 0;
+            return;
+        }
         for (ServerGameConnectionHandler player : players) {
             // leidsime mängija, ta tahab minuga ka mängida. anname mõlemale teada
             if (player.getUserid() == invitedUID && player.getInvitedUID() == userid) {
@@ -392,14 +399,14 @@ public class ServerGameConnectionHandler implements Runnable {
 
     private void receiveGamerMove(int tickID, int action) throws Exception {
         for (ServerGameConnectionHandler player : players) {
-                if (player.getUserid() == opponentID && !player.isLogin()) {
-                    DataOutputStream dos2 = player.getDos();
-                    synchronized (dos2) {
-                            dos2.writeInt(101);
-                            dos2.writeInt(tickID);
-                            dos2.writeInt(action);
-                            dos2.writeInt(userid);
-                    } // sync teade teisele
+            if (player.getUserid() == opponentID && !player.isLogin()) {
+                DataOutputStream dos2 = player.getDos();
+                synchronized (dos2) {
+                    dos2.writeInt(101);
+                    dos2.writeInt(tickID);
+                    dos2.writeInt(action);
+                    dos2.writeInt(userid);
+                } // sync teade teisele
             }
         }
     } // receiveGamerMove

@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServerMain {
-    public static ServerSQL sql;
+
 
     public static void main(String[] args) throws Exception {
         List<ServerGameConnectionHandler> players = new ArrayList<>();
         System.out.println("Server alustab");
+        ServerSQL sql;
         sql = new ServerSQL();
         System.out.println("Mysql connected");
 
@@ -27,7 +28,7 @@ public class ServerMain {
                 // wait for an incoming connection
                 Socket gameSocket = gameServerSocket.accept();
                 debug("Uus connection accepted");
-                ServerGameConnectionHandler connection = new ServerGameConnectionHandler(gameSocket,players);
+                ServerGameConnectionHandler connection = new ServerGameConnectionHandler(gameSocket,players, sql);
                 synchronized (players){
                     debug("Lisame mängija");
                     players.add(connection);
