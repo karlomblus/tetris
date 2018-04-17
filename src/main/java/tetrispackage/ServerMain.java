@@ -10,10 +10,16 @@ public class ServerMain {
 
     public static void main(String[] args) throws Exception {
         List<ServerGameConnectionHandler> players = new ArrayList<>();
-        System.out.println("Server alustab");
+        debug(2,"Server alustab");
         ServerSQL sql;
         sql = new ServerSQL();
-        System.out.println("Mysql connected");
+        debug(3,"Mysql connected");
+
+
+        Thread web = new Thread(new ServerWebMaster(3));
+        web.start();
+
+
 
 
         // plan: weebiserver täiesti eraldi
