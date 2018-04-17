@@ -357,7 +357,7 @@ public class Klient extends Application {
         TetrisGraafikaMultiplayer mp = new TetrisGraafikaMultiplayer();
         multiplayerGame = mp;
         Stage mpstage = new Stage();
-        mp.start(mpstage,this,opponentID);
+        mp.start(mpstage, this, opponentID);
     }
 
     public void showOpenChallengeWindow(String user) {

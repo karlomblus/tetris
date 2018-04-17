@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -37,6 +38,7 @@ public class TetrisGraafikaMultiplayer {
 
     //chati
     TextArea chatWindow;
+    TextField writeArea;
     private Integer opponentID;
 
     //lisasin client, et kasutada Klient klassi meetodeid
@@ -60,18 +62,21 @@ public class TetrisGraafikaMultiplayer {
         messagearea.setFocusTraversable(false);
 
         TextField writearea = new TextField();
+        this.writeArea = writearea;
         writearea.setPromptText("Type your message here...");
         writearea.setPrefWidth(200);
+        writearea.setFocusTraversable(false);
+
 
         writearea.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
 
-                writearea.clear();
                 try {
                     client.sendSomething(105);
-                }catch(IOException error){
+                } catch (IOException error) {
                     messagearea.appendText("Socket kinni. Ei saanud saata.");
                 }
+                writearea.clear();
             }
         });
 
@@ -101,9 +106,22 @@ public class TetrisGraafikaMultiplayer {
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
 
+        //noded-e paigutamine
         hbox.getChildren().add(localTetrisArea);
         hbox.getChildren().add(opponentTetrisArea);
         hbox.getChildren().add(mpChatVbox);
+
+        //kood selleks, et klikkides tetrise mängule deselectib chatirea.(Muidu ei saa klotse liigutada peale chattimist)
+        localTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent me) {
+                hbox.requestFocus();
+            }
+        });
+        opponentTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            public void handle(MouseEvent me) {
+                hbox.requestFocus();
+            }
+        });
 
         peaLava.setOnCloseRequest((we) -> {
             System.out.println("Tetris stage closed!");
@@ -177,11 +195,13 @@ public class TetrisGraafikaMultiplayer {
         }));
         return tickTime;
     }
-    public void addNewMessage(String name, String message){
+
+    public void addNewMessage(String name, String message) {
         chatWindow.appendText(name + ">> " + message + "\n");
     }
-    public String sendMessageandclearMP(){
-        String toReturn = chatWindow.getText();
+
+    public String sendMessageandclearMP() {
+        String toReturn = writeArea.getText();
         //chatWindow.clear();
         return toReturn;
     }
