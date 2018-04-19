@@ -104,6 +104,9 @@ public class TestClientDemo2 {
                 case 8:
                     System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt() );
                     break;
+                case 100:
+                    System.out.println("server tegi tiks: " + dis.readInt()  );
+                    break;
                 default:
                     System.out.println("Ma ei tea mis server ütles (" + servervastus + ") ja ei oska mitte midagi teha");
 

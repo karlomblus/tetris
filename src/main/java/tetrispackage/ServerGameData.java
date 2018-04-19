@@ -47,7 +47,7 @@ public class ServerGameData {
             public void run() {
                 tiksJuhtus();
             }
-        }, 300);
+        }, 300,300);
 
 
     } // start
