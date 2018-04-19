@@ -28,12 +28,20 @@ public class TestClientDemo2 {
 
             loesisendit(dis);
 
+            System.out.println("saadame kutse 1-le");
+            dos.writeInt(7); // saadame 1-l kutse
+            dos.writeInt(1);
+
+
+
+
+/*
             // kirjutame chatti
             dos.writeInt(5);
             dos.writeUTF("TeineTest tahab ka midagi öelda");
             dos.writeInt(5);
             dos.writeUTF("TeineTest Ütleb veel midagi");
-
+*/
 
             /*
 
@@ -48,10 +56,13 @@ public class TestClientDemo2 {
 
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
 */
-            Thread.sleep(1000);
-            loesisendit(dis);
-            Thread.sleep(1000);
-            loesisendit(dis);
+
+
+
+            for (int i = 0; i < 10; i++) {
+                Thread.sleep(1000);
+                loesisendit(dis);
+            }
 
             Thread.sleep(20000); // jääme natueseks ajaks passima
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
@@ -86,6 +97,12 @@ public class TestClientDemo2 {
                     break;
                 case 6:
                     System.out.println("Running games: id: " + dis.readInt() + ", players: " + dis.readUTF() + " ja " + dis.readUTF());
+                    break;
+                case 7:
+                    System.out.println("Sain kutse: id: " + dis.readInt() + ", name: " + dis.readUTF() );
+                    break;
+                case 8:
+                    System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt() );
                     break;
                 default:
                     System.out.println("Ma ei tea mis server ütles (" + servervastus + ") ja ei oska mitte midagi teha");

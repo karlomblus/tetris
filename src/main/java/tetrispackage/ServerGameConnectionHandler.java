@@ -27,7 +27,7 @@ public class ServerGameConnectionHandler implements Runnable {
     ServerGameConnectionHandler(Socket socket, List<ServerGameConnectionHandler> players, ServerSQL sql) {
         this.socket = socket;
         this.players = players;
-        this.sql=sql;
+        this.sql = sql;
     }
 
 
@@ -59,7 +59,7 @@ public class ServerGameConnectionHandler implements Runnable {
                             doLogin(dos, dis.readUTF(), dis.readUTF());
                             break;
                         default:
-                            ServerMain.error("LOGIN: tundmatu/lubamatu command: " + command);
+                            ServerMain.error("LOGIN: tundmatu/lubamatu command: " + command, null);
                     }
                     continue;
                 } // login
@@ -91,7 +91,7 @@ public class ServerGameConnectionHandler implements Runnable {
                         privateChatmessage(dis.readInt(), dis.readUTF());
                         break;
                     default:
-                        ServerMain.error("Tuli sisse tundmatu/lubamatu command: " + command);
+                        ServerMain.error("Tuli sisse tundmatu/lubamatu command: " + command, null);
                 } // command switch
             } // while connected
 
@@ -327,23 +327,16 @@ public class ServerGameConnectionHandler implements Runnable {
             if (player.getUserid() == invitedUID && player.getInvitedUID() == userid) {
                 // see mängija kutsus mind ka mängima, seega aksepteerime mängu ja anname mõlemale teada
                 ServerMain.debug(6, "inviteToGame: " + username + " aksepteerib " + player.getUsername());
-                synchronized (dos) {
-                    dos.writeInt(8);
-                    dos.writeInt(player.getUserid());
-                    dos.writeInt(999); // todo: siia leida õige mänguID
-                    opponentID = player.getUserid();
-                } // sync  teade mulle
-                DataOutputStream dos2 = player.getDos();
-                synchronized (dos2) {
-                    dos2.writeInt(8);
-                    dos2.writeInt(userid);
-                    dos2.writeInt(999); // todo: siia leida õige mänguID
-                    player.setOpponentID(userid);
-                } // sync teade teisele
+                opponentID = player.getUserid();
+                player.setOpponentID(userid);
+                ServerGameData game = new ServerGameData(this, player);
+                game.start();
+
+
             }
             // leidsime mängija, anname talle teada
             else if (player.getUserid() == invitedUID) {
-                ServerMain.debug(6, "inviteToGame: " + username + " kutsub " + player.getUsername());
+                ServerMain.debug(6, "inviteToGame: " + username + " saadab kutse " + player.getUsername());
                 this.invitedUID = invitedUID;
                 DataOutputStream dos2 = player.getDos();
                 synchronized (dos2) {

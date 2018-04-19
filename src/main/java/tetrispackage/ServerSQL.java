@@ -18,7 +18,7 @@ public class ServerSQL {
             ServerMain.debug("SQLException: " + ex.getMessage());
             ServerMain.debug("SQLState: " + ex.getSQLState());
             ServerMain.debug("VendorError: " + ex.getErrorCode());
-            ServerMain.error("SQL ühendumine katki"); // error() laseb prgrammi niikuinii õhku
+            ServerMain.error("SQL ühendumine katki",ex); // error() laseb prgrammi niikuinii õhku
            //throw new RuntimeException(ex);
         }
 

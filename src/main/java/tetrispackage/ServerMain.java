@@ -52,10 +52,10 @@ public class ServerMain {
 
     } // main
 
-    public static void error(String msg) throws Exception {
+    public static void error(String msg, Exception e)  {
         System.out.println("Saime errori: " + msg);
         //todo: logime errori
-        throw new java.lang.Exception("custom error: " + msg);
+        throw new RuntimeException(e);
     } // error
 
 

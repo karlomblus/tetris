@@ -8,25 +8,10 @@ public class TestClientDemo {
     public static void main(String[] args) throws Exception {
 
         System.out.println("Ühendume serveriga");
-        Socket socket = new Socket("tetris.carlnet.ee", 54321);
+        Socket socket = new Socket("127.0.0.1", 54321);
         try (DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
              DataInputStream dis = new DataInputStream(socket.getInputStream())) {
 
-            //System.out.println("Loome uue konto");
-            //dos.writeInt(1); // konto loomise käsk
-            //dos.writeUTF("UusUsername");
-            //dos.writeUTF("UusParool");
-/*
-            System.out.println("Logime sisse vale kasutajakontoga");
-            dos.writeInt(2);
-            dos.writeUTF("UusUsername3333");
-            dos.writeUTF("UusParool3333");
-
-            System.out.println("Logime sisse vale parooliga");
-            dos.writeInt(2);
-            dos.writeUTF("UusUsername");
-            dos.writeUTF("UusParool3333");
-*/
 
             System.out.println("Logime sisse õige parooliga");
             dos.writeInt(2);
@@ -35,10 +20,20 @@ public class TestClientDemo {
             loesisendit(dis);
 
 
-            System.out.println("Küsime userlisti");
-            dos.writeInt(3);
+
+            Thread.sleep(5000);
+            loesisendit(dis);
+            loesisendit(dis);
+            loesisendit(dis);
+            loesisendit(dis);
+            System.out.println("saadame 2-le kutse");
+            dos.writeInt(7); // saadame 2-l kutse
+            dos.writeInt(2);
+            loesisendit(dis);
             loesisendit(dis);
 
+
+            /*
             System.out.println("Ütleme chatis tere");
             dos.writeInt(5);
             dos.writeUTF("Tere kes te kõik siin olete (esimene kasutaja)");
@@ -61,10 +56,12 @@ public class TestClientDemo {
 
             System.out.println("Küsime olemasolevaid mänge, et neid kuskil kuvada");
             dos.writeInt(6);
+*/
+
 
             loesisendit(dis);
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 10; i++) {
                 Thread.sleep(1000);
                 loesisendit(dis);
             }
@@ -104,6 +101,12 @@ public class TestClientDemo {
                     break;
                 case 6:
                     System.out.println("Running games: id: " + dis.readInt() + ", players: " + dis.readUTF() + " ja " + dis.readUTF());
+                    break;
+                case 7:
+                    System.out.println("Sain kutse: id: " + dis.readInt() + ", name: " + dis.readUTF() );
+                    break;
+                case 8:
+                    System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt() );
                     break;
                 default:
                     System.out.println("Ma ei tea mis server ütles (" + servervastus + ") ja ei oska mitte midagi teha");
