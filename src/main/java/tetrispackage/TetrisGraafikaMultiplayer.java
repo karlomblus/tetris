@@ -73,6 +73,7 @@ public class TetrisGraafikaMultiplayer {
 
                 try {
                     client.sendSomething(105);
+                    chatWindow.appendText(client.getNimi()+ ">> " + writearea.getText() + "\n");
                 } catch (IOException error) {
                     messagearea.appendText("Socket kinni. Ei saanud saata.");
                 }
@@ -202,7 +203,7 @@ public class TetrisGraafikaMultiplayer {
 
     public String sendMessageandclearMP() {
         String toReturn = writeArea.getText();
-        //chatWindow.clear();
+
         return toReturn;
     }
 

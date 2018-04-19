@@ -29,6 +29,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Klient extends Application {
+    private String nimi;
     private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
     private boolean challengeOpen = false;
     private boolean mpgameopen = false;
@@ -49,6 +50,10 @@ public class Klient extends Application {
     private ClientThread listener;
     private TetrisGraafikaMultiplayer multiplayerGame;
     Stage loginwindow;
+
+    public String getNimi() {
+        return nimi;
+    }
 
     public TetrisGraafikaMultiplayer getMultiplayerGame() {
         return multiplayerGame;
@@ -149,6 +154,8 @@ public class Klient extends Application {
                     errorlabel.setText("Error, connection error. Please restart.");
                 } else {
                     sendSomething(2);
+                    //sätin cliendi siseseks nimeks proovitud nime
+                    nimi = loginnamefield.getText();
                     int loginvastus = toLoginorNot.take();
                     switch (loginvastus) {
                         case 1:
