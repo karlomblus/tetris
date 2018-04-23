@@ -4,6 +4,10 @@ import chati_leiutis.Klient;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -31,7 +35,7 @@ public class TetrisGraafikaMultiplayer {
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
-    private boolean tickReceived = false;
+    private IntegerProperty tickProperty = new SimpleIntegerProperty();
 
     Tetromino tetromino;
     Tetromino tetromino2;
@@ -99,16 +103,16 @@ public class TetrisGraafikaMultiplayer {
                 opponentTetrisArea.getChildren().add(ristkülik2[i][j]);  // ristkülik lisatakse juure alluvaks
             }
         }
+
         tetromino = new Tetromino(ristkülik);
         tetromino2 = new Tetromino(ristkülik2);
-        doActions(tickReceived, tetromino);
-        doActions(tickReceived, tetromino2);
-        /*Timeline tickTime = createTimeline(Duration.seconds(0.2), tetromino);
-        Timeline tickTime2 = createTimeline(Duration.seconds(0.2), tetromino2);
-        tickTime2.setCycleCount(Timeline.INDEFINITE);
-        tickTime2.play();
-        tickTime.setCycleCount(Timeline.INDEFINITE);
-        tickTime.play();*/
+
+//User navigates forward a page, update page changer object.
+        tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
+            //pageNavigator.setPage(pageNoProperty.doubleValue());
+            doActions(tickProperty.getValue(), tetromino);
+            doActions(tickProperty.getValue(), tetromino2);
+        });
 
         //noded-e paigutamine
         hbox.getChildren().add(localTetrisArea);
@@ -176,31 +180,8 @@ public class TetrisGraafikaMultiplayer {
     public void begin() {
         //launch();
     }
-
-    Timeline createTimeline(Duration durationSeconds, Tetromino tetromino) {
-        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
-        Random rand = new Random();
-        Timeline tickTime = new Timeline(new KeyFrame(durationSeconds, new EventHandler<ActionEvent>() {
-            char randomTetromino = 'S';
-
-            @Override
-            public void handle(ActionEvent event) {
-                if (!tetromino.gameStateOver()) {
-                    tetromino.tick();
-                    tetromino.isRowFilled();
-                    if (tetromino.isDrawingAllowed()) {
-                        if (tetromino.getDrawingTurns() == 2) {
-                            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
-                        }
-                        tetromino.draw(randomTetromino);
-                    }
-                }
-            }
-        }));
-        return tickTime;
-    }
-    void doActions(boolean tickReceived, Tetromino tetromino) {
-        if (tickReceived) {
+    void doActions(int tickReceived, Tetromino tetromino) {
+            System.out.println("I GOT A   TIIIICKKK!");
             char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
             Random rand = new Random();
             char randomTetromino = 'S';
@@ -214,8 +195,6 @@ public class TetrisGraafikaMultiplayer {
                     tetromino.draw(randomTetromino);
                 }
             }
-        }
-        setTickReceived(false);
     }
 
     public void addNewMessage(String name, String message) {
@@ -231,7 +210,7 @@ public class TetrisGraafikaMultiplayer {
     public Integer getOpponentID() {
         return opponentID;
     }
-    public void setTickReceived(boolean state){
-        tickReceived = true;
+    public void setTickValue(int value){
+        tickProperty.set(value);
     }
 }

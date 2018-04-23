@@ -117,6 +117,10 @@ public class ClientThread extends Thread {
                 break;
             case 9:
                 //todo kui vastane keeldub kutsest
+                in.readInt();
+                String message = in.readUTF();
+                client.recieveMessage(-1, "System", message + " keeldus!");
+
                 break;
             case 105:
                 //sissetulev mängu chat message
@@ -129,7 +133,7 @@ public class ClientThread extends Thread {
                 //Tulevad tiksud
                 int tiskuID = in.readInt(); //tiksuID
                 System.out.println("Sain tiksu id'ga " + tiskuID);
-                client.getMultiplayerGame().setTickReceived(true);
+                client.getMultiplayerGame().setTickValue(tiskuID);
             default:
                 if(tologinornot.size() == 0)
                 tologinornot.put(0);
