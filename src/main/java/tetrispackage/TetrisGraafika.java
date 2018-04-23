@@ -34,22 +34,14 @@ public class TetrisGraafika {
             }
         }
         tetromino = new Tetromino(ristkülik);
-
-        char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
-        Random rand = new Random();
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
-            char randomTetromino = 'S';
-
             @Override
             public void handle(ActionEvent event) {
                 if (!tetromino.gameStateOver()) {
                     tetromino.tick();
                     tetromino.isRowFilled();
                     if (tetromino.isDrawingAllowed()) {
-                        if (tetromino.getDrawingTurns() == 2) {
-                            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
-                        }
-                        tetromino.draw(randomTetromino);
+                        tetromino.draw();
                     }
                 }
             }
@@ -63,7 +55,7 @@ public class TetrisGraafika {
             //PlatformImpl.tkExit()
             tickTime.stop();
         });
-        //tickTime.setCycleCount(Timeline.INDEFINITE);
+        tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
 
         //tickTime.play();
@@ -79,23 +71,17 @@ public class TetrisGraafika {
                     tetromino.moveLeft();
                 }
                 if (currentActiveKeys.containsKey(KeyCode.SPACE) && currentActiveKeys.get(KeyCode.SPACE)) {
-                    boolean keepticking = true;
+                        boolean keepticking = true;
                         do {
                             keepticking = tetromino.tick();
                         }
                         while (keepticking);
                 }
-                /*if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
-                    tetromino.tick();
-                }*/
+                if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
+
+                    tetromino.rotateLeft();
+                }
             }
-            if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
-
-                tickTime.setCycleCount(1);
-                tickTime.play();
-
-            }
-
         });
         tetrisStseen.setOnKeyReleased(event ->
                 currentActiveKeys.put(event.getCode(), false)

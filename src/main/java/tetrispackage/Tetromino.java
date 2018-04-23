@@ -3,10 +3,7 @@ package tetrispackage;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Tetromino {
     private Map<Integer, Character> rectToStatus = new HashMap<>();
@@ -20,6 +17,7 @@ public class Tetromino {
     private int tetrominoRotationTracker = 0;
     private boolean gameOver = false;
     private int [][] activeTetrominoMatrix;
+    private char randomTetromino = 'S';
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -207,7 +205,7 @@ public class Tetromino {
                 return false;
             }
             drawingTurns = 2;
-            allowTetrominoDrawing = true;
+            setDrawingPermission(true);
             allActiveToPassive = false;
             keepTicking = false;
         } else if (!allActiveToPassive) {
@@ -241,8 +239,8 @@ public class Tetromino {
     }
 
     //Tetriminos I O T J L S Z
-    void draw(char tetrominoType) {
-        this.tetrominoType = tetrominoType;
+    void draw() {
+        this.tetrominoType = randomTetromino;
 
         drawingTurns -= 1;
         tetrominoRotationTracker = 0;
@@ -316,6 +314,11 @@ public class Tetromino {
     }
 
     public void setDrawingPermission(boolean allowTetrominoDrawing) {
+        if (allowTetrominoDrawing == true){ //if something set drawing to true, make a new random tetromino
+            char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
+            Random rand = new Random();
+            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+        }
         this.allowTetrominoDrawing = allowTetrominoDrawing;
     }
 

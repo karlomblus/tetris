@@ -181,18 +181,11 @@ public class TetrisGraafikaMultiplayer {
         //launch();
     }
     void doActions(int tickReceived, Tetromino tetromino) {
-            System.out.println("I GOT A   TIIIICKKK!");
-            char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
-            Random rand = new Random();
-            char randomTetromino = 'S';
             if (!tetromino.gameStateOver()) {
                 tetromino.tick();
                 tetromino.isRowFilled();
                 if (tetromino.isDrawingAllowed()) {
-                    if (tetromino.getDrawingTurns() == 2) {
-                        randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
-                    }
-                    tetromino.draw(randomTetromino);
+                    tetromino.draw();
                 }
             }
     }
