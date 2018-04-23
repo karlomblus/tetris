@@ -31,6 +31,7 @@ public class TetrisGraafikaMultiplayer {
     final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    private boolean tickReceived = false;
 
     Tetromino tetromino;
     Tetromino tetromino2;
@@ -100,12 +101,14 @@ public class TetrisGraafikaMultiplayer {
         }
         tetromino = new Tetromino(ristkülik);
         tetromino2 = new Tetromino(ristkülik2);
-        Timeline tickTime = createTimeline(Duration.seconds(0.2), tetromino);
+        doActions(tickReceived, tetromino);
+        doActions(tickReceived, tetromino2);
+        /*Timeline tickTime = createTimeline(Duration.seconds(0.2), tetromino);
         Timeline tickTime2 = createTimeline(Duration.seconds(0.2), tetromino2);
         tickTime2.setCycleCount(Timeline.INDEFINITE);
         tickTime2.play();
         tickTime.setCycleCount(Timeline.INDEFINITE);
-        tickTime.play();
+        tickTime.play();*/
 
         //noded-e paigutamine
         hbox.getChildren().add(localTetrisArea);
@@ -128,7 +131,7 @@ public class TetrisGraafikaMultiplayer {
             System.out.println("Tetris stage closed!");
             Platform.exit();
             //PlatformImpl.tkExit()
-            tickTime.stop();
+            //tickTime.stop();
         });
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
@@ -196,6 +199,24 @@ public class TetrisGraafikaMultiplayer {
         }));
         return tickTime;
     }
+    void doActions(boolean tickReceived, Tetromino tetromino) {
+        if (tickReceived) {
+            char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
+            Random rand = new Random();
+            char randomTetromino = 'S';
+            if (!tetromino.gameStateOver()) {
+                tetromino.tick();
+                tetromino.isRowFilled();
+                if (tetromino.isDrawingAllowed()) {
+                    if (tetromino.getDrawingTurns() == 2) {
+                        randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+                    }
+                    tetromino.draw(randomTetromino);
+                }
+            }
+        }
+        setTickReceived(false);
+    }
 
     public void addNewMessage(String name, String message) {
         chatWindow.appendText(name + ">> " + message + "\n");
@@ -209,5 +230,8 @@ public class TetrisGraafikaMultiplayer {
 
     public Integer getOpponentID() {
         return opponentID;
+    }
+    public void setTickReceived(boolean state){
+        tickReceived = true;
     }
 }
