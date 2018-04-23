@@ -288,8 +288,11 @@ public class Klient extends Application {
             public void handle(MouseEvent event) {
                 if (!challengeOpen) {
                     try {
-                        showOpenChallengeWindow(userListView.getSelectionModel().getSelectedItem());
-                        sendSomething(7);
+                        String selectedUserName = userListView.getSelectionModel().getSelectedItem();
+                        if (!selectedUserName.equals(nimi)) {
+                            showOpenChallengeWindow(selectedUserName);
+                            sendSomething(7);
+                        }
                     } catch (Exception e2) {
                         throw new RuntimeException(e2);
                     }
