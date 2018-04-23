@@ -322,6 +322,12 @@ public class ServerGameConnectionHandler implements Runnable {
             this.invitedUID = 0;
             return;
         }
+        if (this.userid==invitedUID) {
+            ServerMain.debug(6,"Kutsus iseennast. ignome");
+            this.invitedUID = 0;
+            return;
+        }
+
         for (ServerGameConnectionHandler player : players) {
             // leidsime mängija, ta tahab minuga ka mängida. anname mõlemale teada
             if (player.getUserid() == invitedUID && player.getInvitedUID() == userid) {
