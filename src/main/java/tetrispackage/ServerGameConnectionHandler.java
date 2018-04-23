@@ -325,6 +325,12 @@ public class ServerGameConnectionHandler implements Runnable {
         if (this.userid==invitedUID) {
             ServerMain.debug(6,"Kutsus iseennast. ignome");
             this.invitedUID = 0;
+            synchronized (dos) {
+                dos.writeInt(9);
+                dos.writeInt(userid);
+                dos.writeUTF(username);
+            }
+
             return;
         }
 
