@@ -134,6 +134,16 @@ public class ClientThread extends Thread {
                 int tiskuID = in.readInt(); //tiksuID
                 System.out.println("Sain tiksu id'ga " + tiskuID);
                 client.getMultiplayerGame().setTickValue(tiskuID);
+                break;
+            case 101:
+                int nuputiskuID = in.readInt(); //tiksuID
+                int nupuvajutus = in.readInt();
+                int kellenupuvajutusID = in.readInt();
+                if (nupuvajutus == TetrisGraafikaMultiplayer.LEFT){
+                    client.getMultiplayerGame().setOpponentMoveLeft(true);
+                }
+                System.out.println("Sain nupu tiksu id'ga " + nuputiskuID);
+
             default:
                 if(tologinornot.size() == 0)
                 tologinornot.put(0);
