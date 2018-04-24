@@ -26,7 +26,7 @@ class ServerWebThread implements Runnable {
 
                 try (BufferedReader bis = new BufferedReader(new InputStreamReader(socket.getInputStream())); PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
                     String inputLine;
-                    ServerWebResponse web = new ServerWebResponse(out);
+                    ServerWebResponse web = new ServerWebResponse(socket, out);
                     while ((inputLine = bis.readLine()) != null) {
                         //instr.append(inputLine);
                         System.out.println("'" + inputLine + "'");
