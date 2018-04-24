@@ -93,13 +93,26 @@ public class ServerGameData {
             }
         } // iter
 
+    }  // sendNewTetromino
 
 
-
-
-
-
-    }
-
-
+    public void removeUserFromGame(ServerGameConnectionHandler removeUser) {
+        players.remove(removeUser);
+        removeUser.setOpponentID(0);
+        // ütleme teistele, et ta läks minema
+        for (ServerGameConnectionHandler player : players) {
+            try {
+                DataOutputStream dos = player.getDos();
+                synchronized (dos) {
+                    dos.writeInt(102);
+                    dos.writeInt(player.getUserid());
+                } // sync
+            } catch (Exception e) { // kui üks mängija läheb katki, siis ei taha me õhku lennata vaid teine mängija jääb üksi mängima
+                ServerMain.debug(1,"Lahkumisteate saatmisel kasutajale "+player.getUsername()+" läks midagi valesti.");
+                ServerMain.debug(5,e.toString());
+                player.setOpponentID(0); // viskame selle minema kellele ei saanud kirjutada
+                players.remove(player);
+            }
+        } // iter
+    } // removeUserFromGame
 } // class
