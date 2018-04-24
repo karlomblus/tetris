@@ -723,4 +723,8 @@ public class Tetromino {
         }
         while (keepticking);
     }
+
+    public char getCurrentTetrominoType() {
+        return randomTetromino;
+    }
 }
