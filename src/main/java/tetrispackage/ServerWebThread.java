@@ -26,27 +26,19 @@ class ServerWebThread implements Runnable {
 
                 try (BufferedReader bis = new BufferedReader(new InputStreamReader(socket.getInputStream())); PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
                     String inputLine;
+                    ServerWebResponse web = new ServerWebResponse(out);
                     while ((inputLine = bis.readLine()) != null) {
                         //instr.append(inputLine);
                         System.out.println("'" + inputLine + "'");
-                        if (inputLine.equals(".q")) {
+                        web.addheader(inputLine);
+                        if (inputLine.equals(".q")) {  // testimiseks
                             socket.close();
                             break;
-                        }
-                        if (inputLine.equals(".k")) throw new RuntimeException(); // test
-                        if (inputLine.equals("")) { // päring sai läbi
-                            System.out.println("saadame mingi kamarajura vastu");
-                            out.println("HTTP/1.1 200 OK");
-                            out.println("Server: Tetris scoreserver");
-                            out.println("Cache-Control: no-cache, no-store, must-revalidate");
-                            out.println("Pragma: no-cache");
-                            out.println("Connection: Close");
-                            out.println("Content-Type: text/html; charset=UTF-8");
-                            out.println("");
-                            out.println("<html><body>  Oled ühendunud tetrise serveri külge. <br><br>Varsti näed siin skoore ja saad mängu alla laadida. </body></html>");
+                        } else if (inputLine.equals(".k")) throw new RuntimeException(); // test
+                        else if (inputLine.equals("")) { // päring sai läbi
+                            web.sendresponse();
                             out.close();
                             break;
-
                         } // päring sai läbi
 
 
