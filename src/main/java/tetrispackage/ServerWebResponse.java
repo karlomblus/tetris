@@ -105,11 +105,17 @@ public class ServerWebResponse {
 
     private void sendfile() {
 
-        ServerMain.debug(4,"WEB: reuested file: " + rawurl + "");
+        ServerMain.debug(4,"WEB: requested file: " + rawurl + "");
 
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         try (   InputStream inStream = classloader.getResourceAsStream("webroot/"+filename);BufferedOutputStream outStream = new BufferedOutputStream(socket.getOutputStream()) ) {
             //try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(new File("webroot/"+filename)));BufferedOutputStream outStream = new BufferedOutputStream(socket.getOutputStream()) ) {
+
+            if (inStream==null) {
+                ServerMain.debug(4,"WEB: sendfile: Miskipärast instream oli NULL.");
+                send404();
+                return;
+            }
 
             out.println("HTTP/1.1 200 OK");
             out.println("Server: Tetris scoreserver");
@@ -124,14 +130,13 @@ public class ServerWebResponse {
                 outStream.write(buffer, 0, read);
 
         } catch (IOException e) { // faili ei leitud
-            ServerMain.debug(4,"WEB: 404: Faili " + rawurl + " ei leitud.");
             send404();
         }
 
 
     }
     private void send404() {
-        ServerMain.debug(6,"Weebiserver saadab vastu 404 errori");
+        ServerMain.debug(6,"WEB: 404: ei leia faili: "+rawurl);
         out.println("HTTP/1.1 404 File Not Found");
         out.println("Server: Tetris scoreserver");
         out.println("Content-Type: text/html; charset=UTF-8");
