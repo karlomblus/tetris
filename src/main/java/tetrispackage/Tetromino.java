@@ -243,6 +243,79 @@ public class Tetromino {
     }
 
     //Tetriminos I O T J L S Z
+    void draw(char tetro) {
+        this.tetrominoType = tetro;
+
+        drawingTurns -= 1;
+        tetrominoRotationTracker = 0;
+        int j = (ruudud[0].length / 2) - 2;
+        if (tetrominoType == 'I') {
+            int i = 0;
+            activeTetrominoColor = Color.CYAN;
+            for (int l = 0; l < 4; l++) {
+                setRectStatusAt(i, j + l, 'A');
+            }
+            drawingTurns -= 1;
+        } else if (tetrominoType == 'O') {
+            activeTetrominoColor = Color.YELLOW;
+            setRectStatusAt(0, j, 'A');
+            setRectStatusAt(0, j + 1, 'A');
+        } else if (tetrominoType == 'Z') {
+            if (drawingTurns == 1) {
+                activeTetrominoColor = Color.RED;
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
+            } else {
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+            }
+        } else if (tetrominoType == 'S') {
+            activeTetrominoColor = Color.LIME;
+            if (drawingTurns == 1) {
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+            } else {
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
+            }
+        } else if (tetrominoType == 'T') {
+            activeTetrominoColor = Color.PURPLE;
+            if (drawingTurns == 1) {
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
+
+            } else {
+                setRectStatusAt(0, j + 1, 'A');
+            }
+        }
+        else if (tetrominoType == 'L') {
+            activeTetrominoColor = Color.ORANGE;
+            if (drawingTurns == 0) {
+                setRectStatusAt(0, j + 2, 'A');
+
+            } else {
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
+            }
+        }
+        else if (tetrominoType == 'J') {
+            activeTetrominoColor = Color.BLUE;
+            if (drawingTurns == 0) {
+                setRectStatusAt(0, j, 'A');
+
+            } else {
+                setRectStatusAt(0, j, 'A');
+                setRectStatusAt(0, j + 1, 'A');
+                setRectStatusAt(0, j + 2, 'A');
+            }
+        }
+        if (drawingTurns == 0) {
+            //System.out.println("TetriminoDrawing false!");
+            setDrawingPermission(false);
+        }
+    }
     void draw() {
         this.tetrominoType = randomTetromino;
 
@@ -722,9 +795,5 @@ public class Tetromino {
             keepticking = tick();
         }
         while (keepticking);
-    }
-
-    public char getCurrentTetrominoType() {
-        return randomTetromino;
     }
 }

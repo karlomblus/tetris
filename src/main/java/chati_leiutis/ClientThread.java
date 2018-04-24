@@ -138,6 +138,11 @@ public class ClientThread extends Thread {
                 int kellenupuvajutusID = in.readInt();
                 client.getMultiplayerGame().setOpponentMoved(nupuvajutus);
                 System.out.println("Sain nupu " + nupuvajutus + " tiksu id'ga " + nuputiskuID);
+            case 103:
+                int kellele = in.readInt();
+                char klots = in.readChar();
+                client.getMultiplayerGame().setRandomTetro(klots);
+                client.getMultiplayerGame().setRandomTetroReceived(true);
 
             default:
                 if (tologinornot.size() == 0)

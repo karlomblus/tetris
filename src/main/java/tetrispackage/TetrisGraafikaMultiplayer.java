@@ -36,10 +36,12 @@ public class TetrisGraafikaMultiplayer {
     public static final char DOWN = 1;
     public static final char LEFT = 2;
     public static final char RIGHT = 3;
+    private boolean randomTetroReceived = true;
 
     private Tetromino myTetromino;
     private Tetromino opponentTetromino;
     private Map<KeyCode, Boolean> myCurrentActiveKeys = new HashMap<>();
+    private Klient client;
 
 
     //chati
@@ -47,9 +49,12 @@ public class TetrisGraafikaMultiplayer {
     private TextField writeArea;
     private Integer opponentID;
     private IntegerProperty opponentMoved = new SimpleIntegerProperty();
+    private char randomTetro = 'Z';
 
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
+        randomTetroReceived = false;
+        this.client = client;
         opponentMoved.setValue(-1);
         this.opponentID = opponentID;
         HBox hbox = new HBox(1);
@@ -219,7 +224,16 @@ public class TetrisGraafikaMultiplayer {
                 tetromino.tick();
                 tetromino.isRowFilled();
                 if (tetromino.isDrawingAllowed()) {
-                    tetromino.draw();
+                    if (tetromino.getDrawingTurns() == 2) {
+                        try {
+                            client.requestRandomTetro();
+                            System.out.println("Requesting random tetro");
+                        } catch (Exception error) {
+                            System.out.println("Socket closed. Keypress sending failed!");
+                        }
+                    }
+                    //TODO perhaps wait until confirmation that really randomTetro came.
+                    tetromino.draw(randomTetro);
                 }
             }
     }
@@ -243,5 +257,13 @@ public class TetrisGraafikaMultiplayer {
 
     public void setOpponentMoved(int state) {
         this.opponentMoved.setValue(state);
+    }
+
+    public void setRandomTetroReceived(boolean randomTetroReceived) {
+        this.randomTetroReceived = randomTetroReceived;
+    }
+
+    public void setRandomTetro(char randomTetro) {
+        this.randomTetro = randomTetro;
     }
 }

@@ -501,6 +501,9 @@ public class Klient extends Application {
         }
 
     }
+    public void requestRandomTetro() throws IOException{
+        out.writeInt(103);
+    }
     public void sendKeypress(Integer tickID, char key) throws IOException {
         System.out.println("Saatsin " + 101 + " " + key);
         out.writeInt(101);
