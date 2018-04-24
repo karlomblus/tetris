@@ -79,7 +79,7 @@ public class ServerWebResponse {
         return true;
     }
 
-    public void sendresponse() {
+    public void sendresponse() throws IOException {
 
         if (filename==null) {
             senderror(); // ma ei tea mida must tahetakse või oli url keelatud
@@ -103,7 +103,7 @@ public class ServerWebResponse {
 
     }
 
-    private void sendfile() {
+    private void sendfile() throws IOException {
 
         ServerMain.debug(4,"WEB: requested file: " + rawurl + "");
 
@@ -112,7 +112,7 @@ public class ServerWebResponse {
             //try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(new File("webroot/"+filename)));BufferedOutputStream outStream = new BufferedOutputStream(socket.getOutputStream()) ) {
 
             if (inStream==null) {
-                ServerMain.debug(4,"WEB: sendfile: Miskipärast instream oli NULL.");
+                ServerMain.debug(4,"WEB: sendfile: instream oli NULL, faili pole.");
                 send404();
                 return;
             }
@@ -129,8 +129,6 @@ public class ServerWebResponse {
             for (int read = inStream.read(buffer); read >= 0; read = inStream.read(buffer))
                 outStream.write(buffer, 0, read);
 
-        } catch (IOException e) { // faili ei leitud
-            send404();
         }
 
 
