@@ -87,7 +87,7 @@ public class ServerGameConnectionHandler implements Runnable {
                         rejectInviteToGame(dis.readInt());
                         break;
                     case 101:
-                        receiveGamerMove(dis.readInt(), dis.readInt());
+                        receiveGamerMove(dis.readInt(), dis.readChar());
                         break;
                     case 103:
                         game.sendNewTetromino(userid);
@@ -422,7 +422,7 @@ public class ServerGameConnectionHandler implements Runnable {
     } // privateChatmessage
 
 
-    private void receiveGamerMove(int tickID, int action) throws Exception {
+    private void receiveGamerMove(int tickID, char action) throws Exception {
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() == opponentID && !player.isLogin()) {
                 ServerMain.debug(6, "move " + userid + "->" + player.userid + ": " + tickID + ":" + action);
@@ -430,7 +430,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 synchronized (dos2) {
                     dos2.writeInt(101);
                     dos2.writeInt(tickID);
-                    dos2.writeInt(action);
+                    dos2.writeChar(action);
                     dos2.writeInt(userid);
                 } // sync teade teisele
             }
