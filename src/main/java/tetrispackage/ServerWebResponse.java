@@ -47,13 +47,16 @@ public class ServerWebResponse {
                     this.moodul = "shtml";
                     this.contentType="text/html; charset=UTF-8";
                 }
-                if (urlitykk[urlitykk.length - 1].equals("html")) {
+                else if (urlitykk[urlitykk.length - 1].equals("html")) {
                     this.contentType="text/html; charset=UTF-8";
                 }
-                if (urlitykk[urlitykk.length - 1].equals("txt")) {
+                else if (urlitykk[urlitykk.length - 1].equals("txt")) {
                     this.contentType="text/plain; charset=UTF-8";
                 }
-                if (
+                else if (urlitykk[urlitykk.length - 1].equals("png")) {
+                    this.contentType="image/png";
+                }
+                else if (
                         BINARYTYPES.contains(urlitykk[urlitykk.length - 1])) {
                     this.contentType="application/octet-stream";
                 }
