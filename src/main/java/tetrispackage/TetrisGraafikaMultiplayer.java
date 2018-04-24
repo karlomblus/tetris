@@ -32,10 +32,10 @@ public class TetrisGraafikaMultiplayer {
     private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
-    public static final int UP = 0;
-    public static final int DOWN = 1;
-    public static final int LEFT = 2;
-    public static final int RIGHT = 3;
+    public static final char UP = 0;
+    public static final char DOWN = 1;
+    public static final char LEFT = 2;
+    public static final char RIGHT = 3;
 
     private Tetromino myTetromino;
     private Tetromino opponentTetromino;

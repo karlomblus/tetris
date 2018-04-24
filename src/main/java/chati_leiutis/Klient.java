@@ -501,11 +501,11 @@ public class Klient extends Application {
         }
 
     }
-    public void sendKeypress(Integer tickID, Integer key) throws IOException {
+    public void sendKeypress(Integer tickID, char key) throws IOException {
         System.out.println("Saatsin " + 101 + " " + key);
         out.writeInt(101);
         out.writeInt(tickID);
-        out.writeInt(key);
+        out.writeChar(key);
     }
 
     public void logIn_or_Register(String nimi, String parool) throws IOException {
