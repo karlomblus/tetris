@@ -137,6 +137,7 @@ public class TetrisGraafikaMultiplayer {
         Scene tetrisStseen = new Scene(hbox, resoWidth + 140, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
+            System.out.println("Event: " + event.getCode());
             if (!tetromino.isDrawingAllowed() && !tetromino.gameStateOver()) {
                 if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
                     tetromino.moveRight();
