@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
+import java.util.Random;
 
 public class ServerGameConnectionHandler implements Runnable {
 
@@ -23,6 +24,7 @@ public class ServerGameConnectionHandler implements Runnable {
     private int invitedUID = 0; // id, keda ma olen mängima kutsunud.
     private int opponentID = 0; // kellega ta mängib
     private ServerSQL sql;
+    private ServerGameData game;
 
     ServerGameConnectionHandler(Socket socket, List<ServerGameConnectionHandler> players, ServerSQL sql) {
         this.socket = socket;
@@ -85,7 +87,10 @@ public class ServerGameConnectionHandler implements Runnable {
                         rejectInviteToGame(dis.readInt());
                         break;
                     case 101:
-                        receiveGamerMove(dis.readInt(), dis.readInt());
+                        receiveGamerMove(dis.readInt(), dis.readChar());
+                        break;
+                    case 103:
+                        game.sendNewTetromino(userid);
                         break;
                     case 105:
                         privateChatmessage(dis.readInt(), dis.readUTF());
@@ -114,6 +119,8 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
     } // run()
+
+
 
 
     private void createAccount(DataOutputStream dos, String username, String password) throws Exception {
@@ -195,23 +202,24 @@ public class ServerGameConnectionHandler implements Runnable {
                 this.username = username;
                 login = false;
 
-
                 // kui sama kasutaja on sees, viskame välja
                 for (ServerGameConnectionHandler player : players) {
-                    if (player!=this && player.userid ==this.userid) {
+                    if (player != this && player.userid == this.userid) {
                         DataOutputStream dos2 = player.getDos();
                         synchronized (dos2) {
                             ServerMain.debug("Kasutaja " + username + " on juba sees, kickime.");
-                                dos2.writeInt(4);
-                                dos2.writeInt(player.userid);
-                                dos2.writeUTF(player.username);
-                                player.connected=false;
-                                player.socket.close();
+                            dos2.writeInt(4);
+                            dos2.writeInt(player.userid);
+                            dos2.writeUTF(player.username);
+                            player.connected = false;
+                            player.socket.close();
                         } // sync
                     }
                 } // iter
 
                 sendLoginmessageToAll();
+                ServerMain.debug(6, "Kõik mängijad: " + players);
+
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Vale parool");
@@ -332,8 +340,8 @@ public class ServerGameConnectionHandler implements Runnable {
             this.invitedUID = 0;
             return;
         }
-        if (this.userid==invitedUID) {
-            ServerMain.debug(6,"Kutsus iseennast. ignome");
+        if (this.userid == invitedUID) {
+            ServerMain.debug(6, "Kutsus iseennast. ignome");
             this.invitedUID = 0;
             synchronized (dos) {
                 dos.writeInt(9);
@@ -351,10 +359,12 @@ public class ServerGameConnectionHandler implements Runnable {
                 ServerMain.debug(6, "inviteToGame: " + username + " aksepteerib " + player.getUsername());
                 opponentID = player.getUserid();
                 player.setOpponentID(userid);
+                player.setInvitedUID(0); // võtame kutse maha peale accepti
+                invitedUID=0;            // mõlemal
                 ServerGameData game = new ServerGameData(this, player);
+                this.game=game;
+                player.game=game;
                 game.start();
-
-
             }
             // leidsime mängija, anname talle teada
             else if (player.getUserid() == invitedUID) {
@@ -375,8 +385,8 @@ public class ServerGameConnectionHandler implements Runnable {
         for (ServerGameConnectionHandler player : players) {
             // leidsime mängija, ja tal on veel kehtiv kutse mulle
             if (player.getUserid() == rejectTo && player.getInvitedUID() == rejectTo) {
-                // see mängija kutsus mind ka mängima, seega aksepteerime mängu ja anname mõlemale teada
-                ServerMain.debug(6, "inviteToGame: " + username + " aksepteerib " + player.getUsername());
+
+                ServerMain.debug(6, "rejectInviteToGame: " + username + " rejectib " + player.getUsername());
 
                 DataOutputStream dos2 = player.getDos();
                 synchronized (dos2) {
@@ -412,15 +422,15 @@ public class ServerGameConnectionHandler implements Runnable {
     } // privateChatmessage
 
 
-    private void receiveGamerMove(int tickID, int action) throws Exception {
+    private void receiveGamerMove(int tickID, char action) throws Exception {
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() == opponentID && !player.isLogin()) {
-                ServerMain.debug(6,"move " + userid+"->"+player.userid+": "+tickID+":"+action);
+                ServerMain.debug(6, "move " + userid + "->" + player.userid + ": " + tickID + ":" + action);
                 DataOutputStream dos2 = player.getDos();
                 synchronized (dos2) {
                     dos2.writeInt(101);
                     dos2.writeInt(tickID);
-                    dos2.writeInt(action);
+                    dos2.writeChar(action);
                     dos2.writeInt(userid);
                 } // sync teade teisele
             }

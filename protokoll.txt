@@ -11,7 +11,7 @@ Klient peaks kannatama asünkroonset suhtlust, st. saama hakkama kui server enne
 >  - klient saadab serverile
 <  - server saadab kliendile
 
-i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
+i: int   s: string  c: char  Käsu numbril loetavuse huvides i: eest ära jäetud
 
 > 1  s: username s:parool   # uue kontro registreerimine
 < 1  i: status s: errormessage # status: 1: OK  -1: ERR  errormessage: misjuhtus   
@@ -31,23 +31,18 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 > 9 i: userid               # klient keeldub kutsest
 < 9: i: userid s: username  # teiselt poolt tuleb tagasi keeldumine 
 
-< 100 i: tickid  # serveri "tiks", et klotsid langeks. ID, et neil vahet teha
-< 101 i: tickid i: action: userid  # server saadab teise useri liigutuse  tickid: mis tiksu järel pidi see olemas
-> 101 i: tickid i: action          # klient saadab välja oma liigutuse  1: üles   2: drop   3: vasakule   4: paremale 
-> 102                                # klient ütleb, et ta lahkus mängust
-< 102                                # teine pool lahkus
-#char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
-> 103                               # klient küsib uue klotsi
-< 103  i: kellele i: klots       # server annab
+< 100 i: tickid                    # serveri "tiks", et klotsid langeks. ID, et neil vahet teha
+< 101 i: tickid c: action: userid  # server saadab teise useri liigutuse  tickid: mis tiksu järel pidi see olemas
+> 101 i: tickid c: action          # klient saadab välja oma liigutuse  1: üles   2: drop   3: vasakule   4: paremale 
+> 102                              # klient ütleb, et ta lahkus mängust
+< 102                              # teine pool lahkus
+> 103                              # klient küsib uue klotsi (endale)
+< 103  i: kellele c: klots         # server annab klotsi (saadab kõigile)   {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
 
 ...
 
 < 105 i: kellelt s: username  s: chatmessage    # teine mängija ütles midagi
 > 105 i: kellele s: chatmessage                 # mängija ütleb midagi
-
-# 106 -> 7-8  (kuna need käsud on lobby sees tegelmiseks, siis võiks nummeratsioonis ka lobby asjade sees olla)
-
-
 
 
 
