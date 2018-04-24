@@ -32,8 +32,8 @@ i: int   s: string  c: char  Käsu numbril loetavuse huvides i: eest ära jäetu
 < 9: i: userid s: username  # teiselt poolt tuleb tagasi keeldumine 
 
 < 100 i: tickid                    # serveri "tiks", et klotsid langeks. ID, et neil vahet teha
-< 101 i: tickid i: action: userid  # server saadab teise useri liigutuse  tickid: mis tiksu järel pidi see olemas
-> 101 i: tickid i: action          # klient saadab välja oma liigutuse  1: üles   2: drop   3: vasakule   4: paremale 
+< 101 i: tickid c: action: userid  # server saadab teise useri liigutuse  tickid: mis tiksu järel pidi see olemas
+> 101 i: tickid c: action          # klient saadab välja oma liigutuse  1: üles   2: drop   3: vasakule   4: paremale 
 > 102                              # klient ütleb, et ta lahkus mängust
 < 102                              # teine pool lahkus
 > 103                              # klient küsib uue klotsi (endale)
