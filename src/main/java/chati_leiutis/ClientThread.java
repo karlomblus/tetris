@@ -1,14 +1,9 @@
 package chati_leiutis;
 
 import javafx.application.Platform;
-import javafx.stage.Stage;
-import tetrispackage.TetrisGraafika;
 import tetrispackage.TetrisGraafikaMultiplayer;
 
-import java.awt.*;
 import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 
@@ -37,7 +32,10 @@ public class ClientThread extends Thread {
     }
 
     public void handleIncomingInput(Integer type) throws Exception {
-        System.out.println("input tüüp on " + type);
+        if (type != 100) {
+            System.out.println("input tüüp on " + type);
+        }
+
         switch (type) {
             case 1:
                 //registreerumise vastus: 1 -- OK, -1 == error
@@ -127,26 +125,23 @@ public class ClientThread extends Thread {
                 in.readInt();
                 String name = in.readUTF();
                 String privatemessage = in.readUTF();
-                client.getMultiplayerGame().addNewMessage(name,privatemessage);
+                client.getMultiplayerGame().addNewMessage(name, privatemessage);
                 break;
             case 100:
                 //Tulevad tiksud
                 int tiskuID = in.readInt(); //tiksuID
-                System.out.println("Sain tiksu id'ga " + tiskuID);
                 client.getMultiplayerGame().setTickValue(tiskuID);
                 break;
             case 101:
                 int nuputiskuID = in.readInt(); //tiksuID
                 int nupuvajutus = in.readInt();
                 int kellenupuvajutusID = in.readInt();
-                if (nupuvajutus == TetrisGraafikaMultiplayer.LEFT){
-                    client.getMultiplayerGame().setOpponentMoveLeft(true);
-                }
-                System.out.println("Sain nupu tiksu id'ga " + nuputiskuID);
+                client.getMultiplayerGame().setOpponentMoved(nupuvajutus);
+                System.out.println("Sain nupu " + nupuvajutus + " tiksu id'ga " + nuputiskuID);
 
             default:
-                if(tologinornot.size() == 0)
-                tologinornot.put(0);
+                if (tologinornot.size() == 0)
+                    tologinornot.put(0);
                 break;
         }
     }
@@ -156,7 +151,6 @@ public class ClientThread extends Thread {
         while (cont) {
             try {
                 int incmsg = in.readInt();
-                System.out.println(incmsg);
                 this.handleIncomingInput(incmsg);
             } catch (Exception e) {
                 cont = false;

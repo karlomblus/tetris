@@ -373,7 +373,6 @@ public class Klient extends Application {
         TetrisGraafikaMultiplayer mp = new TetrisGraafikaMultiplayer();
         multiplayerGame = mp;
         Stage mpstage = new Stage();
-
         mp.start(mpstage, this, opponentID);
     }
 
@@ -496,9 +495,6 @@ public class Klient extends Application {
                 out.writeInt(105);
                 out.writeInt(multiplayerGame.getOpponentID());
                 out.writeUTF(multiplayerGame.sendMessageandclearMP());
-                break;
-            case 101:
-                //TODO send keypress
                 break;
             default:
                 // ei tee midagi

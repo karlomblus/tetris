@@ -430,9 +430,9 @@ public class Tetromino {
             tetrominoRotationTracker = 0;
         }
     }
-    void rotateLeft() {
+    boolean rotateLeft() {
         if (tetrominoType == 'O'){
-            return;
+            return false;
         }
         List<Integer> activeRectCoordI = new ArrayList<>();
         List<Integer> activeRectCoordJ = new ArrayList<>();
@@ -711,8 +711,16 @@ public class Tetromino {
                 setRectStatusAt(changedActiveRectCoordI.get(i), changedActiveRectCoordJ.get(i), 'A');
             }
         }
+        return canRotate;
     }
     boolean gameStateOver(){
         return gameOver;
+    }
+    void drop (){
+        boolean keepticking = true;
+        do {
+            keepticking = tick();
+        }
+        while (keepticking);
     }
 }
