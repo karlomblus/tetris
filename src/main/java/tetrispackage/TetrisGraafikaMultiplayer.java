@@ -50,6 +50,7 @@ public class TetrisGraafikaMultiplayer {
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
 
+
         //chati kood
 
         VBox mpChatVbox = new VBox();

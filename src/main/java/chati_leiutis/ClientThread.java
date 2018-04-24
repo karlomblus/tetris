@@ -104,12 +104,12 @@ public class ClientThread extends Thread {
                 Platform.runLater(() -> client.showIncomingChallengeWindow(challengerID, challengerName));
                 break;
             case 8:
-                int ID = in.readInt();
+                int OpponentID = in.readInt();
                 int startinggameID = in.readInt();
                 if (!client.isMpgameopen()) {
-                    System.out.println("Starting game with " + ID + " with a game ID of " + startinggameID);
+                    System.out.println("Starting game with " + OpponentID + " with a game ID of " + startinggameID);
                     //alustan mängu, andes kaasa vastase ID
-                    Platform.runLater(() -> client.showMultiplayer(ID));
+                    Platform.runLater(() -> client.showMultiplayer(OpponentID));
                 }
                 client.setMpgameopen(true);
                 //võeti challenge vastu
