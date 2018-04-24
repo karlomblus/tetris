@@ -1,14 +1,10 @@
 package tetrispackage;
 
 import chati_leiutis.Klient;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -21,8 +17,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
-//import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 
@@ -30,20 +24,20 @@ public class TetrisGraafikaMultiplayer {
     private int numberOfPlayers = 2;
     private final int resoWidth = 150 * 2;
     private final int resoHeight = 330;
-    final int ruuduSuurus = 15;
-    final int mitukuubikutLaiuses = resoWidth / ruuduSuurus / numberOfPlayers;
-    final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
+    private final int ruuduSuurus = 15;
+    private final int mitukuubikutLaiuses = resoWidth / ruuduSuurus / numberOfPlayers;
+    private final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
 
-    Tetromino tetromino;
-    Tetromino tetromino2;
+    private Tetromino tetromino;
+    private Tetromino tetromino2;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     //chati
-    TextArea chatWindow;
-    TextField writeArea;
+    private TextArea chatWindow;
+    private TextField writeArea;
     private Integer opponentID;
 
     //lisasin client, et kasutada Klient klassi meetodeid

@@ -1,4 +1,5 @@
 package tetrispackage;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -11,17 +12,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.util.*;
 
 public class TetrisGraafika {
 
     private final int resoWidth = 150;
     private final int resoHeight = 330;
-    final int ruuduSuurus = 15;
-    final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
-    final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
+    private final int ruuduSuurus = 15;
+    private final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
+    private final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
-    Tetromino tetromino;
+    private Tetromino tetromino;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     public void start(Stage peaLava) {
@@ -71,14 +73,13 @@ public class TetrisGraafika {
                     tetromino.moveLeft();
                 }
                 if (currentActiveKeys.containsKey(KeyCode.SPACE) && currentActiveKeys.get(KeyCode.SPACE)) {
-                        boolean keepticking = true;
-                        do {
-                            keepticking = tetromino.tick();
-                        }
-                        while (keepticking);
+                    boolean keepticking = true;
+                    do {
+                        keepticking = tetromino.tick();
+                    }
+                    while (keepticking);
                 }
                 if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
-
                     tetromino.rotateLeft();
                 }
             }
