@@ -405,6 +405,7 @@ public class ServerGameConnectionHandler implements Runnable {
     private void receiveGamerMove(int tickID, int action) throws Exception {
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() == opponentID && !player.isLogin()) {
+                ServerMain.debug(6,"move " + userid+"->"+player.userid+": "+tickID+":"+action);
                 DataOutputStream dos2 = player.getDos();
                 synchronized (dos2) {
                     dos2.writeInt(101);
