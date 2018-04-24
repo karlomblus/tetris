@@ -194,8 +194,24 @@ public class ServerGameConnectionHandler implements Runnable {
                 userid = Integer.parseInt(andmebaasist[0]);
                 this.username = username;
                 login = false;
-                sendLoginmessageToAll();
 
+
+                // kui sama kasutaja on sees, viskame välja
+                for (ServerGameConnectionHandler player : players) {
+                    if (player!=this && player.userid ==this.userid) {
+                        DataOutputStream dos2 = player.getDos();
+                        synchronized (dos2) {
+                            ServerMain.debug("Kasutaja " + username + " on juba sees, kickime.");
+                                dos2.writeInt(4);
+                                dos2.writeInt(player.userid);
+                                dos2.writeUTF(player.username);
+                                player.connected=false;
+                                player.socket.close();
+                        } // sync
+                    }
+                } // iter
+
+                sendLoginmessageToAll();
             } else {
                 dos.writeInt(-1);
                 dos.writeUTF("Vale parool");
@@ -235,13 +251,7 @@ public class ServerGameConnectionHandler implements Runnable {
         // fakeme lisadatat, et testides asi tühi poleks
         dos.writeInt(3);
         dos.writeInt(998);
-        dos.writeUTF("Fake1");
-        dos.writeInt(3);
-        dos.writeInt(999);
-        dos.writeUTF("Fake2");
-        dos.writeInt(3);
-        dos.writeInt(1000);
-        dos.writeUTF("Fake3");
+        dos.writeUTF("Fake");
 
     } // getUserList
 
