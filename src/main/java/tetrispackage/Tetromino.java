@@ -43,7 +43,7 @@ public class Tetromino {
         }
     }
 
-    void moveRight() {
+    boolean moveRight() {
         List<Integer> activeRectCoordI = new ArrayList<>();
         List<Integer> activeRectCoordJ = new ArrayList<>();
         boolean movingRightPossible = true;
@@ -63,10 +63,12 @@ public class Tetromino {
                 setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i) + 1, 'A');
                 setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
             }
+            return true;
         }
+        return false;
     }
 
-    void moveLeft() {
+    boolean moveLeft() {
         List<Integer> activeRectCoordI = new ArrayList<>();
         List<Integer> activeRectCoordJ = new ArrayList<>();
         boolean movingLeftPossible = true;
@@ -86,7 +88,9 @@ public class Tetromino {
                 setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i) - 1, 'A');
                 setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
             }
+            return true;
         }
+        return false;
     }
     boolean isRowFilled(){
         boolean isFilled = true;
@@ -109,8 +113,8 @@ public class Tetromino {
             }
         }
         if (isFilled == true){
-            System.out.println("Filled row found!AAAAAAAAAAAAAAAAAAAAAA");
-            System.out.println("Filled row: " + filledRowNumber);
+           // System.out.println("Filled row found!AAAAAAAAAAAAAAAAAAAAAA");
+            //System.out.println("Filled row: " + filledRowNumber);
             for (int i = 0; i < ruudud[0].length; i++) {
                 setRectStatusAt(filledRowNumber, i, 'B');
             }
@@ -187,7 +191,7 @@ public class Tetromino {
             }
         }
         if (allActiveToPassive) {
-            System.out.println("All active to passive!");
+           // System.out.println("All active to passive!");
             for (int k = 0; k < ruudud.length; k++) {
                 for (int l = 0; l < ruudud[k].length; l++) {
                     if (getRectStatusAt(k, l) == 'A') {
@@ -215,7 +219,7 @@ public class Tetromino {
             }
         }
         if (allFallingToPassive){
-            System.out.println("All falling to passive!");
+           // System.out.println("All falling to passive!");
             for (int k = 0; k < ruudud.length; k++) {
                 for (int l = 0; l < ruudud[k].length; l++) {
                     if (getRectStatusAt(k, l) == 'F') {
@@ -308,7 +312,7 @@ public class Tetromino {
             }
         }
         if (drawingTurns == 0) {
-            System.out.println("TetriminoDrawing false!");
+            //System.out.println("TetriminoDrawing false!");
             setDrawingPermission(false);
         }
     }
@@ -444,7 +448,7 @@ public class Tetromino {
         List<Integer> changedActiveRectCoordI = new ArrayList<>();
         List<Integer> changedActiveRectCoordJ = new ArrayList<>();
         boolean canRotate = true;
-        System.out.println("Rotate left triggered");
+       //System.out.println("Rotate left triggered");
         if (tetrominoType == 'S'){
             if (tetrominoRotationTracker == 0) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0) + 2);
@@ -694,7 +698,7 @@ public class Tetromino {
                 canRotate = false;
             }
         }
-        System.out.println("Can rotate: " + canRotate);
+       // System.out.println("Can rotate: " + canRotate);
         if (canRotate) {
             tetrominoRotationTracker += 1;
             if (tetrominoRotationTracker == 4){

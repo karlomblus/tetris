@@ -4,6 +4,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleMapProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
@@ -189,6 +191,7 @@ public class Klient extends Application {
                 loggedIN = false;
                 //listener.shutDown();   kas seda rida on ikka vaja?
                 Platform.exit();
+
             }
         });
         comp.getChildren().add(passwordField);
@@ -494,10 +497,19 @@ public class Klient extends Application {
                 out.writeInt(multiplayerGame.getOpponentID());
                 out.writeUTF(multiplayerGame.sendMessageandclearMP());
                 break;
+            case 101:
+                //TODO send keypress
+                break;
             default:
                 // ei tee midagi
         }
 
+    }
+    public void sendKeypress(Integer tickID, Integer key) throws IOException {
+        System.out.println("Saatsin " + 101 + " " + key);
+        out.writeInt(101);
+        out.writeInt(tickID);
+        out.writeInt(key);
     }
 
     public void logIn_or_Register(String nimi, String parool) throws IOException {

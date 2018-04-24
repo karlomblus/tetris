@@ -3,9 +3,7 @@ package tetrispackage;
 import chati_leiutis.Klient;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -32,16 +30,21 @@ public class TetrisGraafikaMultiplayer {
     private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
-    private MapProperty<KeyCode, Boolean> currentActiveKeysProperty = new SimpleMapProperty<>();
+    public static final int UP = 0;
+    public static final int DOWN = 1;
+    public static final int LEFT = 2;
+    public static final int RIGHT = 3;
 
-    private Tetromino tetromino;
-    private Tetromino tetromino2;
-    private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
+    private Tetromino myTetromino;
+    private Tetromino opponentTetromino;
+    private Map<KeyCode, Boolean> myCurrentActiveKeys = new HashMap<>();
+
 
     //chati
     private TextArea chatWindow;
     private TextField writeArea;
     private Integer opponentID;
+    private boolean opponentMoveLeft = false;
 
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
@@ -49,10 +52,7 @@ public class TetrisGraafikaMultiplayer {
         HBox hbox = new HBox(1);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
-
-
         //chati kood
-
         VBox mpChatVbox = new VBox();
         TextArea messagearea = new TextArea();
         chatWindow = messagearea;
@@ -102,15 +102,16 @@ public class TetrisGraafikaMultiplayer {
             }
         }
 
-        tetromino = new Tetromino(ristkülik);
-        tetromino2 = new Tetromino(ristkülik2);
+        myTetromino = new Tetromino(ristkülik);
+        opponentTetromino = new Tetromino(ristkülik2);
 
 //User navigates forward a page, update page changer object.
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
             //pageNavigator.setPage(pageNoProperty.doubleValue());
-            doActions(tickProperty.getValue(), tetromino);
-            doActions(tickProperty.getValue(), tetromino2);
+            tickAndDraw(tickProperty.getValue(), myTetromino);
+            tickAndDraw(tickProperty.getValue(), opponentTetromino);
         });
+
 
         //noded-e paigutamine
         hbox.getChildren().add(localTetrisArea);
@@ -140,34 +141,45 @@ public class TetrisGraafikaMultiplayer {
         });
         Scene tetrisStseen = new Scene(hbox, resoWidth + 140, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
-            currentActiveKeys.put(event.getCode(), true);
+            myCurrentActiveKeys.put(event.getCode(), true);
             System.out.println("Event: " + event.getCode());
-            if (!tetromino.isDrawingAllowed() && !tetromino.gameStateOver()) {
-                if (currentActiveKeys.containsKey(KeyCode.RIGHT) && currentActiveKeys.get(KeyCode.RIGHT)) {
-                    tetromino.moveRight();
+            if (!myTetromino.isDrawingAllowed() && !myTetromino.gameStateOver()) {
+                if (myCurrentActiveKeys.containsKey(KeyCode.RIGHT) && myCurrentActiveKeys.get(KeyCode.RIGHT)) {
+                    myTetromino.moveRight();
                 }
-                if (currentActiveKeys.containsKey(KeyCode.LEFT) && currentActiveKeys.get(KeyCode.LEFT)) {
-                    tetromino.moveLeft();
+                if (myCurrentActiveKeys.containsKey(KeyCode.LEFT) && myCurrentActiveKeys.get(KeyCode.LEFT)) {
+                    if (myTetromino.moveLeft()){
+                        try {
+                            client.sendKeypress(tickProperty.getValue(), LEFT);
+                        } catch (IOException error) {
+                            messagearea.appendText("Socket closed. Keypress sending failed!");
+                        }
+                    }
                 }
-                if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
-                    tetromino.rotateLeft();
+                if (opponentMoveLeft){
+                    System.out.println("AAAAASADADASDASDASDASDA");
+                    opponentTetromino.moveLeft();
+                    opponentMoveLeft = false;
                 }
-                if (currentActiveKeys.containsKey(KeyCode.SPACE) && currentActiveKeys.get(KeyCode.SPACE)) {
+                if (myCurrentActiveKeys.containsKey(KeyCode.UP) && myCurrentActiveKeys.get(KeyCode.UP)) {
+                    myTetromino.rotateLeft();
+                }
+                if (myCurrentActiveKeys.containsKey(KeyCode.SPACE) && myCurrentActiveKeys.get(KeyCode.SPACE)) {
                     boolean keepticking = true;
                     do {
-                        keepticking = tetromino.tick();
+                        keepticking = myTetromino.tick();
                     }
                     while (keepticking);
                 }
                 /*if (currentActiveKeys.containsKey(KeyCode.DOWN) && currentActiveKeys.get(KeyCode.DOWN)) {
-                    tetromino.tick();
+                    myTetromino.tick();
                 }*/
             }
 
 
         });
         tetrisStseen.setOnKeyReleased(event ->
-                currentActiveKeys.put(event.getCode(), false)
+                myCurrentActiveKeys.put(event.getCode(), false)
         );
 
         peaLava.setTitle("Tetris");  // lava tiitelribale pannakse tekst
@@ -179,7 +191,7 @@ public class TetrisGraafikaMultiplayer {
     public void begin() {
         //launch();
     }
-    void doActions(int tickReceived, Tetromino tetromino) {
+    void tickAndDraw(int tickReceived, Tetromino tetromino) {
             if (!tetromino.gameStateOver()) {
                 tetromino.tick();
                 tetromino.isRowFilled();
@@ -204,5 +216,9 @@ public class TetrisGraafikaMultiplayer {
     }
     public void setTickValue(int value){
         tickProperty.set(value);
+    }
+
+    public void setOpponentMoveLeft(boolean opponentMoveLeft) {
+        this.opponentMoveLeft = opponentMoveLeft;
     }
 }
