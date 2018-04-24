@@ -3,7 +3,9 @@ package tetrispackage;
 import chati_leiutis.Klient;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.MapProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleMapProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
@@ -30,6 +32,7 @@ public class TetrisGraafikaMultiplayer {
     private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
+    private MapProperty<KeyCode, Boolean> currentActiveKeysProperty = new SimpleMapProperty<>();
 
     private Tetromino tetromino;
     private Tetromino tetromino2;

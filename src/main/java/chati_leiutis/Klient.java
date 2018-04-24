@@ -269,6 +269,7 @@ public class Klient extends Application {
 
             }
         });
+        /*
         Button multiplayerbtn = new Button("Multiplayer");
         multiplayerbtn.setOnMouseClicked((MouseEvent) -> {
             try {
@@ -279,7 +280,7 @@ public class Klient extends Application {
                 throw new RuntimeException(e);
 
             }
-        });
+        });*/
 
         Button challengeButton = new Button("Challenge");
         challengeButton.setPrefWidth(w / 4);
@@ -306,8 +307,8 @@ public class Klient extends Application {
         border.setBottom(stackPane);
         stackPane.getChildren().add(pilt);
         stackPane.getChildren().add(singleplayerbtn);
-        stackPane.getChildren().add(multiplayerbtn);
-        stackPane.setAlignment(multiplayerbtn, Pos.BOTTOM_RIGHT);
+        /*stackPane.getChildren().add(multiplayerbtn);
+        stackPane.setAlignment(multiplayerbtn, Pos.BOTTOM_RIGHT);*/
         stackPane.setAlignment(singleplayerbtn, Pos.BOTTOM_CENTER);
 
 
