@@ -36,6 +36,7 @@ i: int   s: string  Käsu numbril loetavuse huvides i: eest ära jäetud
 > 101 i: tickid i: action          # klient saadab välja oma liigutuse  1: üles   2: drop   3: vasakule   4: paremale 
 > 102                                # klient ütleb, et ta lahkus mängust
 < 102                                # teine pool lahkus
+#char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
 > 103                               # klient küsib uue klotsi
 < 103  i: kellele i: klots       # server annab
 
