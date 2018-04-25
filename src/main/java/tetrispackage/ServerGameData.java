@@ -24,17 +24,6 @@ public class ServerGameData {
 
 
     void start() throws Exception {
-        //System.out.println("mängijaid: " + players.size());
-        for (ServerGameConnectionHandler player : players) {
-            //System.out.println("hakkame start käsku saatma mängijale " + player.getUsername());
-            DataOutputStream dos = player.getDos();
-            synchronized (dos) {
-                dos.writeInt(8);
-                dos.writeInt(player.getUserid());
-                dos.writeInt(gameid);
-            } // sync
-        } // iter
-
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -114,4 +103,10 @@ public class ServerGameData {
             }
         } // iter
     } // removeUserFromGame
+
+
+
+    public int getGameid() {
+        return gameid;
+    }
 } // class
