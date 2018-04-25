@@ -14,6 +14,8 @@ public class ServerWebResponse {
     String rawurl="";
     String moodul = "file"; // shtml = parsime muutujaid   file=saadame tuimalt faili
     String contentType=null;
+    String userAgent="";
+    String hostIP;
 
     Socket socket;
     PrintWriter out;
@@ -23,6 +25,7 @@ public class ServerWebResponse {
     public ServerWebResponse(Socket socket,PrintWriter out) {
         this.out = out;
         this.socket=socket;
+        hostIP=socket.getInetAddress().toString();
     }
 
     public void addheader(String inputLine) {
@@ -64,6 +67,8 @@ public class ServerWebResponse {
             } // url ok
 
 
+        } else if (tykid[0].equals("User-Agent:")) {
+            userAgent=tykid[1];
         }
 
     }
@@ -84,6 +89,11 @@ public class ServerWebResponse {
 
     public void sendresponse() throws IOException {
 
+        ServerMain.debug(6,"url: " + rawurl);
+        if (contentType!=null) ServerMain.debug(6,"contenttype: " + contentType);
+        ServerMain.debug(6,"moodul: " + moodul);
+        ServerMain.debug(6,"host: " + hostIP);
+
         if (filename==null) {
             senderror(); // ma ei tea mida must tahetakse või oli url keelatud
             return;
@@ -92,17 +102,8 @@ public class ServerWebResponse {
         if (moodul.equals("file")) {sendfile();return;}
         if (moodul.equals("shtml")) {sendfile();return;} // todo: parsimine teha
 
-        System.out.println("saadame mingi kamarajura vastu");
-        System.out.println("url: " + rawurl);
-        System.out.println("moodul: " + moodul);
-        out.println("HTTP/1.1 200 OK");
-        out.println("Server: Tetris scoreserver");
-        out.println("Cache-Control: no-cache, no-store, must-revalidate");
-        out.println("Pragma: no-cache");
-        out.println("Connection: Close");
-        if(contentType!=null) out.println("Content-Type: "+contentType);
-        out.println("");
-        out.println("<html><body>  Oled ühendunud tetrise serveri külge. <br><br>Varsti näed siin skoore ja saad mängu alla laadida. </body></html>");
+        // kui siia jõuame, siis ma ei tea mida must tahetakse
+        senderror();
 
     }
 
