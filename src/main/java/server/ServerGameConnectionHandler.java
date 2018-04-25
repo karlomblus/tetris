@@ -1,4 +1,4 @@
-package tetrispackage;
+package server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
-import java.util.Random;
 
 public class ServerGameConnectionHandler implements Runnable {
 
