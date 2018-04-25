@@ -140,9 +140,14 @@ public class ClientThread extends Thread {
                 System.out.println("Sain nupu " + nupuvajutus + " tiksu id'ga " + nuputiskuID);
             case 103:
                 int kellele = in.readInt();
+                System.out.println("KLOTS ON MÕELDUD_MANGIJALE ID'ga " + kellele);
                 char klots = in.readChar();
-                client.getMultiplayerGame().setRandomTetro(klots);
-                client.getMultiplayerGame().setRandomTetroReceived(true);
+                if (client.getMultiplayerGame().getOpponentID() == kellele){
+                    client.getMultiplayerGame().getOpponentTetromino().setRandomTetromino(klots);
+                }
+                else{
+                    client.getMultiplayerGame().getMyTetromino().setRandomTetromino(klots);
+                }
 
             default:
                 if (tologinornot.size() == 0)

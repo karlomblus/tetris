@@ -17,7 +17,7 @@ public class Tetromino {
     private int tetrominoRotationTracker = 0;
     private boolean gameOver = false;
     private int [][] activeTetrominoMatrix;
-    private char randomTetromino = 'S';
+    private char randomTetromino = 'Z';
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -795,5 +795,13 @@ public class Tetromino {
             keepticking = tick();
         }
         while (keepticking);
+    }
+
+    public char getRandomTetromino() {
+        return randomTetromino;
+    }
+
+    public void setRandomTetromino(char randomTetromino) {
+        this.randomTetromino = randomTetromino;
     }
 }

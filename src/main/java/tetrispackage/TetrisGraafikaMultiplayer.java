@@ -36,7 +36,6 @@ public class TetrisGraafikaMultiplayer {
     public static final char DOWN = 1;
     public static final char LEFT = 2;
     public static final char RIGHT = 3;
-    private boolean randomTetroReceived = true;
 
     private Tetromino myTetromino;
     private Tetromino opponentTetromino;
@@ -49,11 +48,9 @@ public class TetrisGraafikaMultiplayer {
     private TextField writeArea;
     private Integer opponentID;
     private IntegerProperty opponentMoved = new SimpleIntegerProperty();
-    private char randomTetro = 'Z';
 
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
-        randomTetroReceived = false;
         this.client = client;
         opponentMoved.setValue(-1);
         this.opponentID = opponentID;
@@ -224,7 +221,9 @@ public class TetrisGraafikaMultiplayer {
                 tetromino.tick();
                 tetromino.isRowFilled();
                 if (tetromino.isDrawingAllowed()) {
-                    if (tetromino.getDrawingTurns() == 2) {
+                    tetromino.draw(tetromino.getRandomTetromino());
+                    if (tetromino.getDrawingTurns() == 0 && tetromino == myTetromino) //drawing completed and tetromino is the SAME (not equivalent) of myTetromino
+                    {
                         try {
                             client.requestRandomTetro();
                             System.out.println("Requesting random tetro");
@@ -232,8 +231,6 @@ public class TetrisGraafikaMultiplayer {
                             System.out.println("Socket closed. Keypress sending failed!");
                         }
                     }
-                    //TODO perhaps wait until confirmation that really randomTetro came.
-                    tetromino.draw(randomTetro);
                 }
             }
     }
@@ -259,11 +256,11 @@ public class TetrisGraafikaMultiplayer {
         this.opponentMoved.setValue(state);
     }
 
-    public void setRandomTetroReceived(boolean randomTetroReceived) {
-        this.randomTetroReceived = randomTetroReceived;
+    public Tetromino getMyTetromino() {
+        return myTetromino;
     }
 
-    public void setRandomTetro(char randomTetro) {
-        this.randomTetro = randomTetro;
+    public Tetromino getOpponentTetromino() {
+        return opponentTetromino;
     }
 }

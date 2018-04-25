@@ -44,6 +44,9 @@ public class TetrisGraafika {
                     tetromino.isRowFilled();
                     if (tetromino.isDrawingAllowed()) {
                         tetromino.draw();
+                        if (tetromino.getDrawingTurns() == 0){
+                            System.out.println("FINISHED DRAWING");
+                        }
                     }
                 }
             }
