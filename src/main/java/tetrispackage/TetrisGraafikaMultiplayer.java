@@ -113,8 +113,8 @@ public class TetrisGraafikaMultiplayer {
 
 //User navigates forward a page, update page changer object.
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
-            tickAndDraw(tickProperty.getValue(), myTetromino);
-            tickAndDraw(tickProperty.getValue(), opponentTetromino);
+            tickAndDrawForMe();
+            tickAndDrawForOpponent();
         });
         opponentMoved.addListener((ChangeListener) (o, oldVal, newVal) -> {
             if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
@@ -213,13 +213,13 @@ public class TetrisGraafikaMultiplayer {
         //launch();
     }
 
-    void tickAndDraw(int tickReceived, Tetromino tetromino) {
-            if (!tetromino.gameStateOver()) {
-                tetromino.tick();
-                tetromino.isRowFilled();
-                if (tetromino.isDrawingAllowed()) {
-                    tetromino.draw("multiplayer");
-                    if (tetromino.getDrawingTurns() == 0 && tetromino == myTetromino) //drawing completed and tetromino is the SAME (not equivalent) of myTetromino
+    void tickAndDrawForMe() {
+        if (!myTetromino.gameStateOver()) {
+                myTetromino.tick();
+                myTetromino.isRowFilled();
+                if (myTetromino.isDrawingAllowed()) {
+                    myTetromino.draw("multiplayer");
+                    if (myTetromino.getDrawingTurns() == 0) //drawing completed
                     {
                         try {
                             client.requestRandomTetro();
@@ -231,6 +231,20 @@ public class TetrisGraafikaMultiplayer {
                 }
             }
         }
+    void tickAndDrawForOpponent() {
+        if (!opponentTetromino.gameStateOver()) {
+            opponentTetromino.tick();
+            opponentTetromino.isRowFilled();
+            if (opponentTetromino.isDrawingAllowed()) {
+                opponentTetromino.draw("multiplayer");
+                if (opponentTetromino.getDrawingTurns() == 0) //drawing completed
+                {
+
+                }
+            }
+        }
+    }
+
 
 
     public void addNewMessage(String name, String message) {
