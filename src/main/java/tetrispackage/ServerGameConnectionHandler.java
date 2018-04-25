@@ -89,6 +89,9 @@ public class ServerGameConnectionHandler implements Runnable {
                     case 101:
                         receiveGamerMove(dis.readInt(), dis.readChar());
                         break;
+                    case 102:
+                        game.removeUserFromGame(this);
+                        break;
                     case 103:
                         game.sendNewTetromino(userid);
                         break;
@@ -197,8 +200,8 @@ public class ServerGameConnectionHandler implements Runnable {
             if (passwordMatch) {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
-                ServerMain.debug(5, "dologin: Kasutajanimi " + username + " OK, loggedin.");
                 userid = Integer.parseInt(andmebaasist[0]);
+                ServerMain.debug(5, "dologin: Kasutajanimi " + username + ", id: "+userid+" OK, loggedin.");
                 this.username = username;
                 login = false;
 
@@ -267,6 +270,9 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogout(DataOutputStream dos) throws Exception {
         // while lõpetatakse ära, socketi sulgemisel võetakse ta ka sessioonilistist maha
         connected = false;
+if (game!=null) {
+    game.removeUserFromGame(this);
+}
         ServerMain.debug(5, "dologout: " + username);
         for (ServerGameConnectionHandler player : players) {
             DataOutputStream dos2 = player.getDos();
@@ -442,7 +448,7 @@ public class ServerGameConnectionHandler implements Runnable {
     }
 
     public String toString() {
-        return "\n" + userid + ": Nimi " + username + " login: " + login + " invite: " + invitedUID + " opponent: " + opponentID;
+        return "\n" + userid + ": Nimi " + username + " " + (login?"LOGIN":"") + " invite: " + invitedUID + " opponent: " + opponentID;
     }
 
 

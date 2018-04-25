@@ -1,0 +1,13 @@
+<html>
+<head>
+    <title>  OOP projekt - TETRIS </title>
+
+    <meta property="og:title" content="OOP projekt: TETRIS"/>
+    <meta property="og:description" content="OOP projektitöö: tetrise online multiplayer versioon"/>
+    <meta property="og:url" content="http://tetris.carlnet.ee/"/>
+    <meta property="og:image" content="http://tetris.carlnet.ee/Tetris.png"/>
+
+</head>
+
+
+<body>  Oled ühendunud tetrise serveri külge. <br><br>Varsti näed siin skoore ja saad mängu alla <a href="download.html">laadida</a>. </body></html>
