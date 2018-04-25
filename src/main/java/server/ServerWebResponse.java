@@ -121,13 +121,13 @@ public class ServerWebResponse {
                 return;
             }
 
-            out.println("HTTP/1.1 200 OK");
-            out.println("Server: Tetris scoreserver");
-            out.println("Cache-Control: no-cache, no-store, must-revalidate");
-            out.println("Pragma: no-cache");
-            out.println("Connection: Close");
-            if(contentType!=null) out.println("Content-Type: "+contentType);
-            out.println("");
+            out.printf("HTTP/1.1 200 OK\r\n");
+            out.printf("Server: Tetris scoreserver\r\n");
+            out.printf("Cache-Control: no-cache, no-store, must-revalidate\r\n");
+            out.printf("Pragma: no-cache\r\n");
+            out.printf("Connection: Close\r\n");
+            if(contentType!=null) out.printf("Content-Type: "+contentType+"\r\n");
+            out.printf("\r\n");
 
             final byte[] buffer = new byte[4096];
             for (int read = inStream.read(buffer); read >= 0; read = inStream.read(buffer))
@@ -139,19 +139,19 @@ public class ServerWebResponse {
     }
     private void send404() {
         ServerMain.debug(6,"WEB: 404: ei leia faili: "+rawurl);
-        out.println("HTTP/1.1 404 File Not Found");
-        out.println("Server: Tetris scoreserver");
-        out.println("Content-Type: text/html; charset=UTF-8");
-        out.println("");
-        out.println("<html><body>  Sorry. Faili  "+rawurl+" ei leitud<br>\n </body></html>");
+        out.printf("HTTP/1.1 404 File Not Found\r\n");
+        out.printf("Server: Tetris scoreserver\r\n");
+        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
+        out.printf("\r\n");
+        out.println("<html><body>  Sorry. Faili  "+rawurl+" ei leitud<br>\n </body></html>");   // html sisus pole korrektne reavahetus vist enam oluline sest browser peaks failiga ka sel kujul hakkama saama?
     }
 
     private void senderror() {
-        ServerMain.debug(6,"Weebiserver saadab vastu 500 errori");
-        out.println("HTTP/1.1 500 Error");
-        out.println("Server: Tetris scoreserver");
-        out.println("Content-Type: text/html; charset=UTF-8");
-        out.println("");
+        ServerMain.debug(6,"Weebiserver saadab vastu 400 errori");
+        out.printf("HTTP/1.1 400 bad request\r\n");
+        out.printf("Server: Tetris scoreserver\r\n");
+        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
+        out.printf("\r\n");
         out.println("<html><body>  Kahjuks ei mõista server seda päringut <br><br>\nURL: "+rawurl+"\n<br>Moodul: "+moodul+"<br>\n </body></html>");
     }
 }
