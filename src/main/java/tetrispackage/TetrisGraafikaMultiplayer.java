@@ -19,6 +19,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -81,7 +82,7 @@ public class TetrisGraafikaMultiplayer {
 
                 try {
                     client.sendSomething(105);
-                    chatWindow.appendText(client.getNimi()+ ">> " + writearea.getText() + "\n");
+                    chatWindow.appendText(client.getNimi() + ">> " + writearea.getText() + "\n");
                 } catch (IOException error) {
                     messagearea.appendText("Socket kinni. Ei saanud saata.");
                 }
@@ -119,21 +120,16 @@ public class TetrisGraafikaMultiplayer {
             if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
                 if (opponentMoved.getValue() == 2) {
                     opponentTetromino.moveLeft();
-                }
-                else if (opponentMoved.getValue() == 3){
+                } else if (opponentMoved.getValue() == 3) {
                     opponentTetromino.moveRight();
-                }
-                else if (opponentMoved.getValue() == 0){
+                } else if (opponentMoved.getValue() == 0) {
                     opponentTetromino.rotateLeft();
-                }
-                else if (opponentMoved.getValue() == 1){
+                } else if (opponentMoved.getValue() == 1) {
                     opponentTetromino.drop();
                 }
             }
             opponentMoved.setValue(-1);
         });
-
-
 
 
         //noded-e paigutamine
@@ -167,7 +163,7 @@ public class TetrisGraafikaMultiplayer {
             myCurrentActiveKeys.put(event.getCode(), true);
             if (!myTetromino.isDrawingAllowed() && !myTetromino.gameStateOver()) {
                 if (myCurrentActiveKeys.containsKey(KeyCode.RIGHT) && myCurrentActiveKeys.get(KeyCode.RIGHT)) {
-                    if (myTetromino.moveRight()){
+                    if (myTetromino.moveRight()) {
                         try {
                             client.sendKeypress(tickProperty.getValue(), RIGHT);
                         } catch (IOException error) {
@@ -176,7 +172,7 @@ public class TetrisGraafikaMultiplayer {
                     }
                 }
                 if (myCurrentActiveKeys.containsKey(KeyCode.LEFT) && myCurrentActiveKeys.get(KeyCode.LEFT)) {
-                    if (myTetromino.moveLeft()){
+                    if (myTetromino.moveLeft()) {
                         try {
                             client.sendKeypress(tickProperty.getValue(), LEFT);
                         } catch (IOException error) {
@@ -185,7 +181,7 @@ public class TetrisGraafikaMultiplayer {
                     }
                 }
                 if (myCurrentActiveKeys.containsKey(KeyCode.UP) && myCurrentActiveKeys.get(KeyCode.UP)) {
-                    if (myTetromino.rotateLeft()){
+                    if (myTetromino.rotateLeft()) {
                         try {
                             client.sendKeypress(tickProperty.getValue(), UP);
                         } catch (IOException error) {
@@ -216,12 +212,13 @@ public class TetrisGraafikaMultiplayer {
     public void begin() {
         //launch();
     }
+
     void tickAndDraw(int tickReceived, Tetromino tetromino) {
             if (!tetromino.gameStateOver()) {
                 tetromino.tick();
                 tetromino.isRowFilled();
                 if (tetromino.isDrawingAllowed()) {
-                    tetromino.draw(tetromino.getRandomTetromino());
+                    tetromino.draw("multiplayer");
                     if (tetromino.getDrawingTurns() == 0 && tetromino == myTetromino) //drawing completed and tetromino is the SAME (not equivalent) of myTetromino
                     {
                         try {
@@ -233,7 +230,8 @@ public class TetrisGraafikaMultiplayer {
                     }
                 }
             }
-    }
+        }
+
 
     public void addNewMessage(String name, String message) {
         chatWindow.appendText(name + ">> " + message + "\n");
@@ -241,14 +239,14 @@ public class TetrisGraafikaMultiplayer {
 
     public String sendMessageandclearMP() {
         String toReturn = writeArea.getText();
-
         return toReturn;
     }
 
     public Integer getOpponentID() {
         return opponentID;
     }
-    public void setTickValue(int value){
+
+    public void setTickValue(int value) {
         tickProperty.set(value);
     }
 

@@ -17,7 +17,8 @@ public class Tetromino {
     private int tetrominoRotationTracker = 0;
     private boolean gameOver = false;
     private int [][] activeTetrominoMatrix;
-    private char randomTetromino = 'Z';
+    private char randomTetrominoMP = 'Z';
+    private char randomTetrominoSP = 'Z';
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -243,81 +244,13 @@ public class Tetromino {
     }
 
     //Tetriminos I O T J L S Z
-    void draw(char tetro) {
-        this.tetrominoType = tetro;
-
-        drawingTurns -= 1;
-        tetrominoRotationTracker = 0;
-        int j = (ruudud[0].length / 2) - 2;
-        if (tetrominoType == 'I') {
-            int i = 0;
-            activeTetrominoColor = Color.CYAN;
-            for (int l = 0; l < 4; l++) {
-                setRectStatusAt(i, j + l, 'A');
-            }
-            drawingTurns -= 1;
-        } else if (tetrominoType == 'O') {
-            activeTetrominoColor = Color.YELLOW;
-            setRectStatusAt(0, j, 'A');
-            setRectStatusAt(0, j + 1, 'A');
-        } else if (tetrominoType == 'Z') {
-            if (drawingTurns == 1) {
-                activeTetrominoColor = Color.RED;
-                setRectStatusAt(0, j + 1, 'A');
-                setRectStatusAt(0, j + 2, 'A');
-            } else {
-                setRectStatusAt(0, j, 'A');
-                setRectStatusAt(0, j + 1, 'A');
-            }
-        } else if (tetrominoType == 'S') {
-            activeTetrominoColor = Color.LIME;
-            if (drawingTurns == 1) {
-                setRectStatusAt(0, j, 'A');
-                setRectStatusAt(0, j + 1, 'A');
-            } else {
-                setRectStatusAt(0, j + 1, 'A');
-                setRectStatusAt(0, j + 2, 'A');
-            }
-        } else if (tetrominoType == 'T') {
-            activeTetrominoColor = Color.PURPLE;
-            if (drawingTurns == 1) {
-                setRectStatusAt(0, j, 'A');
-                setRectStatusAt(0, j + 1, 'A');
-                setRectStatusAt(0, j + 2, 'A');
-
-            } else {
-                setRectStatusAt(0, j + 1, 'A');
-            }
+    void draw(String gamemode) {
+        if (gamemode.equals("singeplayer")) {
+            this.tetrominoType = randomTetrominoSP;
         }
-        else if (tetrominoType == 'L') {
-            activeTetrominoColor = Color.ORANGE;
-            if (drawingTurns == 0) {
-                setRectStatusAt(0, j + 2, 'A');
-
-            } else {
-                setRectStatusAt(0, j, 'A');
-                setRectStatusAt(0, j + 1, 'A');
-                setRectStatusAt(0, j + 2, 'A');
-            }
+        else if (gamemode.equals("multiplayer")){
+            this.tetrominoType = randomTetrominoMP;
         }
-        else if (tetrominoType == 'J') {
-            activeTetrominoColor = Color.BLUE;
-            if (drawingTurns == 0) {
-                setRectStatusAt(0, j, 'A');
-
-            } else {
-                setRectStatusAt(0, j, 'A');
-                setRectStatusAt(0, j + 1, 'A');
-                setRectStatusAt(0, j + 2, 'A');
-            }
-        }
-        if (drawingTurns == 0) {
-            //System.out.println("TetriminoDrawing false!");
-            setDrawingPermission(false);
-        }
-    }
-    void draw() {
-        this.tetrominoType = randomTetromino;
 
         drawingTurns -= 1;
         tetrominoRotationTracker = 0;
@@ -394,7 +327,7 @@ public class Tetromino {
         if (allowTetrominoDrawing == true){ //if something set drawing to true, make a new random tetromino
             char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
             Random rand = new Random();
-            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+            randomTetrominoSP = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
         }
         this.allowTetrominoDrawing = allowTetrominoDrawing;
     }
@@ -797,11 +730,11 @@ public class Tetromino {
         while (keepticking);
     }
 
-    public char getRandomTetromino() {
-        return randomTetromino;
+    public char getRandomTetrominoMP() {
+        return randomTetrominoMP;
     }
 
-    public void setRandomTetromino(char randomTetromino) {
-        this.randomTetromino = randomTetromino;
+    public void setRandomTetrominoMP(char randomTetrominoMP) {
+        this.randomTetrominoMP = randomTetrominoMP;
     }
 }
