@@ -211,8 +211,8 @@ public class Klient extends Application {
     public void showLobby() throws Exception {
 
         //säti suurus
-        int w = 900;
-        int h = 800;
+        int w = 700;
+        int h = 600;
         Stage primaryStage = new Stage();
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -488,13 +488,14 @@ public class Klient extends Application {
                 String challengeeName = userListView.getSelectionModel().getSelectedItem();
                 out.writeInt(name_2_ID.get(challengeeName));
                 break;
-            case 9:
+            /*case 9:
                 //todo keeldumine
-                break;
+                break;*/
             case 105:
                 out.writeInt(105);
                 out.writeInt(multiplayerGame.getOpponentID());
                 out.writeUTF(multiplayerGame.sendMessageandclearMP());
+                System.out.println("Saatsin kirja tetriseaknas kasutajale " + multiplayerGame.getOpponentID());
                 break;
             default:
                 // ei tee midagi
