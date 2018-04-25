@@ -14,8 +14,9 @@ public class ServerWebResponse {
     String rawurl="";
     String moodul = "file"; // shtml = parsime muutujaid   file=saadame tuimalt faili
     String contentType=null;
-    String userAgent="";
+    String userAgent="";    // väärtustame viisaka apache stiilis logimise jaoks
     String hostIP;
+    String referer="";
 
     Socket socket;
     PrintWriter out;
@@ -69,6 +70,8 @@ public class ServerWebResponse {
 
         } else if (tykid[0].equals("User-Agent:")) {
             userAgent=tykid[1];
+        }else if (tykid[0].equals("Referer:")) {
+            referer=tykid[1];
         }
 
     }

@@ -448,7 +448,7 @@ if (game!=null) {
     }
 
     public String toString() {
-        return "\n" + userid + ": Nimi " + username + " login: " + login + " invite: " + invitedUID + " opponent: " + opponentID;
+        return "\n" + userid + ": Nimi " + username + " " + (login?"LOGIN":"") + " invite: " + invitedUID + " opponent: " + opponentID;
     }
 
 
