@@ -200,8 +200,8 @@ public class ServerGameConnectionHandler implements Runnable {
             if (passwordMatch) {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
-                ServerMain.debug(5, "dologin: Kasutajanimi " + username + " OK, loggedin.");
                 userid = Integer.parseInt(andmebaasist[0]);
+                ServerMain.debug(5, "dologin: Kasutajanimi " + username + ", id: "+userid+" OK, loggedin.");
                 this.username = username;
                 login = false;
 
