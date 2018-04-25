@@ -257,7 +257,7 @@ public class Klient extends Application {
         konsool = messagefield;
 
         //pilt
-        Image chatImage = new Image("file:\\C:\\Users\\Ingo\\IdeaProjects\\OOPprojekt\\tetris\\src\\main\\resources\\Tetris.png", 850, 200, true, false);
+        Image chatImage = new Image("/Tetris.png",850,200,true,false);
         ImageView pilt = new ImageView(chatImage);
 
         //TODO pole kindel kas selline lahendus on okei, aga töötab hetkel.
