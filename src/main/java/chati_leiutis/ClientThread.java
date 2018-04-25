@@ -144,11 +144,11 @@ public class ClientThread extends Thread {
                 char klots = in.readChar();
                 if (client.getMultiplayerGame().getOpponentID() == kellele){
                     client.getMultiplayerGame().getOpponentTetromino().setRandomTetrominoMP(klots);
-                    client.getMultiplayerGame().getOpponentTetromino().setNewRandomTetroReceivedForOpponent(true);
+                    client.getMultiplayerGame().getOpponentTetromino().setNewRandomTetroReceived(true);
                 }
                 else{
                     client.getMultiplayerGame().getMyTetromino().setRandomTetrominoMP(klots);
-                    client.getMultiplayerGame().getOpponentTetromino().setNewRandomTetroReceivedForMe(true);
+                    client.getMultiplayerGame().getMyTetromino().setNewRandomTetroReceived(true);
                 }
                 break;
             default:

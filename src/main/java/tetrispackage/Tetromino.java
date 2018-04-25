@@ -19,8 +19,7 @@ public class Tetromino {
     private int [][] activeTetrominoMatrix;
     private char randomTetrominoMP = 'Z';
     private char randomTetrominoSP = 'Z';
-    private boolean newRandomTetroReceivedForMe = true;
-    private boolean newRandomTetroReceivedForOpponent = true;
+    private boolean newRandomTetroReceived = true;
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -740,19 +739,11 @@ public class Tetromino {
         this.randomTetrominoMP = randomTetrominoMP;
     }
 
-    public boolean isNewRandomTetroReceivedForMe() {
-        return newRandomTetroReceivedForMe;
+    public boolean isNewRandomTetroReceived() {
+        return newRandomTetroReceived;
     }
 
-    public void setNewRandomTetroReceivedForMe(boolean newRandomTetroReceivedForMe) {
-        this.newRandomTetroReceivedForMe = newRandomTetroReceivedForMe;
-    }
-
-    public boolean isNewRandomTetroReceivedForOpponent() {
-        return newRandomTetroReceivedForOpponent;
-    }
-
-    public void setNewRandomTetroReceivedForOpponent(boolean newRandomTetroReceivedForOpponent) {
-        this.newRandomTetroReceivedForOpponent = newRandomTetroReceivedForOpponent;
+    public void setNewRandomTetroReceived(boolean newRandomTetroReceived) {
+        this.newRandomTetroReceived = newRandomTetroReceived;
     }
 }

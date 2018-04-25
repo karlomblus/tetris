@@ -113,8 +113,12 @@ public class TetrisGraafikaMultiplayer {
 
 //User navigates forward a page, update page changer object.
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
-            tickAndDrawForMe();
-            tickAndDrawForOpponent();
+            if (myTetromino.isNewRandomTetroReceived()) {
+                tickAndDrawForMe();
+            }
+            if (opponentTetromino.isNewRandomTetroReceived()) {
+                tickAndDrawForOpponent();
+            }
         });
         opponentMoved.addListener((ChangeListener) (o, oldVal, newVal) -> {
             if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
@@ -221,6 +225,7 @@ public class TetrisGraafikaMultiplayer {
                     myTetromino.draw("multiplayer");
                     if (myTetromino.getDrawingTurns() == 0) //drawing completed
                     {
+                        myTetromino.setNewRandomTetroReceived(false);
                         try {
                             client.requestRandomTetro();
                             System.out.println("Requesting random tetro");
@@ -239,7 +244,7 @@ public class TetrisGraafikaMultiplayer {
                 opponentTetromino.draw("multiplayer");
                 if (opponentTetromino.getDrawingTurns() == 0) //drawing completed
                 {
-
+                    opponentTetromino.setNewRandomTetroReceived(false);
                 }
             }
         }
