@@ -43,7 +43,10 @@ public class TetrisGraafika {
                     tetromino.tick();
                     tetromino.isRowFilled();
                     if (tetromino.isDrawingAllowed()) {
-                        tetromino.draw();
+                        tetromino.draw("singleplayer");
+                        if (tetromino.getDrawingTurns() == 0){
+                            System.out.println("FINISHED DRAWING");
+                        }
                     }
                 }
             }

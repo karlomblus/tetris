@@ -28,6 +28,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -210,8 +211,8 @@ public class Klient extends Application {
     public void showLobby() throws Exception {
 
         //säti suurus
-        int w = 900;
-        int h = 800;
+        int w = 700;
+        int h = 600;
         Stage primaryStage = new Stage();
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -260,7 +261,6 @@ public class Klient extends Application {
         Image chatImage = new Image("/Tetris.png",850,200,true,false);
         ImageView pilt = new ImageView(chatImage);
 
-        //TODO pole kindel kas selline lahendus on okei, aga töötab hetkel.
         Button singleplayerbtn = new Button("Singleplayer");
         TetrisGraafika tetris = new TetrisGraafika();
         singleplayerbtn.setOnMouseClicked((MouseEvent) -> {
@@ -488,18 +488,22 @@ public class Klient extends Application {
                 String challengeeName = userListView.getSelectionModel().getSelectedItem();
                 out.writeInt(name_2_ID.get(challengeeName));
                 break;
-            case 9:
+            /*case 9:
                 //todo keeldumine
-                break;
+                break;*/
             case 105:
                 out.writeInt(105);
                 out.writeInt(multiplayerGame.getOpponentID());
                 out.writeUTF(multiplayerGame.sendMessageandclearMP());
+                System.out.println("Saatsin kirja tetriseaknas kasutajale " + multiplayerGame.getOpponentID());
                 break;
             default:
                 // ei tee midagi
         }
 
+    }
+    public void requestRandomTetro() throws IOException{
+        out.writeInt(103);
     }
     public void sendKeypress(Integer tickID, char key) throws IOException {
         System.out.println("Saatsin " + 101 + " " + key);

@@ -1,4 +1,4 @@
-package tetrispackage;
+package server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.List;
-import java.util.Random;
 
 public class ServerGameConnectionHandler implements Runnable {
 
@@ -124,8 +123,6 @@ public class ServerGameConnectionHandler implements Runnable {
     } // run()
 
 
-
-
     private void createAccount(DataOutputStream dos, String username, String password) throws Exception {
 
         synchronized (dos) {
@@ -200,8 +197,8 @@ public class ServerGameConnectionHandler implements Runnable {
             if (passwordMatch) {
                 dos.writeInt(1);
                 dos.writeUTF("OK");
-                ServerMain.debug(5, "dologin: Kasutajanimi " + username + " OK, loggedin.");
                 userid = Integer.parseInt(andmebaasist[0]);
+                ServerMain.debug(5, "dologin: Kasutajanimi " + username + ", id: " + userid + " OK, loggedin.");
                 this.username = username;
                 login = false;
 
@@ -270,9 +267,9 @@ public class ServerGameConnectionHandler implements Runnable {
     private void doLogout(DataOutputStream dos) throws Exception {
         // while lõpetatakse ära, socketi sulgemisel võetakse ta ka sessioonilistist maha
         connected = false;
-if (game!=null) {
-    game.removeUserFromGame(this);
-}
+        if (game != null) {
+            game.removeUserFromGame(this);
+        }
         ServerMain.debug(5, "dologout: " + username);
         for (ServerGameConnectionHandler player : players) {
             DataOutputStream dos2 = player.getDos();
@@ -366,10 +363,25 @@ if (game!=null) {
                 opponentID = player.getUserid();
                 player.setOpponentID(userid);
                 player.setInvitedUID(0); // võtame kutse maha peale accepti
-                invitedUID=0;            // mõlemal
+                invitedUID = 0;            // mõlemal
                 ServerGameData game = new ServerGameData(this, player);
-                this.game=game;
-                player.game=game;
+                this.game = game;
+                player.game = game;
+
+                //System.out.println("hakkame start käsku saatma mängijale " + player.getUsername());
+                DataOutputStream dos2 = player.getDos();
+                synchronized (dos2) {
+                    dos2.writeInt(8);
+                    dos2.writeInt(userid);
+                    dos2.writeInt(game.getGameid());
+                } // sync
+                synchronized (dos) {
+                    dos.writeInt(8);
+                    dos.writeInt(player.getUserid());
+                    dos.writeInt(game.getGameid());
+                } // sync
+
+
                 game.start();
             }
             // leidsime mängija, anname talle teada
@@ -448,7 +460,7 @@ if (game!=null) {
     }
 
     public String toString() {
-        return "\n" + userid + ": Nimi " + username + " login: " + login + " invite: " + invitedUID + " opponent: " + opponentID;
+        return "\n" + userid + ": Nimi " + username + " " + (login ? "LOGIN" : "") + " invite: " + invitedUID + " opponent: " + opponentID;
     }
 
 

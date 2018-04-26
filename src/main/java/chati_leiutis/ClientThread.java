@@ -1,7 +1,6 @@
 package chati_leiutis;
 
 import javafx.application.Platform;
-import tetrispackage.TetrisGraafikaMultiplayer;
 
 import java.io.DataInputStream;
 import java.net.Socket;
@@ -138,7 +137,20 @@ public class ClientThread extends Thread {
                 int kellenupuvajutusID = in.readInt();
                 client.getMultiplayerGame().setOpponentMoved(nupuvajutus);
                 System.out.println("Sain nupu " + nupuvajutus + " tiksu id'ga " + nuputiskuID);
-
+                break;
+            case 103:
+                int kellele = in.readInt();
+                System.out.println("RANDOM KLOTS ON MÕELDUD_MANGIJALE ID'ga " + kellele);
+                char klots = in.readChar();
+                if (client.getMultiplayerGame().getOpponentID() == kellele){
+                    client.getMultiplayerGame().getOpponentTetromino().setRandomTetrominoMP(klots);
+                    client.getMultiplayerGame().getOpponentTetromino().setNewRandomTetroReceived(true);
+                }
+                else{
+                    client.getMultiplayerGame().getMyTetromino().setRandomTetrominoMP(klots);
+                    client.getMultiplayerGame().getMyTetromino().setNewRandomTetroReceived(true);
+                }
+                break;
             default:
                 if (tologinornot.size() == 0)
                     tologinornot.put(0);

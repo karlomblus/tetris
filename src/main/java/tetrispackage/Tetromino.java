@@ -17,7 +17,9 @@ public class Tetromino {
     private int tetrominoRotationTracker = 0;
     private boolean gameOver = false;
     private int [][] activeTetrominoMatrix;
-    private char randomTetromino = 'S';
+    private char randomTetrominoMP = 'Z';
+    private char randomTetrominoSP = 'Z';
+    private boolean newRandomTetroReceived = true;
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -243,8 +245,13 @@ public class Tetromino {
     }
 
     //Tetriminos I O T J L S Z
-    void draw() {
-        this.tetrominoType = randomTetromino;
+    void draw(String gamemode) {
+        if (gamemode.equals("singeplayer")) {
+            this.tetrominoType = randomTetrominoSP;
+        }
+        else if (gamemode.equals("multiplayer")){
+            this.tetrominoType = randomTetrominoMP;
+        }
 
         drawingTurns -= 1;
         tetrominoRotationTracker = 0;
@@ -321,7 +328,7 @@ public class Tetromino {
         if (allowTetrominoDrawing == true){ //if something set drawing to true, make a new random tetromino
             char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
             Random rand = new Random();
-            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+            randomTetrominoSP = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
         }
         this.allowTetrominoDrawing = allowTetrominoDrawing;
     }
@@ -724,7 +731,19 @@ public class Tetromino {
         while (keepticking);
     }
 
-    public char getCurrentTetrominoType() {
-        return randomTetromino;
+    public char getRandomTetrominoMP() {
+        return randomTetrominoMP;
+    }
+
+    public void setRandomTetrominoMP(char randomTetrominoMP) {
+        this.randomTetrominoMP = randomTetrominoMP;
+    }
+
+    public boolean isNewRandomTetroReceived() {
+        return newRandomTetroReceived;
+    }
+
+    public void setNewRandomTetroReceived(boolean newRandomTetroReceived) {
+        this.newRandomTetroReceived = newRandomTetroReceived;
     }
 }

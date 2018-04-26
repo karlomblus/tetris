@@ -1,10 +1,7 @@
-package tetrispackage;
+package server;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -14,6 +11,9 @@ public class ServerWebResponse {
     String rawurl="";
     String moodul = "file"; // shtml = parsime muutujaid   file=saadame tuimalt faili
     String contentType=null;
+    String userAgent="";    // väärtustame viisaka apache stiilis logimise jaoks
+    String hostIP;
+    String referer="";
 
     Socket socket;
     PrintWriter out;
@@ -23,6 +23,7 @@ public class ServerWebResponse {
     public ServerWebResponse(Socket socket,PrintWriter out) {
         this.out = out;
         this.socket=socket;
+        hostIP=socket.getInetAddress().toString();
     }
 
     public void addheader(String inputLine) {
@@ -64,6 +65,10 @@ public class ServerWebResponse {
             } // url ok
 
 
+        } else if (tykid[0].equals("User-Agent:")) {
+            userAgent=tykid[1];
+        }else if (tykid[0].equals("Referer:")) {
+            referer=tykid[1];
         }
 
     }
@@ -84,6 +89,11 @@ public class ServerWebResponse {
 
     public void sendresponse() throws IOException {
 
+        ServerMain.debug(6,"url: " + rawurl);
+        if (contentType!=null) ServerMain.debug(6,"contenttype: " + contentType);
+        ServerMain.debug(6,"moodul: " + moodul);
+        ServerMain.debug(6,"host: " + hostIP);
+
         if (filename==null) {
             senderror(); // ma ei tea mida must tahetakse või oli url keelatud
             return;
@@ -92,17 +102,8 @@ public class ServerWebResponse {
         if (moodul.equals("file")) {sendfile();return;}
         if (moodul.equals("shtml")) {sendfile();return;} // todo: parsimine teha
 
-        System.out.println("saadame mingi kamarajura vastu");
-        System.out.println("url: " + rawurl);
-        System.out.println("moodul: " + moodul);
-        out.println("HTTP/1.1 200 OK");
-        out.println("Server: Tetris scoreserver");
-        out.println("Cache-Control: no-cache, no-store, must-revalidate");
-        out.println("Pragma: no-cache");
-        out.println("Connection: Close");
-        if(contentType!=null) out.println("Content-Type: "+contentType);
-        out.println("");
-        out.println("<html><body>  Oled ühendunud tetrise serveri külge. <br><br>Varsti näed siin skoore ja saad mängu alla laadida. </body></html>");
+        // kui siia jõuame, siis ma ei tea mida must tahetakse
+        senderror();
 
     }
 
@@ -120,13 +121,13 @@ public class ServerWebResponse {
                 return;
             }
 
-            out.println("HTTP/1.1 200 OK");
-            out.println("Server: Tetris scoreserver");
-            out.println("Cache-Control: no-cache, no-store, must-revalidate");
-            out.println("Pragma: no-cache");
-            out.println("Connection: Close");
-            if(contentType!=null) out.println("Content-Type: "+contentType);
-            out.println("");
+            out.printf("HTTP/1.1 200 OK\r\n");
+            out.printf("Server: Tetris scoreserver\r\n");
+            out.printf("Cache-Control: no-cache, no-store, must-revalidate\r\n");
+            out.printf("Pragma: no-cache\r\n");
+            out.printf("Connection: Close\r\n");
+            if(contentType!=null) out.printf("Content-Type: "+contentType+"\r\n");
+            out.printf("\r\n");
 
             final byte[] buffer = new byte[4096];
             for (int read = inStream.read(buffer); read >= 0; read = inStream.read(buffer))
@@ -138,19 +139,19 @@ public class ServerWebResponse {
     }
     private void send404() {
         ServerMain.debug(6,"WEB: 404: ei leia faili: "+rawurl);
-        out.println("HTTP/1.1 404 File Not Found");
-        out.println("Server: Tetris scoreserver");
-        out.println("Content-Type: text/html; charset=UTF-8");
-        out.println("");
-        out.println("<html><body>  Sorry. Faili  "+rawurl+" ei leitud<br>\n </body></html>");
+        out.printf("HTTP/1.1 404 File Not Found\r\n");
+        out.printf("Server: Tetris scoreserver\r\n");
+        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
+        out.printf("\r\n");
+        out.println("<html><body>  Sorry. Faili  "+rawurl+" ei leitud<br>\n </body></html>");   // html sisus pole korrektne reavahetus vist enam oluline sest browser peaks failiga ka sel kujul hakkama saama?
     }
 
     private void senderror() {
-        ServerMain.debug(6,"Weebiserver saadab vastu 500 errori");
-        out.println("HTTP/1.1 500 Error");
-        out.println("Server: Tetris scoreserver");
-        out.println("Content-Type: text/html; charset=UTF-8");
-        out.println("");
+        ServerMain.debug(6,"Weebiserver saadab vastu 400 errori");
+        out.printf("HTTP/1.1 400 bad request\r\n");
+        out.printf("Server: Tetris scoreserver\r\n");
+        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
+        out.printf("\r\n");
         out.println("<html><body>  Kahjuks ei mõista server seda päringut <br><br>\nURL: "+rawurl+"\n<br>Moodul: "+moodul+"<br>\n </body></html>");
     }
 }

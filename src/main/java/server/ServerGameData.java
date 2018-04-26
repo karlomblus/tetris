@@ -1,4 +1,4 @@
-package tetrispackage;
+package server;
 
 import java.io.DataOutputStream;
 import java.util.*;
@@ -13,29 +13,17 @@ public class ServerGameData {
         players = new ArrayList<>();
         players.add(player1);
         players.add(player2);
-        System.out.println("Lisasime mängija1 " + player1.getUserid()+": "+ player1.getUsername());
-        System.out.println("Lisasime mängija2 " + player2.getUserid()+": "+ player2.getUsername());
+        System.out.println("Lisasime mängija1 " + player1.getUserid() + ": " + player1.getUsername());
+        System.out.println("Lisasime mängija2 " + player2.getUserid() + ": " + player2.getUsername());
 
         // todo: gameid tuleb mängu lisamisest mysql-i
-        gameid=999;
-
+        gameid = 999;
 
 
     }
 
 
-    void start() throws Exception{
-        //System.out.println("mängijaid: " + players.size());
-        for (ServerGameConnectionHandler player : players) {
-            //System.out.println("hakkame start käsku saatma mängijale " + player.getUsername());
-            DataOutputStream dos = player.getDos();
-            synchronized (dos) {
-                dos.writeInt(8);
-                dos.writeInt(player.getUserid());
-                dos.writeInt(gameid);
-            } // sync
-        } // iter
-
+    void start() throws Exception {
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -44,7 +32,7 @@ public class ServerGameData {
             public void run() {
                 tiksJuhtus();
             }
-        }, 300,300);
+        }, 300, 300);
 
 
     } // start
@@ -52,21 +40,21 @@ public class ServerGameData {
 
     private void tiksJuhtus() {
 
-            tickid++;
-            for (ServerGameConnectionHandler player : players) {
-                try {
+        tickid++;
+        for (ServerGameConnectionHandler player : players) {
+            try {
                 DataOutputStream dos = player.getDos();
                 synchronized (dos) {
                     dos.writeInt(100);
                     dos.writeInt(tickid);
                 } // sync
-                } catch (Exception e) { // kui üks mängija läheb katki, siis ei taha me õhku lennata vaid teine mängija jääb üksi mängima
-                    ServerMain.debug(1,"Tiksu saatmisel kasutajale "+player.getUsername()+" läks midagi valesti.");
-                    ServerMain.debug(5,e.toString());
-                    player.setOpponentID(0);
-                    players.remove(player); // teise mängija viskame minema
-                }
-            } // iter
+            } catch (Exception e) { // kui üks mängija läheb katki, siis ei taha me õhku lennata vaid teine mängija jääb üksi mängima
+                ServerMain.debug(1, "Tiksu saatmisel kasutajale " + player.getUsername() + " läks midagi valesti.");
+                ServerMain.debug(5, e.toString());
+                player.setOpponentID(0);
+                players.remove(player); // teise mängija viskame minema
+            }
+        } // iter
 
 
     } // tiksJuhtus
@@ -76,7 +64,7 @@ public class ServerGameData {
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
         char randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
-
+        ServerMain.debug(7, "sendNewTetromino: id " + kellele + " tellis uue tetromino, saadame selle: " + players);
         for (ServerGameConnectionHandler player : players) {
             try {
                 DataOutputStream dos = player.getDos();
@@ -86,8 +74,8 @@ public class ServerGameData {
                     dos.writeChar(randomTetromino);
                 } // sync
             } catch (Exception e) { // kui üks mängija läheb katki, siis ei taha me õhku lennata vaid teine mängija jääb üksi mängima
-                ServerMain.debug(1,"Tetromino info saatmisel kasutajale "+player.getUsername()+" läks midagi valesti.");
-                ServerMain.debug(5,e.toString());
+                ServerMain.debug(1, "Tetromino info saatmisel kasutajale " + player.getUsername() + " läks midagi valesti.");
+                ServerMain.debug(5, e.toString());
                 player.setOpponentID(0);
                 players.remove(player); // teise mängija viskame minema
             }
@@ -108,11 +96,17 @@ public class ServerGameData {
                     dos.writeInt(player.getUserid());
                 } // sync
             } catch (Exception e) { // kui üks mängija läheb katki, siis ei taha me õhku lennata vaid teine mängija jääb üksi mängima
-                ServerMain.debug(1,"Lahkumisteate saatmisel kasutajale "+player.getUsername()+" läks midagi valesti.");
-                ServerMain.debug(5,e.toString());
+                ServerMain.debug(1, "Lahkumisteate saatmisel kasutajale " + player.getUsername() + " läks midagi valesti.");
+                ServerMain.debug(5, e.toString());
                 player.setOpponentID(0); // viskame selle minema kellele ei saanud kirjutada
                 players.remove(player);
             }
         } // iter
     } // removeUserFromGame
+
+
+
+    public int getGameid() {
+        return gameid;
+    }
 } // class

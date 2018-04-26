@@ -1,7 +1,6 @@
-package tetrispackage;
+package server;
 
 import java.sql.*;
-import java.util.Calendar;
 
 public class ServerSQL {
     private Connection conn = null;

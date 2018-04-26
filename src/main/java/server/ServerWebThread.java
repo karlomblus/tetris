@@ -1,4 +1,4 @@
-package tetrispackage;
+package server;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -29,7 +29,7 @@ class ServerWebThread implements Runnable {
                     ServerWebResponse web = new ServerWebResponse(socket, out);
                     while ((inputLine = bis.readLine()) != null) {
                         //instr.append(inputLine);
-                        System.out.println("'" + inputLine + "'");
+                        //System.out.println("'" + inputLine + "'");
                         web.addheader(inputLine);
                         if (inputLine.equals(".q")) {  // testimiseks
                             socket.close();
