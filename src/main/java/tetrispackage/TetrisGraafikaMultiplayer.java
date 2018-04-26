@@ -45,9 +45,10 @@ public class TetrisGraafikaMultiplayer {
     private IntegerProperty opponentMoved = new SimpleIntegerProperty();
     private int opponentMoveTiksuID = 0;
 
-    public TetrisGraafikaMultiplayer(){
+    public TetrisGraafikaMultiplayer() {
         opponentMoved.setValue(-1);
     }
+
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
         //tickProperty.setValue(0);
@@ -226,7 +227,7 @@ public class TetrisGraafikaMultiplayer {
                     }
                 }
             }
-            if (myTetromino.isNewRandomTetroReceived()) {
+            if (myTetromino.isNewRandomTetroReceived()) {//wait until new randomtetro received
                 if (myTetromino.isDrawingAllowed()) {
                     myTetromino.draw("multiplayer"); //after drawing, getDrawingTurns is no longer 2
                 }
@@ -235,6 +236,7 @@ public class TetrisGraafikaMultiplayer {
                     randomTetroRequestSent = 0;
                 }
             }
+
         }
     }
 
@@ -259,10 +261,12 @@ public class TetrisGraafikaMultiplayer {
         String toReturn = writeArea.getText();
         return toReturn;
     }
-    public void opponentLeft(){
-        chatWindow.appendText("--------------- "+"\n"+"Your opponent has left the game, closing after 5 seconds...");
+
+    public void opponentLeft() {
+        chatWindow.appendText("--------------- " + "\n" + "Your opponent has left the game, closing after 5 seconds...");
         //todo sulgemine pärast ootamist?
     }
+
     public Integer getOpponentID() {
         return opponentID;
     }

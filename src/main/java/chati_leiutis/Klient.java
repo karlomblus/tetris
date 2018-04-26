@@ -491,7 +491,7 @@ public class Klient extends Application {
     }
 
     public void sendKeypress(Integer tickID, char key) throws IOException {
-        System.out.println("Saatsin " + 101 + " " + key);
+        System.out.println("Saatsin " + 101 + " " + String.valueOf(key));
         out.writeInt(101);
         out.writeInt(tickID);
         out.writeChar(key);
