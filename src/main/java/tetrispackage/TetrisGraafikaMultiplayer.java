@@ -195,6 +195,8 @@ public class TetrisGraafikaMultiplayer {
                         messagearea.appendText("Socket closed. Keypress sending failed!");
                     }
                     myTetromino.drop();
+                    myTetromino.setNewRandomTetroReceived(false);
+                    randomTetroRequestSent = 0;
                 }
             }
         });
