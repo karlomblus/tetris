@@ -109,7 +109,6 @@ public class ClientThread extends Thread {
                     //alustan mängu, andes kaasa vastase ID
                     Platform.runLater(() -> client.showMultiplayer(OpponentID));
                 }
-                client.setMpgameopen(true);
                 //võeti challenge vastu
 
                 break;
@@ -118,7 +117,8 @@ public class ClientThread extends Thread {
                 in.readInt();
                 String message = in.readUTF();
                 client.recieveMessage(-1, "System", message + " keeldus!");
-
+                client.challengewindow.close();
+                client.newStage.close();
 
                 break;
             case 105:
