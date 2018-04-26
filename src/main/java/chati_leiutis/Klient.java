@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -16,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -34,6 +36,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Klient extends Application {
+    Klient self;
     private String nimi;
     private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
     private boolean challengeOpen = false;
@@ -54,8 +57,7 @@ public class Klient extends Application {
     private TextField regnamefield;
     private ClientThread listener;
     private TetrisGraafikaMultiplayer multiplayerGame;
-    Stage challengewindow;
-    Stage newStage = new Stage();
+    OpenChallengeWindow challengewindow;
 
     public String getNimi() {
         return nimi;
@@ -151,9 +153,10 @@ public class Klient extends Application {
         comp.getChildren().add(nameField);
 
         Button login_nupp = new Button("Log in");
+        login_nupp.setDefaultButton(true);
 
         //login event- ootame blockqueuest vastust,vastavalt sellele tegutseme
-        login_nupp.setOnMouseClicked((event) -> {
+        login_nupp.setOnAction(ev -> {
             try {
                 if (connection == null || connection.isClosed()) {
                     errorlabel.setText("Error, connection error. Please restart.");
@@ -177,6 +180,11 @@ public class Klient extends Application {
                 }
             } catch (Exception e) {
                 throw new RuntimeException(e);
+            }
+        });
+        loginnamefield.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                login_nupp.fire();
             }
         });
 
@@ -211,8 +219,8 @@ public class Klient extends Application {
     public void showLobby() throws Exception {
 
         //säti suurus
-        int w = 900;
-        int h = 400;
+        int w = 700;
+        int h = 600;
         Stage primaryStage = new Stage();
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -277,18 +285,6 @@ public class Klient extends Application {
 
             }
         });
-        /*
-        Button multiplayerbtn = new Button("Multiplayer");
-        multiplayerbtn.setOnMouseClicked((MouseEvent) -> {
-            try {
-                Stage lava = new Stage();
-                tetris.start(lava);
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-
-            }
-        });*/
 
         Button challengeButton = new Button("Challenge");
         challengeButton.setPrefWidth(w / 4);
@@ -299,7 +295,10 @@ public class Klient extends Application {
                     try {
                         String selectedUserName = userListView.getSelectionModel().getSelectedItem();
                         if (!selectedUserName.equals(nimi)) {
-                            showOpenChallengeWindow(selectedUserName);
+                            Stage inchallengewindow = new Stage();
+                            OpenChallengeWindow challenge = new OpenChallengeWindow(inchallengewindow);
+                            challengewindow = challenge;
+                            challenge.start(inchallengewindow,selectedUserName,self);
                             sendSomething(7);
                         }
                     } catch (Exception e2) {
@@ -378,29 +377,6 @@ public class Klient extends Application {
         multiplayerGame = mp;
         Stage mpstage = new Stage();
         mp.start(mpstage, this, opponentID);
-    }
-
-    public void showOpenChallengeWindow(String user) {
-        challengewindow = newStage;
-        VBox comp = new VBox();
-        comp.setAlignment(Pos.CENTER);
-        Label messagelabel = new Label("Challenging " + user + ". Waiting for response...");
-
-        Button closebutton = new Button("Close");
-        closebutton.setOnMouseClicked((event) -> {
-            try {
-                challengeOpen = false;
-                newStage.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            newStage.close();
-        });
-
-        comp.getChildren().addAll(messagelabel, closebutton);
-        Scene stageScene = new Scene(comp, 250, 130);
-        newStage.setScene(stageScene);
-        newStage.show();
     }
 
     public void showIncomingChallengeWindow(Integer ID, String user) {
@@ -569,8 +545,13 @@ public class Klient extends Application {
         this.challengeOpen = challengeOpen;
     }
 
+    public boolean isChallengeOpen() {
+        return challengeOpen;
+    }
+
     @Override
     public void start(Stage primaryStage) throws Exception {
+        self = this;
         //üritame käivitamisel ühenduse luua
         try (Socket socket = new Socket("tetris.carlnet.ee", 54321);
              DataOutputStream output = new DataOutputStream(socket.getOutputStream());

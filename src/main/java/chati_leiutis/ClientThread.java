@@ -118,7 +118,6 @@ public class ClientThread extends Thread {
                 String message = in.readUTF();
                 client.recieveMessage(-1, "System", message + " keeldus!");
                 client.challengewindow.close();
-                client.newStage.close();
 
                 break;
             case 105:
