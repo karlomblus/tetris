@@ -241,14 +241,10 @@ public class TetrisGraafikaMultiplayer {
 
     void tickAndDrawForOpponent() {
         if (!opponentTetromino.gameStateOver()) {
-            if (!opponentTetromino.isDrawingAllowed()) {
                 opponentTetromino.tick();
                 opponentTetromino.isRowFilled();
-            }
             if (opponentTetromino.isDrawingAllowed() && opponentTetromino.isNewRandomTetroReceived()) {
                 opponentTetromino.draw("multiplayer");
-                opponentTetromino.tick();
-                opponentTetromino.isRowFilled();
                 if (opponentTetromino.getDrawingTurns() == 0) {
                     opponentTetromino.setNewRandomTetroReceived(false);
                 }
