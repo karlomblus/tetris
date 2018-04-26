@@ -95,7 +95,7 @@ public class Tetromino {
         return false;
     }
 
-    boolean isRowFilled() {
+    boolean CheckIfRowFilled() {
         boolean isFilled = true;
         int filledRowNumber = 0;
         int foundPassiveBlocksinRow = 0;
@@ -241,6 +241,7 @@ public class Tetromino {
                 setRectStatusAt(fallingRectCoordI.get(i), fallingRectCoordJ.get(i), 'B');
             }
         }
+        CheckIfRowFilled();
         return keepTicking;
     }
 
