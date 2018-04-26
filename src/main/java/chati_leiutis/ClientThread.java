@@ -32,10 +32,6 @@ public class ClientThread extends Thread {
     }
 
     public void handleIncomingInput(Integer type) throws Exception {
-        if (type != 100) {
-            System.out.println("input tüüp on " + type);
-        }
-
         switch (type) {
             case 1:
                 //registreerumise vastus: 1 -- OK, -1 == error
@@ -139,12 +135,12 @@ public class ClientThread extends Thread {
                 int kellenupuvajutusID = in.readInt(); //Do I need this?
                 client.getMultiplayerGame().setOpponentMoveTiksuID(nuputiskuID);
                 client.getMultiplayerGame().setOpponentMoved(nupuvajutus);
-                System.out.println("Sain nupu " + nupuvajutus + " tiksu id'ga " + nuputiskuID);
+                System.out.println("Sain nupu " + String.valueOf(nupuvajutus) + " tiksu id'ga " + nuputiskuID);
                 break;
             case 103:
                 int kellele = in.readInt();
-                System.out.println("RANDOM KLOTS ON MÕELDUD_MANGIJALE ID'ga " + kellele);
                 char klots = in.readChar();
+                System.out.println("Sain random klotsi " + String.valueOf(klots) + " ID'ga " + kellele);
                 if (client.getMultiplayerGame().getOpponentID() == kellele) {
                     client.getMultiplayerGame().getOpponentTetromino().setRandomTetrominoMP(klots);
                     client.getMultiplayerGame().getOpponentTetromino().setNewRandomTetroReceived(true);
