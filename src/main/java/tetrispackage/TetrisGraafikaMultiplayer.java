@@ -45,11 +45,13 @@ public class TetrisGraafikaMultiplayer {
     private IntegerProperty opponentMoved = new SimpleIntegerProperty();
     private int opponentMoveTiksuID = 0;
 
+    public TetrisGraafikaMultiplayer(){
+        opponentMoved.setValue(-1);
+    }
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
         //tickProperty.setValue(0);
         this.client = client;
-        opponentMoved.setValue(-1);
         this.opponentID = opponentID;
         HBox hbox = new HBox(10);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
@@ -150,8 +152,6 @@ public class TetrisGraafikaMultiplayer {
                 System.out.println("Failed to send info about closing/exiting the MP game");
             }
             Platform.exit();
-            //PlatformImpl.tkExit()
-            //tickTime.stop();
         });
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
