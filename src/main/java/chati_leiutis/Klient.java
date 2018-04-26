@@ -211,8 +211,8 @@ public class Klient extends Application {
     public void showLobby() throws Exception {
 
         //säti suurus
-        int w = 700;
-        int h = 600;
+        int w = 900;
+        int h = 400;
         Stage primaryStage = new Stage();
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -258,8 +258,10 @@ public class Klient extends Application {
         konsool = messagefield;
 
         //pilt
-        Image chatImage = new Image("/Tetris.png",850,200,true,false);
+        Image chatImage = new Image("/Tetris.png", w, 200, true, false);
         ImageView pilt = new ImageView(chatImage);
+        pilt.setFitHeight(h / 5);
+        pilt.setFitWidth(w);
 
 
         Button singleplayerbtn = new Button("Singleplayer");
@@ -422,8 +424,10 @@ public class Klient extends Application {
 
         declinebutton.setOnMouseClicked((event) -> {
             try {
+                sendSomething(9);
                 out.writeInt(9);
                 out.writeInt(ID);
+                challengeOpen = false;
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -504,9 +508,11 @@ public class Klient extends Application {
         }
 
     }
-    public void requestRandomTetro() throws IOException{
+
+    public void requestRandomTetro() throws IOException {
         out.writeInt(103);
     }
+
     public void sendKeypress(Integer tickID, char key) throws IOException {
         System.out.println("Saatsin " + 101 + " " + key);
         out.writeInt(101);
@@ -558,6 +564,9 @@ public class Klient extends Application {
         }
     }
 
+    public void setChallengeOpen(boolean challengeOpen) {
+        this.challengeOpen = challengeOpen;
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
