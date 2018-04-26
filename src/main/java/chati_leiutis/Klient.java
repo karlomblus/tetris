@@ -261,6 +261,7 @@ public class Klient extends Application {
         Image chatImage = new Image("/Tetris.png",850,200,true,false);
         ImageView pilt = new ImageView(chatImage);
 
+
         Button singleplayerbtn = new Button("Singleplayer");
         TetrisGraafika tetris = new TetrisGraafika();
         singleplayerbtn.setOnMouseClicked((MouseEvent) -> {
