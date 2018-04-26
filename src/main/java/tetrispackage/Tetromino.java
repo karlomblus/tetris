@@ -12,11 +12,11 @@ public class Tetromino {
     private Color activeTetrominoColor;
     private Rectangle[][] ruudud;
     private boolean allActiveToPassive = false;
-    private  boolean allFallingToPassive = false;
+    private boolean allFallingToPassive = false;
     private char tetrominoType;
     private int tetrominoRotationTracker = 0;
     private boolean gameOver = false;
-    private int [][] activeTetrominoMatrix;
+    private int[][] activeTetrominoMatrix;
     private char randomTetrominoMP = 'Z';
     private char randomTetrominoSP = 'Z';
     private boolean newRandomTetroReceived = true;
@@ -94,28 +94,28 @@ public class Tetromino {
         }
         return false;
     }
-    boolean isRowFilled(){
+
+    boolean isRowFilled() {
         boolean isFilled = true;
         int filledRowNumber = 0;
         int foundPassiveBlocksinRow = 0;
         for (int i = 0; i < ruudud.length; i++) {
             for (int j = 0; j < ruudud[0].length; j++) {
-                if (getRectStatusAt(i, j) == 'P'){
+                if (getRectStatusAt(i, j) == 'P') {
                     foundPassiveBlocksinRow += 1;
                 }
             }
-            if (foundPassiveBlocksinRow == ruudud[0].length){
+            if (foundPassiveBlocksinRow == ruudud[0].length) {
                 isFilled = true;
                 filledRowNumber = i;
                 break;
-            }
-            else{
+            } else {
                 foundPassiveBlocksinRow = 0;
                 isFilled = false;
             }
         }
-        if (isFilled == true){
-           // System.out.println("Filled row found!AAAAAAAAAAAAAAAAAAAAAA");
+        if (isFilled == true) {
+            // System.out.println("Filled row found!AAAAAAAAAAAAAAAAAAAAAA");
             //System.out.println("Filled row: " + filledRowNumber);
             for (int i = 0; i < ruudud[0].length; i++) {
                 setRectStatusAt(filledRowNumber, i, 'B');
@@ -124,11 +124,12 @@ public class Tetromino {
         }
         return isFilled;
     }
-    void setAllAboveToFalling (int deletedRow){
+
+    void setAllAboveToFalling(int deletedRow) {
         for (int i = 0; i < deletedRow; i++) {
             for (int j = 0; j < ruudud[0].length; j++) {
                 if (getRectStatusAt(i, j) == 'P')
-                setRectStatusAt(i ,j, 'F');
+                    setRectStatusAt(i, j, 'F');
             }
         }
     }
@@ -193,7 +194,7 @@ public class Tetromino {
             }
         }
         if (allActiveToPassive) {
-           // System.out.println("All active to passive!");
+            // System.out.println("All active to passive!");
             for (int k = 0; k < ruudud.length; k++) {
                 for (int l = 0; l < ruudud[k].length; l++) {
                     if (getRectStatusAt(k, l) == 'A') {
@@ -202,17 +203,16 @@ public class Tetromino {
                 }
             }
             for (int i = 0; i < ruudud[0].length; i++) {
-                if (activeRectCoordI.get(0) == 0){
+                if (activeRectCoordI.get(0) == 0) {
                     gameOver = true;
                 }
             }
-            if (gameOver){
+            if (gameOver) {
                 System.out.println("Game over!");
                 return false;
             }
-            drawingTurns = 2;
             setDrawingPermission(true);
-
+            System.out.println("Setting drawing permission to true!");
             allActiveToPassive = false;
             keepTicking = false;
         } else if (!allActiveToPassive) {
@@ -221,8 +221,8 @@ public class Tetromino {
                 setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
             }
         }
-        if (allFallingToPassive){
-           // System.out.println("All falling to passive!");
+        if (allFallingToPassive) {
+            // System.out.println("All falling to passive!");
             for (int k = 0; k < ruudud.length; k++) {
                 for (int l = 0; l < ruudud[k].length; l++) {
                     if (getRectStatusAt(k, l) == 'F') {
@@ -231,13 +231,12 @@ public class Tetromino {
                 }
             }
             allFallingToPassive = false;
-        }
-        else if (!allFallingToPassive) {
+        } else if (!allFallingToPassive) {
             for (int i = 0; i < fallingRectCoordI.size(); i++) {
                 setRectStatusAt(fallingRectCoordI.get(i) + 1, fallingRectCoordJ.get(i), 'F');
-                ruudud[fallingRectCoordI.get(i)+1][fallingRectCoordJ.get(i)].setFill
+                ruudud[fallingRectCoordI.get(i) + 1][fallingRectCoordJ.get(i)].setFill
                         (ruudud[fallingRectCoordI.get(i)][fallingRectCoordJ.get(i)].getFill());
-                ruudud[fallingRectCoordI.get(i)+1][fallingRectCoordJ.get(i)].setStroke
+                ruudud[fallingRectCoordI.get(i) + 1][fallingRectCoordJ.get(i)].setStroke
                         (ruudud[fallingRectCoordI.get(i)][fallingRectCoordJ.get(i)].getStroke());
                 setRectStatusAt(fallingRectCoordI.get(i), fallingRectCoordJ.get(i), 'B');
             }
@@ -249,8 +248,7 @@ public class Tetromino {
     void draw(String gamemode) {
         if (gamemode.equals("singeplayer")) {
             this.tetrominoType = randomTetrominoSP;
-        }
-        else if (gamemode.equals("multiplayer")){
+        } else if (gamemode.equals("multiplayer")) {
             this.tetrominoType = randomTetrominoMP;
         }
 
@@ -296,8 +294,7 @@ public class Tetromino {
             } else {
                 setRectStatusAt(0, j + 1, 'A');
             }
-        }
-        else if (tetrominoType == 'L') {
+        } else if (tetrominoType == 'L') {
             activeTetrominoColor = Color.ORANGE;
             if (drawingTurns == 0) {
                 setRectStatusAt(0, j + 2, 'A');
@@ -307,8 +304,7 @@ public class Tetromino {
                 setRectStatusAt(0, j + 1, 'A');
                 setRectStatusAt(0, j + 2, 'A');
             }
-        }
-        else if (tetrominoType == 'J') {
+        } else if (tetrominoType == 'J') {
             activeTetrominoColor = Color.BLUE;
             if (drawingTurns == 0) {
                 setRectStatusAt(0, j, 'A');
@@ -326,10 +322,13 @@ public class Tetromino {
     }
 
     public void setDrawingPermission(boolean allowTetrominoDrawing) {
-        if (allowTetrominoDrawing == true){ //if something set drawing to true, make a new random tetromino
+        if (allowTetrominoDrawing == true) { //if something set drawing to true, make a new random tetromino
             char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
             Random rand = new Random();
             randomTetrominoSP = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+        }
+        if (allowTetrominoDrawing) {
+            drawingTurns = 2;
         }
         this.allowTetrominoDrawing = allowTetrominoDrawing;
     }
@@ -342,104 +341,33 @@ public class Tetromino {
         return drawingTurns;
     }
 
-    public void setDrawingTurns(int drawingTurns) {
-        this.drawingTurns = drawingTurns;
+    boolean gameStateOver() {
+        return gameOver;
     }
-    void rotate(){
-        List<Integer> activeRectCoordI = new ArrayList<>();
-        List<Integer> activeRectCoordJ = new ArrayList<>();
-        for (int i = 0; i < ruudud.length; i++) {  //Find all active blocks
-            for (int j = 0; j < ruudud[i].length; j++) {
-                if (getRectStatusAt(i, j) == 'A') {
-                    activeRectCoordI.add(i); //remember where the active blocks are
-                    activeRectCoordJ.add(j);
-                }
-            }
-        }
-        int minI = activeRectCoordI.get(0);
-        int minJ = activeRectCoordJ.get(0);
-        for (int i = 1; i < activeRectCoordI.size(); i++) {
-            if (activeRectCoordI.get(i) < minI){
-                minI = activeRectCoordI.get(i);
-            }
-            if (activeRectCoordJ.get(i) < minJ){
-                minJ = activeRectCoordJ.get(i);
-            }
-        }
 
-        if (tetrominoRotationTracker == 0){
-            activeTetrominoMatrix = new int[3][3];
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    activeTetrominoMatrix[i][j] = 0;
-                }
-            }
-            for (int i = 0; i < activeRectCoordI.size(); i++) {
-                activeTetrominoMatrix[activeRectCoordI.get(i) - minI][activeRectCoordJ.get(i) - minJ] = 1;
-                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
-            }
-            transponeeri(activeTetrominoMatrix);
-            vahetaRead(activeTetrominoMatrix);
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (activeTetrominoMatrix[i][j] == 1){
-                        setRectStatusAt(i + minI, j + minJ, 'A');
-                    }
-                }
-            }
-            tetrominoRotationTracker += 1;
+    void drop() {
+        boolean keepticking = true;
+        do {
+            keepticking = tick();
         }
-        else if (tetrominoRotationTracker == 1){
-            for (int i = 0; i < activeRectCoordI.size(); i++) {
-                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
-            }
-            transponeeri(activeTetrominoMatrix);
-            vahetaRead(activeTetrominoMatrix);
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (activeTetrominoMatrix[i][j] == 1){
-                        setRectStatusAt(i + minI, j + minJ, 'A');
-                    }
-                }
-            }
-            tetrominoRotationTracker += 1;
-        }
-        else if (tetrominoRotationTracker == 2){
-            for (int i = 0; i < activeRectCoordI.size(); i++) {
-                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
-            }
-            transponeeri(activeTetrominoMatrix);
-            vahetaRead(activeTetrominoMatrix);
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (activeTetrominoMatrix[i][j] == 1){
-                        setRectStatusAt(i + minI - 1, j + minJ, 'A');
-                    }
-                }
-            }
-            tetrominoRotationTracker += 1;
-        }
-        else if (tetrominoRotationTracker == 3){
-            for (int i = 0; i < activeRectCoordI.size(); i++) {
-                setRectStatusAt(activeRectCoordI.get(i), activeRectCoordJ.get(i), 'B');
-            }
-            transponeeri(activeTetrominoMatrix);
-            vahetaRead(activeTetrominoMatrix);
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (activeTetrominoMatrix[i][j] == 1){
-                        setRectStatusAt(i + minI, j + minJ - 1, 'A');
-                    }
-                }
-            }
-            tetrominoRotationTracker += 1;
-        }
-        if (tetrominoRotationTracker == 4){
-            tetrominoRotationTracker = 0;
-        }
+        while (keepticking);
+        //setDrawingPermission(true);
     }
+
+    public void setRandomTetrominoMP(char randomTetrominoMP) {
+        this.randomTetrominoMP = randomTetrominoMP;
+    }
+
+    public boolean isNewRandomTetroReceived() {
+        return newRandomTetroReceived;
+    }
+
+    public void setNewRandomTetroReceived(boolean newRandomTetroReceived) {
+        this.newRandomTetroReceived = newRandomTetroReceived;
+    }
+
     boolean rotateLeft() {
-        if (tetrominoType == 'O'){
+        if (tetrominoType == 'O') {
             return false;
         }
         List<Integer> activeRectCoordI = new ArrayList<>();
@@ -456,8 +384,8 @@ public class Tetromino {
         List<Integer> changedActiveRectCoordI = new ArrayList<>();
         List<Integer> changedActiveRectCoordJ = new ArrayList<>();
         boolean canRotate = true;
-       //System.out.println("Rotate left triggered");
-        if (tetrominoType == 'S'){
+        //System.out.println("Rotate left triggered");
+        if (tetrominoType == 'S') {
             if (tetrominoRotationTracker == 0) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0) + 2);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
@@ -467,8 +395,7 @@ public class Tetromino {
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
                 changedActiveRectCoordI.add(activeRectCoordI.get(3));
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
-            }
-            else if (tetrominoRotationTracker == 1){
+            } else if (tetrominoRotationTracker == 1) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 2);
                 changedActiveRectCoordI.add(activeRectCoordI.get(1) + 1);
@@ -477,8 +404,7 @@ public class Tetromino {
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
                 changedActiveRectCoordI.add(activeRectCoordI.get(3));
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
-            }
-            else if (tetrominoRotationTracker == 2){
+            } else if (tetrominoRotationTracker == 2) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0));
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
                 changedActiveRectCoordI.add(activeRectCoordI.get(1));
@@ -487,8 +413,7 @@ public class Tetromino {
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(2) + 2);
                 changedActiveRectCoordI.add(activeRectCoordI.get(3) - 2);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(3));
-            }
-            else if (tetrominoRotationTracker == 3){
+            } else if (tetrominoRotationTracker == 3) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0));
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0));
                 changedActiveRectCoordI.add(activeRectCoordI.get(1));
@@ -654,8 +579,7 @@ public class Tetromino {
                 changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 1);
             }
-        }
-        else if (tetrominoType == 'I') {
+        } else if (tetrominoType == 'I') {
             if (tetrominoRotationTracker == 0) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0) - 1);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 1);
@@ -665,8 +589,7 @@ public class Tetromino {
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(2) - 1);
                 changedActiveRectCoordI.add(activeRectCoordI.get(3) + 2);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 2);
-            }
-            else if (tetrominoRotationTracker == 1){
+            } else if (tetrominoRotationTracker == 1) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0) + 2);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 1);
                 changedActiveRectCoordI.add(activeRectCoordI.get(1) + 1);
@@ -676,8 +599,7 @@ public class Tetromino {
                 changedActiveRectCoordI.add(activeRectCoordI.get(3) - 1);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(3) + 2);
 
-            }
-            else if (tetrominoRotationTracker == 2) {
+            } else if (tetrominoRotationTracker == 2) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0) - 2);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0) + 2);
                 changedActiveRectCoordI.add(activeRectCoordI.get(1) - 1);
@@ -686,8 +608,7 @@ public class Tetromino {
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(2));
                 changedActiveRectCoordI.add(activeRectCoordI.get(3) + 1);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(3) - 1);
-            }
-            else if (tetrominoRotationTracker == 3){
+            } else if (tetrominoRotationTracker == 3) {
                 changedActiveRectCoordI.add(activeRectCoordI.get(0) + 1);
                 changedActiveRectCoordJ.add(activeRectCoordJ.get(0) - 2);
                 changedActiveRectCoordI.add(activeRectCoordI.get(1));
@@ -702,14 +623,14 @@ public class Tetromino {
             if (changedActiveRectCoordI.get(i) < 0 || changedActiveRectCoordJ.get(i) < 0
                     || changedActiveRectCoordI.get(i) >= ruudud.length ||
                     changedActiveRectCoordJ.get(i) >= ruudud[0].length ||
-                    getRectStatusAt(changedActiveRectCoordI.get(i),changedActiveRectCoordJ.get(i)) == 'P'){
+                    getRectStatusAt(changedActiveRectCoordI.get(i), changedActiveRectCoordJ.get(i)) == 'P') {
                 canRotate = false;
             }
         }
-       // System.out.println("Can rotate: " + canRotate);
+        // System.out.println("Can rotate: " + canRotate);
         if (canRotate) {
             tetrominoRotationTracker += 1;
-            if (tetrominoRotationTracker == 4){
+            if (tetrominoRotationTracker == 4) {
                 tetrominoRotationTracker = 0;
             }
             for (int i = 0; i < activeRectCoordI.size(); i++) {
@@ -720,31 +641,5 @@ public class Tetromino {
             }
         }
         return canRotate;
-    }
-    boolean gameStateOver(){
-        return gameOver;
-    }
-    void drop (){
-        boolean keepticking = true;
-        do {
-            keepticking = tick();
-        }
-        while (keepticking);
-    }
-
-    public char getRandomTetrominoMP() {
-        return randomTetrominoMP;
-    }
-
-    public void setRandomTetrominoMP(char randomTetrominoMP) {
-        this.randomTetrominoMP = randomTetrominoMP;
-    }
-
-    public boolean isNewRandomTetroReceived() {
-        return newRandomTetroReceived;
-    }
-
-    public void setNewRandomTetroReceived(boolean newRandomTetroReceived) {
-        this.newRandomTetroReceived = newRandomTetroReceived;
     }
 }

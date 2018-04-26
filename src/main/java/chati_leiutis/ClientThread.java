@@ -3,6 +3,7 @@ package chati_leiutis;
 import javafx.application.Platform;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
@@ -126,7 +127,6 @@ public class ClientThread extends Thread {
             case 100:
                 //Tulevad tiksud
                 int tiksuID = in.readInt(); //tiksuID
-                System.out.println("Saabus tiks ID'ga " + tiksuID);
                 client.getMultiplayerGame().setTickValue(tiksuID);
                 break;
             case 101:
@@ -171,7 +171,11 @@ public class ClientThread extends Thread {
                 if (e instanceof SocketException) {
                     cont = false;
                     System.out.println("Socket pandi kinni... sulen listener threadi");
-                } else
+                }
+                else if (e instanceof EOFException){
+                    throw new RuntimeException(e);
+                }
+                else
                     System.out.println(e.toString());
             }
         }
