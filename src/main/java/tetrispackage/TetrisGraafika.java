@@ -41,7 +41,6 @@ public class TetrisGraafika {
             public void handle(ActionEvent event) {
                 if (!tetromino.gameStateOver()) {
                     tetromino.tick();
-                    tetromino.CheckIfRowFilled();
                     if (tetromino.isDrawingAllowed()) {
                         tetromino.draw("singleplayer");
                         if (tetromino.getDrawingTurns() == 0){
@@ -57,13 +56,10 @@ public class TetrisGraafika {
         peaLava.setOnCloseRequest((we) -> {
             System.out.println("Tetris stage closed!");
             Platform.exit();
-            //PlatformImpl.tkExit()
             tickTime.stop();
         });
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
-
-        //tickTime.play();
 
         Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {

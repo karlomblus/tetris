@@ -16,7 +16,6 @@ public class Tetromino {
     private char tetrominoType;
     private int tetrominoRotationTracker = 0;
     private boolean gameOver = false;
-    private int[][] activeTetrominoMatrix;
     private char randomTetrominoMP = 'Z';
     private char randomTetrominoSP = 'Z';
     private boolean newRandomTetroReceived = true;
@@ -247,7 +246,7 @@ public class Tetromino {
 
     //Tetriminos I O T J L S Z
     void draw(String gamemode) {
-        if (gamemode.equals("singeplayer")) {
+        if (gamemode.equals("singleplayer")) {
             this.tetrominoType = randomTetrominoSP;
         } else if (gamemode.equals("multiplayer")) {
             this.tetrominoType = randomTetrominoMP;
