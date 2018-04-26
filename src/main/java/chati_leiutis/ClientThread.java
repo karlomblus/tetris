@@ -166,9 +166,8 @@ public class ClientThread extends Thread {
                 this.handleIncomingInput(incmsg);
             } catch (Exception e) {
                 cont = false;
-                System.out.println(e.toString());
                 System.out.println("Socket kinni/ootasin muud sisendit serverilt");
-                //throw new RuntimeException(e);
+                throw new RuntimeException(e);
             }
         }
         shutDown();
