@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
 public class KlientConnHandler {
     BlockingQueue<Integer> toLoginorNot;
     Klient client;
-    ClientThread listener;
+    Listener listener;
     private DataOutputStream out;
     private DataInputStream in;
     private Socket connection;
@@ -51,7 +51,7 @@ public class KlientConnHandler {
             this.out = output;
             System.out.println("Connection to tetris.carlnet.ee established...");
 
-            listener = new ClientThread(connection, client, input, toLoginorNot);
+            listener = new Listener(connection, client, input, toLoginorNot);
             Thread clienthread = new Thread(listener);
             clienthread.start();
   //          client.setOut(this.out);

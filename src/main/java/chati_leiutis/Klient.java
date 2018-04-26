@@ -2,13 +2,8 @@ package chati_leiutis;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.property.MapProperty;
-import javafx.beans.property.SimpleMapProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -17,7 +12,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
@@ -30,7 +24,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -55,7 +48,7 @@ public class Klient extends Application {
     private TextField loginnamefield;
     private PasswordField regpasswordfield;
     private TextField regnamefield;
-    private ClientThread listener;
+    private Listener listener;
     private TetrisGraafikaMultiplayer multiplayerGame;
     OpenChallengeWindow challengewindow;
 
@@ -567,7 +560,7 @@ public class Klient extends Application {
             this.out = output;
             System.out.println("Connection to tetris.carlnet.ee established...");
 
-            listener = new ClientThread(connection, this, input, toLoginorNot);
+            listener = new Listener(connection, this, input, toLoginorNot);
             Thread clienthread = new Thread(listener);
             clienthread.start();
             loggedIN = true;

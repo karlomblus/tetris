@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 
-public class ClientThread extends Thread {
+public class Listener extends Thread {
     Socket socket;
     boolean cont = true;
     Klient client;
@@ -25,7 +25,7 @@ public class ClientThread extends Thread {
         }
     }
 
-    public ClientThread(Socket socket, Klient client, DataInputStream in, BlockingQueue<Integer> tologinornot) throws Exception {
+    public Listener(Socket socket, Klient client, DataInputStream in, BlockingQueue<Integer> tologinornot) throws Exception {
         this.socket = socket;
         this.client = client;
         this.in = in;
