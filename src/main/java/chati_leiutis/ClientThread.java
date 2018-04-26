@@ -137,6 +137,9 @@ public class ClientThread extends Thread {
                 client.getMultiplayerGame().setOpponentMoved(nupuvajutus);
                 System.out.println("Sain nupu " + String.valueOf(nupuvajutus) + " tiksu id'ga " + nuputiskuID);
                 break;
+            case 102:
+                client.getMultiplayerGame().opponentLeft();
+                //TODO kui vastane sulgeb oma mp mängu/lahkub
             case 103:
                 int kellele = in.readInt();
                 char klots = in.readChar();

@@ -158,7 +158,13 @@ public class TetrisGraafikaMultiplayer {
 
         peaLava.setOnCloseRequest((we) -> {
             System.out.println("Tetris stage closed!");
+            //multiplayer läheb kinni
             client.setMpgameopen(false);
+            try {
+                client.sendSomething(102);
+            } catch (IOException e) {
+                System.out.println("Failed to send info about closing/exiting the MP game");
+            }
             Platform.exit();
             //PlatformImpl.tkExit()
             //tickTime.stop();
@@ -273,7 +279,10 @@ public class TetrisGraafikaMultiplayer {
         String toReturn = writeArea.getText();
         return toReturn;
     }
-
+    public void opponentLeft(){
+        chatWindow.appendText("--------------- "+"\n"+"Your opponent has left the game, closing after 5 seconds...");
+        //todo sulgemine pärast ootamist?
+    }
     public Integer getOpponentID() {
         return opponentID;
     }

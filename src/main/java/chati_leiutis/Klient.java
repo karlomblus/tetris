@@ -434,54 +434,61 @@ public class Klient extends Application {
     }
 
     public void sendSomething(Integer type) throws IOException {
-        System.out.println("Saatsin " + type);
-        //vastavalt prokokollile:
-        switch (type) {
-            case 1:
-                out.writeInt(type);
-                String regname = regnamefield.getText();
-                String regpass = regpasswordfield.getText();
-                logIn_or_Register(regname, regpass);
-                break;
-            case 2:
-                out.writeInt(type);
-                String loginname = loginnamefield.getText();
-                String loginpass = loginpasswordfield.getText();
-                logIn_or_Register(loginname, loginpass);
-                break;
-            case 3:
-                out.writeInt(type);
-                //jääme ootama userlisti
-                break;
-            case 4:
-                out.writeInt(type);
-                //väljalogimine
-                break;
-            case 5:
-                out.writeInt(type);
-                sendAndClearField(konsool);
-                break;
-            case 6:
-                out.writeInt(type);
-                //ootame tagasi käivate mängude listi
-                break;
-            case 7:
-                out.writeInt(type);
-                String challengeeName = userListView.getSelectionModel().getSelectedItem();
-                out.writeInt(name_2_ID.get(challengeeName));
-                break;
+        try {
+            System.out.println("Saatsin " + type);
+            //vastavalt prokokollile:
+            switch (type) {
+                case 1:
+                    out.writeInt(type);
+                    String regname = regnamefield.getText();
+                    String regpass = regpasswordfield.getText();
+                    logIn_or_Register(regname, regpass);
+                    break;
+                case 2:
+                    out.writeInt(type);
+                    String loginname = loginnamefield.getText();
+                    String loginpass = loginpasswordfield.getText();
+                    logIn_or_Register(loginname, loginpass);
+                    break;
+                case 3:
+                    out.writeInt(type);
+                    //jääme ootama userlisti
+                    break;
+                case 4:
+                    out.writeInt(type);
+                    //väljalogimine
+                    break;
+                case 5:
+                    out.writeInt(type);
+                    sendAndClearField(konsool);
+                    break;
+                case 6:
+                    out.writeInt(type);
+                    //ootame tagasi käivate mängude listi
+                    break;
+                case 7:
+                    out.writeInt(type);
+                    String challengeeName = userListView.getSelectionModel().getSelectedItem();
+                    out.writeInt(name_2_ID.get(challengeeName));
+                    break;
             /*case 9:
                 //todo keeldumine
                 break;*/
-            case 105:
-                System.out.println("Saatsin kirja tetriseaknas kasutajale " + multiplayerGame.getOpponentID());
-                out.writeInt(105);
-                out.writeInt(multiplayerGame.getOpponentID());
-                out.writeUTF(multiplayerGame.sendMessageandclearMP());
+                case 102:
+                    out.writeInt(102);
+                    break;
+                case 105:
+                    System.out.println("Saatsin kirja tetriseaknas kasutajale " + multiplayerGame.getOpponentID());
+                    out.writeInt(105);
+                    out.writeInt(multiplayerGame.getOpponentID());
+                    out.writeUTF(multiplayerGame.sendMessageandclearMP());
 
-                break;
-            default:
-                // ei tee midagi
+                    break;
+                default:
+                    // ei tee midagi
+            }
+        }catch (IOException e){
+            System.out.println("Socket kinni");
         }
 
     }
