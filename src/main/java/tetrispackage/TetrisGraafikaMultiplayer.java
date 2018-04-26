@@ -36,6 +36,7 @@ public class TetrisGraafikaMultiplayer {
     public static final char DOWN = 1;
     public static final char LEFT = 2;
     public static final char RIGHT = 3;
+    private int syncproblem = 0;
 
     private Tetromino myTetromino;
     private Tetromino opponentTetromino;
@@ -114,6 +115,7 @@ public class TetrisGraafikaMultiplayer {
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
             tickAndDrawForMe();
             tickAndDrawForOpponent();
+
         });
         opponentMoved.addListener((ChangeListener) (o, oldVal, newVal) -> {
             if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
@@ -126,10 +128,11 @@ public class TetrisGraafikaMultiplayer {
                 } else if (opponentMoved.getValue() == 1) {
                     opponentTetromino.drop();
                 }
-                if (opponentMoveTiksuID != tickProperty.getValue()){
+                if (opponentMoveTiksuID != tickProperty.getValue()) {
                     System.out.println("OUT OF SYNC!!! ");
                     System.out.println("MoveTiks: " + opponentMoveTiksuID);
                     System.out.println("TickID " + tickProperty.getValue());
+                    syncproblem = 1;
                 }
             }
             opponentMoved.setValue(-1);
@@ -246,8 +249,8 @@ public class TetrisGraafikaMultiplayer {
 
     void tickAndDrawForOpponent() {
         if (!opponentTetromino.gameStateOver()) {
-                opponentTetromino.tick();
-                opponentTetromino.isRowFilled();
+            opponentTetromino.tick();
+            opponentTetromino.isRowFilled();
             if (opponentTetromino.isDrawingAllowed() && opponentTetromino.isNewRandomTetroReceived()) {
                 opponentTetromino.draw("multiplayer");
                 if (opponentTetromino.getDrawingTurns() == 0) {
