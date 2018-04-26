@@ -2,9 +2,7 @@ package tetrispackage;
 
 import chati_leiutis.Klient;
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
@@ -50,6 +48,7 @@ public class TetrisGraafikaMultiplayer {
     private TextField writeArea;
     private Integer opponentID;
     private IntegerProperty opponentMoved = new SimpleIntegerProperty();
+    private int opponentMoveTiksuID = 0;
 
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
@@ -126,6 +125,11 @@ public class TetrisGraafikaMultiplayer {
                     opponentTetromino.rotateLeft();
                 } else if (opponentMoved.getValue() == 1) {
                     opponentTetromino.drop();
+                }
+                if (opponentMoveTiksuID != tickProperty.getValue()){
+                    System.out.println("OUT OF SYNC!!! ");
+                    System.out.println("MoveTiks: " + opponentMoveTiksuID);
+                    System.out.println("TickID " + tickProperty.getValue());
                 }
             }
             opponentMoved.setValue(-1);
@@ -281,5 +285,9 @@ public class TetrisGraafikaMultiplayer {
 
     public Tetromino getOpponentTetromino() {
         return opponentTetromino;
+    }
+
+    public void setOpponentMoveTiksuID(int opponentMoveTiksuID) {
+        this.opponentMoveTiksuID = opponentMoveTiksuID;
     }
 }
