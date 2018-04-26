@@ -100,7 +100,6 @@ public class ClientThread extends Thread {
                 int challengerID = in.readInt();
                 String challengerName = in.readUTF();
                 Platform.runLater(() -> client.showIncomingChallengeWindow(challengerID, challengerName));
-                client.
                 break;
             case 8:
                 int OpponentID = in.readInt();
