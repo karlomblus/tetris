@@ -136,7 +136,8 @@ public class ClientThread extends Thread {
             case 101:
                 int nuputiskuID = in.readInt(); //tiksuID
                 char nupuvajutus = in.readChar();
-                int kellenupuvajutusID = in.readInt();
+                int kellenupuvajutusID = in.readInt(); //Do I need this?
+                client.getMultiplayerGame().setOpponentMoveTiksuID(nuputiskuID);
                 client.getMultiplayerGame().setOpponentMoved(nupuvajutus);
                 System.out.println("Sain nupu " + nupuvajutus + " tiksu id'ga " + nuputiskuID);
                 break;
