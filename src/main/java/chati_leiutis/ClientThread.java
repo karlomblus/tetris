@@ -4,6 +4,7 @@ import javafx.application.Platform;
 
 import java.io.DataInputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 
 public class ClientThread extends Thread {
@@ -99,6 +100,7 @@ public class ClientThread extends Thread {
                 int challengerID = in.readInt();
                 String challengerName = in.readUTF();
                 Platform.runLater(() -> client.showIncomingChallengeWindow(challengerID, challengerName));
+                client.
                 break;
             case 8:
                 int OpponentID = in.readInt();
@@ -117,6 +119,7 @@ public class ClientThread extends Thread {
                 in.readInt();
                 String message = in.readUTF();
                 client.recieveMessage(-1, "System", message + " keeldus!");
+
 
                 break;
             case 105:
@@ -142,11 +145,10 @@ public class ClientThread extends Thread {
                 int kellele = in.readInt();
                 System.out.println("RANDOM KLOTS ON MÕELDUD_MANGIJALE ID'ga " + kellele);
                 char klots = in.readChar();
-                if (client.getMultiplayerGame().getOpponentID() == kellele){
+                if (client.getMultiplayerGame().getOpponentID() == kellele) {
                     client.getMultiplayerGame().getOpponentTetromino().setRandomTetrominoMP(klots);
                     client.getMultiplayerGame().getOpponentTetromino().setNewRandomTetroReceived(true);
-                }
-                else{
+                } else {
                     client.getMultiplayerGame().getMyTetromino().setRandomTetrominoMP(klots);
                     client.getMultiplayerGame().getMyTetromino().setNewRandomTetroReceived(true);
                 }
@@ -165,13 +167,13 @@ public class ClientThread extends Thread {
                 int incmsg = in.readInt();
                 this.handleIncomingInput(incmsg);
             } catch (Exception e) {
-                cont = false;
-                System.out.println("Socket kinni/ootasin muud sisendit serverilt");
-                throw new RuntimeException(e);
+                if (e instanceof SocketException) {
+                    cont = false;
+                    System.out.println("Socket pandi kinni... sulen listener threadi");
+                } else
+                    throw new RuntimeException(e);
             }
         }
         shutDown();
     }
 }
-
-//TODO teha client class lõime peale, et üks lõim kuulab serverit, teine ootan konsoolilt sisendeid

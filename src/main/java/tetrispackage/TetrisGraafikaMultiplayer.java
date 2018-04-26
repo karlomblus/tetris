@@ -155,6 +155,7 @@ public class TetrisGraafikaMultiplayer {
 
         peaLava.setOnCloseRequest((we) -> {
             System.out.println("Tetris stage closed!");
+            client.setChallengeOpen(false);
             Platform.exit();
             //PlatformImpl.tkExit()
             //tickTime.stop();
