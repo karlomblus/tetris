@@ -25,11 +25,6 @@ public class TetrisGraafikaMultiplayer {
     private int numberOfPlayers = 2;
     private final int resoWidth = 150 * 2;
     private final int resoHeight = 330;
-    private final int ruuduSuurus = 15;
-    private final int mitukuubikutLaiuses = resoWidth / ruuduSuurus / numberOfPlayers;
-    private final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
-    private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
-    private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
     private int randomTetroRequestSent = 1;
     public static final char UP = 0;
@@ -42,7 +37,6 @@ public class TetrisGraafikaMultiplayer {
     private Tetromino opponentTetromino;
     private Map<KeyCode, Boolean> myCurrentActiveKeys = new HashMap<>();
     private Klient client;
-
 
     //chati
     private TextArea chatWindow;
@@ -94,23 +88,13 @@ public class TetrisGraafikaMultiplayer {
         });
 
         //chati koodi lõpp
-        for (int i = 0; i < mitukuubikutPikkuses; i++) {
-            for (int j = 0; j < mitukuubikutLaiuses; j++) {
-                ristkülik[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
-                ristkülik[i][j].setStroke(Color.LIGHTGRAY);
-                localTetrisArea.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
-            }
-        }
-        for (int i = 0; i < mitukuubikutPikkuses; i++) {
-            for (int j = 0; j < mitukuubikutLaiuses; j++) {
-                ristkülik2[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
-                ristkülik2[i][j].setStroke(Color.LIGHTGRAY);
-                opponentTetrisArea.getChildren().add(ristkülik2[i][j]);  // ristkülik lisatakse juure alluvaks
-            }
-        }
+        TetrisRectangle localTetrisRect = new TetrisRectangle();
+        localTetrisRect.fill(localTetrisArea);
+        TetrisRectangle opponentTetrisRect = new TetrisRectangle();
+        opponentTetrisRect.fill(opponentTetrisArea);
 
-        myTetromino = new Tetromino(ristkülik);
-        opponentTetromino = new Tetromino(ristkülik2);
+        myTetromino = new Tetromino(localTetrisRect.getRistkülik());
+        opponentTetromino = new Tetromino(opponentTetrisRect.getRistkülik());
 
 //User navigates forward a page, update page changer object.
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {

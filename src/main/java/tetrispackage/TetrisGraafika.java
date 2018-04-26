@@ -17,25 +17,16 @@ import java.util.*;
 
 public class TetrisGraafika {
 
-    private final int resoWidth = 150;
-    private final int resoHeight = 330;
-    private final int ruuduSuurus = 15;
-    private final int mitukuubikutLaiuses = resoWidth / ruuduSuurus;
-    private final int mitukuubikutPikkuses = resoHeight / ruuduSuurus;
-    private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
+    private static final int resoWidth = 150;
+    private static final int resoHeight = 330;
     private Tetromino tetromino;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     public void start(Stage peaLava) {
         Group juur = new Group(); // luuakse juur
-        for (int i = 0; i < mitukuubikutPikkuses; i++) {
-            for (int j = 0; j < mitukuubikutLaiuses; j++) {
-                ristkülik[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);
-                ristkülik[i][j].setStroke(Color.LIGHTGRAY);
-                juur.getChildren().add(ristkülik[i][j]);  // ristkülik lisatakse juure alluvaks
-            }
-        }
-        tetromino = new Tetromino(ristkülik);
+        TetrisRectangle tetrisRect = new TetrisRectangle();
+        tetrisRect.fill(juur);
+        tetromino = new Tetromino(tetrisRect.getRistkülik());
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -91,5 +82,13 @@ public class TetrisGraafika {
 
     public void begin() {
         //launch();
+    }
+
+    public static int getResoWidth() {
+        return resoWidth;
+    }
+
+    public static int getResoHeight() {
+        return resoHeight;
     }
 }
