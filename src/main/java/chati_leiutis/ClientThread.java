@@ -125,8 +125,9 @@ public class ClientThread extends Thread {
                 break;
             case 100:
                 //Tulevad tiksud
-                int tiskuID = in.readInt(); //tiksuID
-                client.getMultiplayerGame().setTickValue(tiskuID);
+                int tiksuID = in.readInt(); //tiksuID
+                System.out.println("Saabus tiks ID'ga " + tiksuID);
+                client.getMultiplayerGame().setTickValue(tiksuID);
                 break;
             case 101:
                 int nuputiskuID = in.readInt(); //tiksuID
@@ -139,7 +140,12 @@ public class ClientThread extends Thread {
             case 103:
                 int kellele = in.readInt();
                 char klots = in.readChar();
-                System.out.println("Sain random klotsi " + String.valueOf(klots) + " ID'ga " + kellele);
+                if (kellele == client.getMultiplayerGame().getOpponentID()){
+                    System.out.println("Opponent got random Tetro " + String.valueOf(klots));
+                }
+                else {
+                    System.out.println("I got random tetro " + String.valueOf(klots));
+                }
                 if (client.getMultiplayerGame().getOpponentID() == kellele) {
                     client.getMultiplayerGame().getOpponentTetromino().setRandomTetrominoMP(klots);
                     client.getMultiplayerGame().getOpponentTetromino().setNewRandomTetroReceived(true);
@@ -166,7 +172,7 @@ public class ClientThread extends Thread {
                     cont = false;
                     System.out.println("Socket pandi kinni... sulen listener threadi");
                 } else
-                    throw new RuntimeException(e);
+                    System.out.println(e.toString());
             }
         }
         shutDown();

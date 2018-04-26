@@ -212,6 +212,7 @@ public class Tetromino {
             }
             drawingTurns = 2;
             setDrawingPermission(true);
+
             allActiveToPassive = false;
             keepTicking = false;
         } else if (!allActiveToPassive) {

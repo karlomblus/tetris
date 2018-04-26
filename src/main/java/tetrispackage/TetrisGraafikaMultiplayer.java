@@ -53,6 +53,7 @@ public class TetrisGraafikaMultiplayer {
 
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
+        //tickProperty.setValue(0);
         this.client = client;
         opponentMoved.setValue(-1);
         this.opponentID = opponentID;
@@ -115,7 +116,6 @@ public class TetrisGraafikaMultiplayer {
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
             tickAndDrawForMe();
             tickAndDrawForOpponent();
-
         });
         opponentMoved.addListener((ChangeListener) (o, oldVal, newVal) -> {
             if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
@@ -223,27 +223,31 @@ public class TetrisGraafikaMultiplayer {
 
     void tickAndDrawForMe() {
         if (!myTetromino.gameStateOver()) {
-            if (myTetromino.isNewRandomTetroReceived()) {
-                myTetromino.tick();
-                myTetromino.isRowFilled();
-                if (myTetromino.isDrawingAllowed()) {
-                    if (randomTetroRequestSent == 0) //Only send one request
-                    {
-                        myTetromino.setNewRandomTetroReceived(false); //When it is time to draw a new tetro, disallow ticking and drawing until received
-                        try {
-                            client.requestRandomTetro();
-                            System.out.println("Requesting random tetro");
-                        } catch (Exception error) {
-                            System.out.println("Socket closed. Keypress sending failed!");
-                        }
-                        randomTetroRequestSent = 1;
+            if (myTetromino.isDrawingAllowed()) {
+                if (randomTetroRequestSent == 0) //Only send one request, 1 by default
+                {
+                    randomTetroRequestSent = 1;
+                    myTetromino.setNewRandomTetroReceived(false);  //When it is time to draw a new tetro, disallow ticking and drawing until received
+                    try {
+                        client.requestRandomTetro();
+                        System.out.println("Requesting random tetro");
+                    } catch (Exception error) {
+                        System.out.println("Socket closed. Keypress sending failed!");
                     }
-                    if (myTetromino.getDrawingTurns() == 2) {
-                        randomTetroRequestSent = 0;
-                    }
-                    myTetromino.draw("multiplayer"); //after drawing, getDrawingTurns is no longer 2
                 }
             }
+            if (myTetromino.isNewRandomTetroReceived()) {
+                if (myTetromino.isDrawingAllowed()) {
+                    myTetromino.draw("multiplayer"); //after drawing, getDrawingTurns is no longer 2
+                }
+                myTetromino.tick();
+                myTetromino.isRowFilled();
+                if (myTetromino.getDrawingTurns() == 2) {
+                    randomTetroRequestSent = 0;
+                }
+            }
+
+
         }
     }
 
