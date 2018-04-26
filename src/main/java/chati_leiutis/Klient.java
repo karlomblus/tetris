@@ -54,7 +54,8 @@ public class Klient extends Application {
     private TextField regnamefield;
     private ClientThread listener;
     private TetrisGraafikaMultiplayer multiplayerGame;
-    Stage loginwindow;
+    Stage challengewindow;
+    Stage newStage = new Stage();
 
     public String getNimi() {
         return nimi;
@@ -114,7 +115,6 @@ public class Klient extends Application {
 
     public void showLogIn() {
         Stage newStage = new Stage();
-        loginwindow = newStage;
 
         BorderPane border = new BorderPane();
         Button singleplayerbutton = new Button("Singleplayer");
@@ -373,6 +373,7 @@ public class Klient extends Application {
     }
 
     public void showMultiplayer(Integer opponentID) {
+        mpgameopen = true;
         TetrisGraafikaMultiplayer mp = new TetrisGraafikaMultiplayer();
         multiplayerGame = mp;
         Stage mpstage = new Stage();
@@ -380,8 +381,7 @@ public class Klient extends Application {
     }
 
     public void showOpenChallengeWindow(String user) {
-        challengeOpen = true;
-        Stage newStage = new Stage();
+        challengewindow = newStage;
         VBox comp = new VBox();
         comp.setAlignment(Pos.CENTER);
         Label messagelabel = new Label("Challenging " + user + ". Waiting for response...");
@@ -389,6 +389,7 @@ public class Klient extends Application {
         Button closebutton = new Button("Close");
         closebutton.setOnMouseClicked((event) -> {
             try {
+                challengeOpen = false;
                 newStage.close();
             } catch (Exception e) {
                 throw new RuntimeException(e);
