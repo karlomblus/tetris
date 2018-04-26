@@ -492,10 +492,11 @@ public class Klient extends Application {
                 //todo keeldumine
                 break;*/
             case 105:
+                System.out.println("Saatsin kirja tetriseaknas kasutajale " + multiplayerGame.getOpponentID());
                 out.writeInt(105);
                 out.writeInt(multiplayerGame.getOpponentID());
                 out.writeUTF(multiplayerGame.sendMessageandclearMP());
-                System.out.println("Saatsin kirja tetriseaknas kasutajale " + multiplayerGame.getOpponentID());
+
                 break;
             default:
                 // ei tee midagi
