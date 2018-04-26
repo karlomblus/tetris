@@ -41,7 +41,7 @@ public class TetrisGraafika {
             public void handle(ActionEvent event) {
                 if (!tetromino.gameStateOver()) {
                     tetromino.tick();
-                    tetromino.isRowFilled();
+                    tetromino.CheckIfRowFilled();
                     if (tetromino.isDrawingAllowed()) {
                         tetromino.draw("singleplayer");
                         if (tetromino.getDrawingTurns() == 0){

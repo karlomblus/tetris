@@ -247,20 +247,16 @@ public class TetrisGraafikaMultiplayer {
                     myTetromino.draw("multiplayer"); //after drawing, getDrawingTurns is no longer 2
                 }
                 myTetromino.tick();
-                myTetromino.isRowFilled();
                 if (myTetromino.getDrawingTurns() == 2) {
                     randomTetroRequestSent = 0;
                 }
             }
-
-
         }
     }
 
     void tickAndDrawForOpponent() {
         if (!opponentTetromino.gameStateOver()) {
             opponentTetromino.tick();
-            opponentTetromino.isRowFilled();
             if (opponentTetromino.isDrawingAllowed() && opponentTetromino.isNewRandomTetroReceived()) {
                 opponentTetromino.draw("multiplayer");
                 if (opponentTetromino.getDrawingTurns() == 0) {
