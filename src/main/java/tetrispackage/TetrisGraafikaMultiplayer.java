@@ -33,6 +33,7 @@ public class TetrisGraafikaMultiplayer {
     private Rectangle[][] ristkülik = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private Rectangle[][] ristkülik2 = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
+    private int randomTetroRequestSent = 1;
     public static final char UP = 0;
     public static final char DOWN = 1;
     public static final char LEFT = 2;
@@ -55,7 +56,7 @@ public class TetrisGraafikaMultiplayer {
         this.client = client;
         opponentMoved.setValue(-1);
         this.opponentID = opponentID;
-        HBox hbox = new HBox(1);
+        HBox hbox = new HBox(10);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
         //chati kood
@@ -77,10 +78,11 @@ public class TetrisGraafikaMultiplayer {
         writearea.setFocusTraversable(false);
 
 
+        mpChatVbox.getChildren().addAll(messagearea, writearea);
         writearea.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) {
-
                 try {
+                    System.out.println("Trying to send message");
                     client.sendSomething(105);
                     chatWindow.appendText(client.getNimi() + ">> " + writearea.getText() + "\n");
                 } catch (IOException error) {
@@ -89,8 +91,6 @@ public class TetrisGraafikaMultiplayer {
                 writearea.clear();
             }
         });
-
-        mpChatVbox.getChildren().addAll(messagearea, writearea);
 
         //chati koodi lõpp
         for (int i = 0; i < mitukuubikutPikkuses; i++) {
@@ -113,12 +113,8 @@ public class TetrisGraafikaMultiplayer {
 
 //User navigates forward a page, update page changer object.
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
-            if (myTetromino.isNewRandomTetroReceived()) {
-                tickAndDrawForMe();
-            }
-            if (opponentTetromino.isNewRandomTetroReceived()) {
-                tickAndDrawForOpponent();
-            }
+            tickAndDrawForMe();
+            tickAndDrawForOpponent();
         });
         opponentMoved.addListener((ChangeListener) (o, oldVal, newVal) -> {
             if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
@@ -220,37 +216,46 @@ public class TetrisGraafikaMultiplayer {
 
     void tickAndDrawForMe() {
         if (!myTetromino.gameStateOver()) {
+            if (myTetromino.isNewRandomTetroReceived()) {
                 myTetromino.tick();
                 myTetromino.isRowFilled();
                 if (myTetromino.isDrawingAllowed()) {
-                    myTetromino.draw("multiplayer");
-                    if (myTetromino.getDrawingTurns() == 0) //drawing completed
+                    if (randomTetroRequestSent == 0) //Only send one request
                     {
-                        myTetromino.setNewRandomTetroReceived(false);
+                        myTetromino.setNewRandomTetroReceived(false); //When it is time to draw a new tetro, disallow ticking and drawing until received
                         try {
                             client.requestRandomTetro();
                             System.out.println("Requesting random tetro");
                         } catch (Exception error) {
                             System.out.println("Socket closed. Keypress sending failed!");
                         }
+                        randomTetroRequestSent = 1;
                     }
-                }
-            }
-        }
-    void tickAndDrawForOpponent() {
-        if (!opponentTetromino.gameStateOver()) {
-            opponentTetromino.tick();
-            opponentTetromino.isRowFilled();
-            if (opponentTetromino.isDrawingAllowed()) {
-                opponentTetromino.draw("multiplayer");
-                if (opponentTetromino.getDrawingTurns() == 0) //drawing completed
-                {
-                    opponentTetromino.setNewRandomTetroReceived(false);
+                    if (myTetromino.getDrawingTurns() == 2) {
+                        randomTetroRequestSent = 0;
+                    }
+                    myTetromino.draw("multiplayer"); //after drawing, getDrawingTurns is no longer 2
                 }
             }
         }
     }
 
+    void tickAndDrawForOpponent() {
+        if (!opponentTetromino.gameStateOver()) {
+            if (!opponentTetromino.isDrawingAllowed()) {
+                opponentTetromino.tick();
+                opponentTetromino.isRowFilled();
+            }
+            if (opponentTetromino.isDrawingAllowed() && opponentTetromino.isNewRandomTetroReceived()) {
+                opponentTetromino.draw("multiplayer");
+                opponentTetromino.tick();
+                opponentTetromino.isRowFilled();
+                if (opponentTetromino.getDrawingTurns() == 0) {
+                    opponentTetromino.setNewRandomTetroReceived(false);
+                }
+            }
+        }
+    }
 
 
     public void addNewMessage(String name, String message) {
