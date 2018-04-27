@@ -178,8 +178,11 @@ public class Listener extends Thread {
                 else if (e instanceof EOFException){
                     throw new RuntimeException(e);
                 }
-                else
+                else if (e instanceof NullPointerException)
                     System.out.println(e.toString());
+                else{
+                    throw new RuntimeException();
+                }
             }
         }
         shutDown();
