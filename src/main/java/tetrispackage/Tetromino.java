@@ -19,6 +19,7 @@ public class Tetromino {
     private char randomTetrominoMP = 'Z';
     private char randomTetrominoSP = 'Z';
     private boolean newRandomTetroReceived = true;
+    private int rowsCleared = 0;
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -120,6 +121,7 @@ public class Tetromino {
                 setRectStatusAt(filledRowNumber, i, 'B');
             }
             setAllAboveToFalling(filledRowNumber);
+            rowsCleared += 1;
         }
         return isFilled;
     }
@@ -364,6 +366,10 @@ public class Tetromino {
 
     public void setNewRandomTetroReceived(boolean newRandomTetroReceived) {
         this.newRandomTetroReceived = newRandomTetroReceived;
+    }
+
+    public int getRowsCleared() {
+        return rowsCleared;
     }
 
     boolean rotateLeft() {

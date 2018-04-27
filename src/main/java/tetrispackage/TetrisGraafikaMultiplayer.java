@@ -8,14 +8,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -39,11 +35,10 @@ public class TetrisGraafikaMultiplayer {
     private Klient client;
 
     //chati
-    private TextArea chatWindow;
-    private TextField writeArea;
     private Integer opponentID;
     private IntegerProperty opponentMoved = new SimpleIntegerProperty();
     private int opponentMoveTiksuID = 0;
+    private PrivateChat privateChat;
 
     public TetrisGraafikaMultiplayer() {
         opponentMoved.setValue(-1);
@@ -51,44 +46,12 @@ public class TetrisGraafikaMultiplayer {
 
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
-        //tickProperty.setValue(0);
-        this.client = client;
+        privateChat = new PrivateChat(client);
         this.opponentID = opponentID;
         HBox hbox = new HBox(10);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
         //chati kood
-        VBox mpChatVbox = new VBox();
-        TextArea messagearea = new TextArea();
-        chatWindow = messagearea;
-        //muudan aknad mitteklikitavaks
-        messagearea.setEditable(false);
-        messagearea.setWrapText(true);
-        messagearea.setPrefSize(140, 300);
-        messagearea.setPromptText("Messages...");
-        messagearea.setMouseTransparent(true);
-        messagearea.setFocusTraversable(false);
-
-        TextField writearea = new TextField();
-        this.writeArea = writearea;
-        writearea.setPromptText("Type your message here...");
-        writearea.setPrefWidth(200);
-        writearea.setFocusTraversable(false);
-
-
-        mpChatVbox.getChildren().addAll(messagearea, writearea);
-        writearea.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ENTER) {
-                try {
-                    System.out.println("Trying to send message");
-                    client.sendSomething(105);
-                    chatWindow.appendText(client.getNimi() + ">> " + writearea.getText() + "\n");
-                } catch (IOException error) {
-                    messagearea.appendText("Socket kinni. Ei saanud saata.");
-                }
-                writearea.clear();
-            }
-        });
 
         //chati koodi lõpp
         TetrisRectangle localTetrisRect = new TetrisRectangle();
@@ -129,7 +92,7 @@ public class TetrisGraafikaMultiplayer {
         //noded-e paigutamine
         hbox.getChildren().add(localTetrisArea);
         hbox.getChildren().add(opponentTetrisArea);
-        hbox.getChildren().add(mpChatVbox);
+        hbox.getChildren().add(privateChat.getChatArea());
 
         //kood selleks, et klikkides tetrise mängule deselectib chatirea.(Muidu ei saa klotse liigutada peale chattimist)
         localTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -166,7 +129,7 @@ public class TetrisGraafikaMultiplayer {
                         try {
                             client.sendKeypress(tickProperty.getValue(), RIGHT);
                         } catch (IOException error) {
-                            messagearea.appendText("Socket closed. Keypress sending failed!");
+                            privateChat.keyPressSendingFailed();
                         }
                     }
                 }
@@ -175,7 +138,7 @@ public class TetrisGraafikaMultiplayer {
                         try {
                             client.sendKeypress(tickProperty.getValue(), LEFT);
                         } catch (IOException error) {
-                            messagearea.appendText("Socket closed. Keypress sending failed!");
+                            privateChat.keyPressSendingFailed();
                         }
                     }
                 }
@@ -184,7 +147,7 @@ public class TetrisGraafikaMultiplayer {
                         try {
                             client.sendKeypress(tickProperty.getValue(), UP);
                         } catch (IOException error) {
-                            messagearea.appendText("Socket closed. Keypress sending failed!");
+                            privateChat.keyPressSendingFailed();
                         }
                     }
                 }
@@ -192,7 +155,7 @@ public class TetrisGraafikaMultiplayer {
                     try {
                         client.sendKeypress(tickProperty.getValue(), DOWN);
                     } catch (IOException error) {
-                        messagearea.appendText("Socket closed. Keypress sending failed!");
+                        privateChat.keyPressSendingFailed();
                     }
                     myTetromino.drop();
                     myTetromino.setNewRandomTetroReceived(false);
@@ -255,20 +218,6 @@ public class TetrisGraafikaMultiplayer {
     }
 
 
-    public void addNewMessage(String name, String message) {
-        chatWindow.appendText(name + ">> " + message + "\n");
-    }
-
-    public String sendMessageandclearMP() {
-        String toReturn = writeArea.getText();
-        return toReturn;
-    }
-
-    public void opponentLeft() {
-        chatWindow.appendText("--------------- " + "\n" + "Your opponent has left the game, closing after 5 seconds...");
-        //todo sulgemine pärast ootamist?
-    }
-
     public Integer getOpponentID() {
         return opponentID;
     }
@@ -291,5 +240,9 @@ public class TetrisGraafikaMultiplayer {
 
     public void setOpponentMoveTiksuID(int opponentMoveTiksuID) {
         this.opponentMoveTiksuID = opponentMoveTiksuID;
+    }
+
+    public PrivateChat getPrivateChat() {
+        return privateChat;
     }
 }

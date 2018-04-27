@@ -474,7 +474,7 @@ public class Klient extends Application {
                     System.out.println("Saatsin kirja tetriseaknas kasutajale " + multiplayerGame.getOpponentID());
                     out.writeInt(105);
                     out.writeInt(multiplayerGame.getOpponentID());
-                    out.writeUTF(multiplayerGame.sendMessageandclearMP());
+                    out.writeUTF(multiplayerGame.getPrivateChat().sendMessageandclearMP());
 
                     break;
                 default:

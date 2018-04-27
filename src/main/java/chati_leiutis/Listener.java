@@ -122,7 +122,7 @@ public class Listener extends Thread {
                 in.readInt();
                 String name = in.readUTF();
                 String privatemessage = in.readUTF();
-                client.getMultiplayerGame().addNewMessage(name, privatemessage);
+                client.getMultiplayerGame().getPrivateChat().addNewMessage(name, privatemessage);
                 break;
             case 100:
                 //Tulevad tiksud
@@ -138,7 +138,7 @@ public class Listener extends Thread {
                 System.out.println("Sain nupu " + String.valueOf(nupuvajutus) + " tiksu id'ga " + nuputiskuID);
                 break;
             case 102:
-                client.getMultiplayerGame().opponentLeft();
+                client.getMultiplayerGame().getPrivateChat().opponentLeft();
                 //TODO kui vastane sulgeb oma mp mängu/lahkub
             case 103:
                 int kellele = in.readInt();
