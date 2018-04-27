@@ -3,13 +3,17 @@ package tetrispackage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -23,10 +27,23 @@ public class TetrisGraafika {
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
     public void start(Stage peaLava) {
-        Group juur = new Group(); // luuakse juur
+        HBox hbox = new HBox(10);
+        Group tetrisArea = new Group();
+        VBox vBox = new VBox();
+        Text myScore = new Text("");
+        vBox.getChildren().add(myScore);
         TetrisRectangle tetrisRect = new TetrisRectangle();
-        tetrisRect.fill(juur);
+        tetrisRect.fill(tetrisArea);
         tetromino = new Tetromino(tetrisRect.getRistkülik());
+        myScore.textProperty().setValue("My score: " + tetromino.getRowsCleared().getValue().toString());
+
+
+        tetromino.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
+            myScore.textProperty().setValue("My score: " + newVal.toString());
+        });
+
+        hbox.getChildren().add(tetrisArea);
+        hbox.getChildren().add(vBox);
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -52,7 +69,7 @@ public class TetrisGraafika {
         tickTime.setCycleCount(Timeline.INDEFINITE);
         tickTime.play();
 
-        Scene tetrisStseen = new Scene(juur, resoWidth, resoHeight, Color.SNOW);  // luuakse stseen
+        Scene tetrisStseen = new Scene(hbox, resoWidth + 140, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             currentActiveKeys.put(event.getCode(), true);
             if (!tetromino.isDrawingAllowed() && !tetromino.gameStateOver()) {

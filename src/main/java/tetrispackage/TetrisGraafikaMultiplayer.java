@@ -52,7 +52,7 @@ public class TetrisGraafikaMultiplayer {
         this.client = client;
         privateChat = new PrivateChat(client);
         this.opponentID = opponentID;
-        HBox hbox = new HBox(10);
+        HBox root = new HBox(10);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
         VBox vBox = new VBox();
@@ -67,6 +67,8 @@ public class TetrisGraafikaMultiplayer {
 
         myTetromino = new Tetromino(localTetrisRect.getRistkülik());
         opponentTetromino = new Tetromino(opponentTetrisRect.getRistkülik());
+        myScore.textProperty().setValue("My score: " + myTetromino.getRowsCleared().getValue().toString());
+        opponentScore.textProperty().setValue("Opponent score: " + opponentTetromino.getRowsCleared().getValue().toString());
 
         myTetromino.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
             myScore.textProperty().setValue("My score: " + newVal.toString());
@@ -79,10 +81,10 @@ public class TetrisGraafikaMultiplayer {
 
 
         //noded-e paigutamine
-        hbox.getChildren().add(localTetrisArea);
-        hbox.getChildren().add(vBox);
-        hbox.getChildren().add(opponentTetrisArea);
-        hbox.getChildren().add(privateChat.getChatArea());
+        root.getChildren().add(localTetrisArea);
+        root.getChildren().add(vBox);
+        root.getChildren().add(opponentTetrisArea);
+        root.getChildren().add(privateChat.getChatArea());
 
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
             tickAndDrawForMe();
@@ -113,12 +115,12 @@ public class TetrisGraafikaMultiplayer {
         //kood selleks, et klikkides tetrise mängule deselectib chatirea.(Muidu ei saa klotse liigutada peale chattimist)
         localTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent me) {
-                hbox.requestFocus();
+                root.requestFocus();
             }
         });
         opponentTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
             public void handle(MouseEvent me) {
-                hbox.requestFocus();
+                root.requestFocus();
             }
         });
 
@@ -136,7 +138,7 @@ public class TetrisGraafikaMultiplayer {
         peaLava.setOnShowing(event -> { //Do only once
             //draw('I');
         });
-        Scene tetrisStseen = new Scene(hbox, resoWidth + 140, resoHeight, Color.SNOW);  // luuakse stseen
+        Scene tetrisStseen = new Scene(root, TetrisGraafika.getResoWidth() * 2 + privateChat.getWidth() * 2, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             myCurrentActiveKeys.put(event.getCode(), true);
             if (!myTetromino.isDrawingAllowed() && !myTetromino.gameStateOver()) {

@@ -13,6 +13,7 @@ public class PrivateChat {
     private TextField writeArea;
     private Klient client;
     TextArea messagearea = new TextArea();
+    private final int width =  140;
     VBox chatArea = new VBox();
 
 
@@ -73,4 +74,9 @@ public class PrivateChat {
     public void keyPressSendingFailed(){
         messagearea.appendText("Socket closed. Keypress sending failed!");
     }
+
+    public int getWidth() {
+        return width;
+    }
 }
+
