@@ -14,6 +14,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -22,6 +24,7 @@ import tetrispackage.TetrisGraafikaMultiplayer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -505,6 +508,12 @@ public class Klient extends Application {
 
     public void recieveMessage(int userID, String username, String message) {
         ekraan.appendText(username + ">> " + message + "\n");
+
+        //sound
+        String musicFile = "C:\\Users\\Ingo\\IdeaProjects\\OOPprojekt\\tetris\\src\\main\\resources\\chattick.wav";
+        Media sound = new Media(new File(musicFile).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.play();
     }
 
     public void handleUserList(Integer type, Integer ID, String name) {
