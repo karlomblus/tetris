@@ -46,6 +46,7 @@ public class TetrisGraafikaMultiplayer {
 
     //lisasin client, et kasutada Klient klassi meetodeid
     public void start(Stage peaLava, Klient client, Integer opponentID) {
+        this.client = client;
         privateChat = new PrivateChat(client);
         this.opponentID = opponentID;
         HBox hbox = new HBox(10);
