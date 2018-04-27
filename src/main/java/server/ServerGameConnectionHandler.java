@@ -402,7 +402,7 @@ public class ServerGameConnectionHandler implements Runnable {
         ServerMain.debug(5, "rejectInviteToGame: " + username + " saadab ID " + rejectTo + " pikalt");
         for (ServerGameConnectionHandler player : players) {
             // leidsime mängija, ja tal on veel kehtiv kutse mulle
-            if (player.getUserid() == rejectTo && player.getInvitedUID() == rejectTo) {
+            if (player.getUserid() == rejectTo && player.getInvitedUID() == userid) {
 
                 ServerMain.debug(6, "rejectInviteToGame: " + username + " rejectib " + player.getUsername());
 
