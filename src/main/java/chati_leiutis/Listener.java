@@ -173,7 +173,8 @@ public class Listener extends Thread {
             } catch (Exception e) {
                 if (e instanceof SocketException) {
                     cont = false;
-                    System.out.println("Socket pandi kinni... sulen listener threadi");
+                    client.getEkraan().appendText("Disconnected... please restart to reconnect.");
+                    client.getKonsool().setDisable(true);
                 }
                 else if (e instanceof EOFException){
                     throw new RuntimeException(e);

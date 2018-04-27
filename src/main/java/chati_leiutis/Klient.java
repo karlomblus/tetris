@@ -14,14 +14,18 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import tetrispackage.TetrisGraafika;
 import tetrispackage.TetrisGraafikaMultiplayer;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -51,6 +55,8 @@ public class Klient extends Application {
     private Listener listener;
     private TetrisGraafikaMultiplayer multiplayerGame;
     OpenChallengeWindow challengewindow;
+    //kompaktne soundifaili saamine
+    private MediaPlayer chatsound = new MediaPlayer(new Media(new File(ClassLoader.getSystemClassLoader().getResource("chattick.wav").getFile()).toURI().toString()));
 
     public String getNimi() {
         return nimi;
@@ -291,7 +297,7 @@ public class Klient extends Application {
                             Stage inchallengewindow = new Stage();
                             OpenChallengeWindow challenge = new OpenChallengeWindow(inchallengewindow);
                             challengewindow = challenge;
-                            challenge.start(inchallengewindow,selectedUserName,self);
+                            challenge.start(inchallengewindow, selectedUserName, self);
                             sendSomething(7);
                         }
                     } catch (Exception e2) {
@@ -480,9 +486,12 @@ public class Klient extends Application {
                 default:
                     // ei tee midagi
             }
-        }catch (IOException e){
-            System.out.println("Socket kinni");
+        } catch (IOException e) {
+            disconnectionError();
+            konsool.setDisable(true);
+
         }
+
 
     }
 
@@ -505,6 +514,16 @@ public class Klient extends Application {
 
     public void recieveMessage(int userID, String username, String message) {
         ekraan.appendText(username + ">> " + message + "\n");
+        /*
+        String fileName = "chattick.wav";
+        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+        File musicfile = new File(ClassLoader.getSystemClassLoader().getResource("chattick.wav").getFile());
+        //sound
+        String musicFile = "C:\\Users\\Ingo\\IdeaProjects\\OOPprojekt\\tetris\\src\\main\\resources\\chattick.wav";
+        Media sound = new Media(new File(ClassLoader.getSystemClassLoader().getResource("chattick.wav").getFile()).toURI().toString());
+        MediaPlayer mediaPlayer = new MediaPlayer(sound);*/
+        chatsound.seek(new Duration(0));
+        chatsound.play();
     }
 
     public void handleUserList(Integer type, Integer ID, String name) {
@@ -541,12 +560,25 @@ public class Klient extends Application {
         }
     }
 
+    void disconnectionError() {
+        ekraan.appendText("Connection lost... Please restart to reconnect.");
+        konsool.setDisable(true);
+    }
+
     public void setChallengeOpen(boolean challengeOpen) {
         this.challengeOpen = challengeOpen;
     }
 
     public boolean isChallengeOpen() {
         return challengeOpen;
+    }
+
+    public TextArea getEkraan() {
+        return ekraan;
+    }
+
+    public TextField getKonsool() {
+        return konsool;
     }
 
     @Override
