@@ -28,21 +28,12 @@ public class TetrisGraafika {
     public void start(Stage peaLava) {
         HBox hbox = new HBox(10);
         Group tetrisArea = new Group();
-        VBox vBox = new VBox();
-        Text myScore = new Text("");
-        vBox.getChildren().add(myScore);
         TetrisRectangle tetrisRect = new TetrisRectangle();
         tetrisRect.fill(tetrisArea);
         tetromino = new Tetromino(tetrisRect.getRistkülik());
-        myScore.textProperty().setValue("My score: " + tetromino.getRowsCleared().getValue().toString());
-
-
-        tetromino.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
-            myScore.textProperty().setValue("My score: " + newVal.toString());
-        });
-
+        ScoreHandler scoreHandler = new ScoreHandler(tetromino);
         hbox.getChildren().add(tetrisArea);
-        hbox.getChildren().add(vBox);
+        hbox.getChildren().add(scoreHandler.getScoreArea());
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {

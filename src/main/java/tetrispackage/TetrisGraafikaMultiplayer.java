@@ -53,10 +53,6 @@ public class TetrisGraafikaMultiplayer {
         HBox root = new HBox(10);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
-        VBox vBox = new VBox();
-        Text myScore = new Text("");
-        Text opponentScore = new Text("");
-        vBox.getChildren().addAll(myScore, opponentScore);
 
         TetrisRectangle localTetrisRect = new TetrisRectangle();
         localTetrisRect.fill(localTetrisArea);
@@ -65,22 +61,11 @@ public class TetrisGraafikaMultiplayer {
 
         myTetromino = new Tetromino(localTetrisRect.getRistkülik());
         opponentTetromino = new Tetromino(opponentTetrisRect.getRistkülik());
-        myScore.textProperty().setValue("My score: " + myTetromino.getRowsCleared().getValue().toString());
-        opponentScore.textProperty().setValue("Opponent score: " + opponentTetromino.getRowsCleared().getValue().toString());
-
-        myTetromino.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
-            myScore.textProperty().setValue("My score: " + newVal.toString());
-        });
-        opponentTetromino.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
-            opponentScore.textProperty().setValue("Opponent score: " + newVal.toString());
-        });
-
-//User navigates forward a page, update page changer object.
-
+        ScoreHandler scoreHandler = new ScoreHandler(myTetromino, opponentTetromino);
 
         //noded-e paigutamine
         root.getChildren().add(localTetrisArea);
-        root.getChildren().add(vBox);
+        root.getChildren().add(scoreHandler.getScoreArea());
         root.getChildren().add(opponentTetrisArea);
         root.getChildren().add(privateChat.getChatArea());
 
