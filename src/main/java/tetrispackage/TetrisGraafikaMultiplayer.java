@@ -11,15 +11,18 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
 
 public class TetrisGraafikaMultiplayer {
     private int numberOfPlayers = 2;
-    private final int resoWidth = 150 * 2;
+    private final int resoWidth = 150 * 3;
     private final int resoHeight = 330;
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
     private int randomTetroRequestSent = 1;
@@ -52,9 +55,11 @@ public class TetrisGraafikaMultiplayer {
         HBox hbox = new HBox(10);
         Group localTetrisArea = new Group(); // luuakse localTetrisArea
         Group opponentTetrisArea = new Group();
-        //chati kood
+        VBox vBox = new VBox();
+        Text myScore = new Text("");
+        Text opponentScore = new Text("");
+        vBox.getChildren().addAll(myScore, opponentScore);
 
-        //chati koodi lõpp
         TetrisRectangle localTetrisRect = new TetrisRectangle();
         localTetrisRect.fill(localTetrisArea);
         TetrisRectangle opponentTetrisRect = new TetrisRectangle();
@@ -63,7 +68,22 @@ public class TetrisGraafikaMultiplayer {
         myTetromino = new Tetromino(localTetrisRect.getRistkülik());
         opponentTetromino = new Tetromino(opponentTetrisRect.getRistkülik());
 
+        myTetromino.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
+            myScore.textProperty().setValue("My score: " + newVal.toString());
+        });
+        opponentTetromino.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
+            opponentScore.textProperty().setValue("Opponent score: " + newVal.toString());
+        });
+
 //User navigates forward a page, update page changer object.
+
+
+        //noded-e paigutamine
+        hbox.getChildren().add(localTetrisArea);
+        hbox.getChildren().add(vBox);
+        hbox.getChildren().add(opponentTetrisArea);
+        hbox.getChildren().add(privateChat.getChatArea());
+
         tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
             tickAndDrawForMe();
             tickAndDrawForOpponent();
@@ -89,11 +109,6 @@ public class TetrisGraafikaMultiplayer {
             opponentMoved.setValue(-1);
         });
 
-
-        //noded-e paigutamine
-        hbox.getChildren().add(localTetrisArea);
-        hbox.getChildren().add(opponentTetrisArea);
-        hbox.getChildren().add(privateChat.getChatArea());
 
         //kood selleks, et klikkides tetrise mängule deselectib chatirea.(Muidu ei saa klotse liigutada peale chattimist)
         localTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {

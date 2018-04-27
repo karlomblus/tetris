@@ -1,5 +1,7 @@
 package tetrispackage;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -19,7 +21,8 @@ public class Tetromino {
     private char randomTetrominoMP = 'Z';
     private char randomTetrominoSP = 'Z';
     private boolean newRandomTetroReceived = true;
-    private int rowsCleared = 0;
+    private IntegerProperty rowsCleared = new SimpleIntegerProperty() {
+    };
 
     public Tetromino(Rectangle[][] ristkülik) {
         ruudud = ristkülik;
@@ -121,7 +124,7 @@ public class Tetromino {
                 setRectStatusAt(filledRowNumber, i, 'B');
             }
             setAllAboveToFalling(filledRowNumber);
-            rowsCleared += 1;
+            rowsCleared.setValue(rowsCleared.getValue() + 1);
         }
         return isFilled;
     }
@@ -368,7 +371,7 @@ public class Tetromino {
         this.newRandomTetroReceived = newRandomTetroReceived;
     }
 
-    public int getRowsCleared() {
+    public IntegerProperty getRowsCleared() {
         return rowsCleared;
     }
 
