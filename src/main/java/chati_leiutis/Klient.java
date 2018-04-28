@@ -287,13 +287,13 @@ public class Klient extends Application {
             }
         });
 
+        //siit läheb replay käima
         Button replaybtn = new Button("Replays");
         TetrisReplay replay = new TetrisReplay();
         replaybtn.setOnMouseClicked((MouseEvent) -> {
-
             try {
                 Stage replaylava = new Stage();
-                replay.start(replaylava);
+                replay.start(replaylava,"1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT");
 
             } catch (Exception e) {
                 throw new RuntimeException(e);

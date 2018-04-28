@@ -25,7 +25,7 @@ public class TetrisReplay {
     private Tetromino tetromino;
     private Map<KeyCode, Boolean> currentActiveKeys = new HashMap<>();
 
-    public void start(Stage peaLava) {
+    public void start(Stage peaLava,String commandString) {
         HBox hbox = new HBox(10);
         Group tetrisArea = new Group();
         TetrisRectangle tetrisRect = new TetrisRectangle();
@@ -87,7 +87,7 @@ public class TetrisReplay {
         peaLava.setScene(tetrisStseen);  // lavale lisatakse stseen
         peaLava.show();  // lava tehakse nähtavaks
 
-        Thread replaythread  = new Thread(new ReplayRunner(this));
+        Thread replaythread  = new Thread(new ReplayRunner(this,commandString));
         replaythread.start();
     }
 
