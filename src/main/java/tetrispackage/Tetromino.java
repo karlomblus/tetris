@@ -371,6 +371,10 @@ public class Tetromino {
         this.newRandomTetroReceived = newRandomTetroReceived;
     }
 
+    public void setTetrominoType(char tetrominoType) {
+        this.tetrominoType = tetrominoType;
+    }
+
     public IntegerProperty getRowsCleared() {
         return rowsCleared;
     }

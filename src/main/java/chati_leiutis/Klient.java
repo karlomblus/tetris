@@ -29,12 +29,15 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Klient extends Application {
     Klient self;
+    Integer laius;
+    Integer kõrgus;
     private String nimi;
     private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
     private boolean challengeOpen = false;
@@ -43,11 +46,13 @@ public class Klient extends Application {
     private boolean lobbyOpen = false;
     private HashMap<Integer, String> online_users = new HashMap<>();
     private HashMap<String, Integer> name_2_ID = new HashMap<>();
-    private ObservableList<String> observableUsers;
     private Socket connection;
     private DataOutputStream out;
     private TextArea ekraan;
+    private ObservableList<String> observableUsers;
+    private ObservableList<String> observableReplays;
     private ListView<String> userListView = new ListView<>();
+    private ListView<String> replayListView = new ListView<>();
     private TextField konsool;
     private PasswordField loginpasswordfield;
     private TextField loginnamefield;
@@ -58,6 +63,7 @@ public class Klient extends Application {
     OpenChallengeWindow challengewindow;
     //kompaktne soundifaili saamine
     private MediaPlayer chatsound = new MediaPlayer(new Media(new File(ClassLoader.getSystemClassLoader().getResource("chattick.wav").getFile()).toURI().toString()));
+    private MediaPlayer gamenotificationsound = new MediaPlayer(new Media(new File(ClassLoader.getSystemClassLoader().getResource("gamenotification.mp3").getFile()).toURI().toString()));
 
     public String getNimi() {
         return nimi;
@@ -220,8 +226,8 @@ public class Klient extends Application {
     public void showLobby() throws Exception {
 
         //säti suurus
-        int w = 700;
-        int h = 600;
+        laius = 700;
+        kõrgus = 600;
         Stage primaryStage = new Stage();
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -241,9 +247,10 @@ public class Klient extends Application {
         Group juur = new Group();
         TextArea messagearea = new TextArea();
         ekraan = messagearea;
+        //online olevate userite list
         observableUsers = FXCollections.observableArrayList(online_users.values());
         userListView.setItems(observableUsers);
-        userListView.setPrefSize((w / 4), (h / 4.5) * 3 - 20);
+        userListView.setPrefSize((laius / 4), (kõrgus / 4.5) * 3 - 20);
 
         Font labelfont = new Font(16);
         Label userlabel = new Label("Users");
@@ -254,23 +261,24 @@ public class Klient extends Application {
         //muudan aknad mitteklikitavaks
         messagearea.setEditable(false);
         messagearea.setWrapText(true);
-        messagearea.setPrefSize((w / 4) * 3, (h / 4.5) * 3);
+        messagearea.setPrefSize((laius / 4) * 3, (kõrgus / 4.5) * 3);
         messagearea.setPromptText("Messages...");
 
         //panen userid paika
         sendSomething(3);
 
+        //siia panene kõik chati teksti
         TextField messagefield = new TextField();
         messagefield.setPromptText("Enter message here...");
         messagefield.setFont(labelfont);
-        messagefield.setPrefWidth((w / 3.5) * 3);
+        messagefield.setPrefWidth((laius / 3.5) * 3);
         konsool = messagefield;
 
         //pilt
-        Image chatImage = new Image("/Tetris.png", w, 200, true, false);
+        Image chatImage = new Image("/Tetris.png", laius, 200, true, false);
         ImageView pilt = new ImageView(chatImage);
-        pilt.setFitHeight(h / 5);
-        pilt.setFitWidth(w);
+        pilt.setFitHeight(kõrgus / 5);
+        pilt.setFitWidth(laius);
 
 
         Button singleplayerbtn = new Button("Singleplayer");
@@ -289,36 +297,18 @@ public class Klient extends Application {
 
         //siit läheb replay käima
         Button replaybtn = new Button("Replays");
-        TetrisReplay replay = new TetrisReplay();
+
         replaybtn.setOnMouseClicked((MouseEvent) -> {
-            try {
-                Stage replaylava = new Stage();
-                replay.start(replaylava,"1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT");
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-
-            }
+            showReplays();
         });
 
         Button challengeButton = new Button("Challenge");
-        challengeButton.setPrefWidth(w / 4);
+        challengeButton.setPrefWidth(laius / 4);
         challengeButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
                 if (!challengeOpen) {
-                    try {
-                        String selectedUserName = userListView.getSelectionModel().getSelectedItem();
-                        if (!selectedUserName.equals(nimi)) {
-                            Stage inchallengewindow = new Stage();
-                            OpenChallengeWindow challenge = new OpenChallengeWindow(inchallengewindow);
-                            challengewindow = challenge;
-                            challenge.start(inchallengewindow, selectedUserName, self);
-                            sendSomething(7);
-                        }
-                    } catch (Exception e2) {
-                        throw new RuntimeException(e2);
-                    }
+                    showOpenChallengeWindow();
                 }
             }
         });
@@ -378,7 +368,7 @@ public class Klient extends Application {
         outervbox.getChildren().addAll(hbox, hbox2, border);
         juur.getChildren().add(outervbox);
 
-        Scene lava = new Scene(juur, w, h);
+        Scene lava = new Scene(juur, laius, kõrgus);
         primaryStage.setResizable(false);
         primaryStage.setScene(lava);
         primaryStage.setTitle("Client");
@@ -443,6 +433,63 @@ public class Klient extends Application {
                 }
             }
         });
+
+        newStage.setScene(stageScene);
+        newStage.show();
+    }
+
+    void showOpenChallengeWindow() {
+        try {
+            String selectedUserName = userListView.getSelectionModel().getSelectedItem();
+            if (!selectedUserName.equals(nimi)) {
+                Stage inchallengewindow = new Stage();
+                OpenChallengeWindow challenge = new OpenChallengeWindow(inchallengewindow);
+                challengewindow = challenge;
+                challenge.start(inchallengewindow, selectedUserName, self);
+                sendSomething(7);
+            }
+        } catch (Exception e2) {
+            throw new RuntimeException(e2);
+        }
+    }
+
+    void showReplays() {
+        //todo päris andmete serverilt saamine ja siis nende kasutamine
+        //todo hetkel lihtsalt faken mingid andmed
+        String mäng1 = "Ingo-Theodor   Duration-2651s";
+        String mäng2 = "Theodor-Karl    Duration-1m23s";
+        String mäng3 = "Ingo-Karl   Duration-3m55s";
+
+        observableReplays = FXCollections.observableArrayList(Arrays.asList(mäng1, mäng2, mäng3));
+        replayListView.setItems(observableReplays);
+        replayListView.setPrefSize(600, 270);
+
+        Button watchButton = new Button("Watch game");
+        watchButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                String selectedReplayname = replayListView.getSelectionModel().getSelectedItem();
+                TetrisReplay replay = new TetrisReplay();
+                try {
+                    Stage replaylava = new Stage();
+                    //todo vali õige replay, ava TetrisReplay vastava andmetega
+                    replay.start(replaylava,selectedReplayname, "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN",
+                            "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN");
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+
+                }
+            }
+        });
+
+        Stage newStage = new Stage();
+        newStage.setResizable(false);
+
+        VBox comp = new VBox();
+        comp.getChildren().addAll(replayListView, watchButton);
+
+        Scene stageScene = new Scene(comp, 600, 300);
 
         newStage.setScene(stageScene);
         newStage.show();
@@ -530,14 +577,7 @@ public class Klient extends Application {
 
     public void recieveMessage(int userID, String username, String message) {
         ekraan.appendText(username + ">> " + message + "\n");
-        /*
-        String fileName = "chattick.wav";
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-        File musicfile = new File(ClassLoader.getSystemClassLoader().getResource("chattick.wav").getFile());
-        //sound
-        String musicFile = "C:\\Users\\Ingo\\IdeaProjects\\OOPprojekt\\tetris\\src\\main\\resources\\chattick.wav";
-        Media sound = new Media(new File(ClassLoader.getSystemClassLoader().getResource("chattick.wav").getFile()).toURI().toString());
-        MediaPlayer mediaPlayer = new MediaPlayer(sound);*/
+
         chatsound.seek(new Duration(0));
         chatsound.play();
     }
@@ -595,6 +635,10 @@ public class Klient extends Application {
 
     public TextField getKonsool() {
         return konsool;
+    }
+
+    public MediaPlayer getGamenotificationsound() {
+        return gamenotificationsound;
     }
 
     @Override

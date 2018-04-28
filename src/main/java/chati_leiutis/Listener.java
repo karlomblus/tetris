@@ -1,6 +1,7 @@
 package chati_leiutis;
 
 import javafx.application.Platform;
+import javafx.util.Duration;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -96,6 +97,9 @@ public class Listener extends Thread {
                 //tulev challenge
                 int challengerID = in.readInt();
                 String challengerName = in.readUTF();
+                //mängin soundi, kui keegi kutsub su mängu
+                client.getGamenotificationsound().seek(new Duration(0));
+                client.getGamenotificationsound().play();
                 Platform.runLater(() -> client.showIncomingChallengeWindow(challengerID, challengerName));
                 break;
             case 8:
