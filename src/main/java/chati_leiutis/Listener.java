@@ -170,20 +170,13 @@ public class Listener extends Thread {
             try {
                 int incmsg = in.readInt();
                 this.handleIncomingInput(incmsg);
-            } catch (Exception e) {
-                if (e instanceof SocketException) {
-                    cont = false;
-                    client.getEkraan().appendText("Disconnected... please restart to reconnect.");
-                    client.getKonsool().setDisable(true);
-                }
-                else if (e instanceof EOFException){
-                    throw new RuntimeException(e);
-                }
-                else if (e instanceof NullPointerException)
-                    System.out.println(e.toString());
-                else{
-                    throw new RuntimeException();
-                }
+            } catch (SocketException e) {
+                cont = false;
+                client.getEkraan().appendText("Disconnected... please restart to reconnect.");
+                client.getKonsool().setDisable(true);
+            }
+            catch (Exception e){
+                throw new RuntimeException(e);
             }
         }
         shutDown();
