@@ -29,8 +29,8 @@ public class TetrisReplay {
     public void start(Stage peaLava, String name, String commandString1, String commandString2) {
         //mängijate nimed...
         String nimi = name.split("  ")[0];
-        String nimi1 = name.split("-")[0];
-        String nimi2 = name.split("-")[1];
+        String nimi1 = nimi.split("-")[0];
+        String nimi2 = nimi.split("-")[1];
         Label namelabel1 = new Label(nimi1);
         Label namelabel2 = new Label(nimi2);
 
