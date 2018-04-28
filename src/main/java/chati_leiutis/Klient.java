@@ -22,6 +22,7 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import tetrispackage.TetrisGraafika;
 import tetrispackage.TetrisGraafikaMultiplayer;
+import tetrispackage.TetrisReplay;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -136,6 +137,7 @@ public class Klient extends Application {
 
             }
         });
+
 
         VBox comp = new VBox();
         HBox nupudkõrvuti = new HBox();
@@ -285,6 +287,20 @@ public class Klient extends Application {
             }
         });
 
+        Button replaybtn = new Button("Replays");
+        TetrisReplay replay = new TetrisReplay();
+        replaybtn.setOnMouseClicked((MouseEvent) -> {
+
+            try {
+                Stage replaylava = new Stage();
+                replay.start(replaylava);
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+
+            }
+        });
+
         Button challengeButton = new Button("Challenge");
         challengeButton.setPrefWidth(w / 4);
         challengeButton.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -313,8 +329,8 @@ public class Klient extends Application {
         border.setBottom(stackPane);
         stackPane.getChildren().add(pilt);
         stackPane.getChildren().add(singleplayerbtn);
-        /*stackPane.getChildren().add(multiplayerbtn);
-        stackPane.setAlignment(multiplayerbtn, Pos.BOTTOM_RIGHT);*/
+        stackPane.getChildren().add(replaybtn);
+        stackPane.setAlignment(replaybtn, Pos.BOTTOM_RIGHT);
         stackPane.setAlignment(singleplayerbtn, Pos.BOTTOM_CENTER);
 
 
