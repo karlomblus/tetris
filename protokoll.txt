@@ -39,7 +39,7 @@ i: int   s: string  c: char  Käsu numbril loetavuse huvides i: eest ära jäetu
 > 103                              # klient küsib uue klotsi (endale)
 < 103  i: kellele c: klots         # server annab klotsi (saadab kõigile)   {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
 > 104  i: mänguNR                  # klient küsib mängu järelvaatamist
-< 104  i: mänguNR s: tegevuslogi   # server annab vastu tegevuslogi kujul   timestamp,userid,tickID,tegevus\n  (millal, kes, mistiks,mistegi)
+< 104  i: mänguNR i: player1 s: player1 i: player2 s: player2 s: tegevuslogi   # server annab vastu tegevuslogi kujul   timestamp,userid,tickID,tegevus\n  (millal, kes, mistiks,mistegi)     mistegi:  0=tiks; {'I', 'O', 'Z', 'S', 'T', 'J', 'L'}=uusklots
 
 < 105 i: kellelt s: username  s: chatmessage    # teine mängija ütles midagi
 > 105 i: kellele s: chatmessage                 # mängija ütleb midagi
