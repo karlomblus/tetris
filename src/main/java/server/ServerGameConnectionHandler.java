@@ -6,6 +6,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.*;
 import java.util.List;
 
 public class ServerGameConnectionHandler implements Runnable {
@@ -94,6 +95,9 @@ public class ServerGameConnectionHandler implements Runnable {
                     case 103:
                         game.sendNewTetromino(userid);
                         break;
+                    case 104:
+                        sendGameLog(dis.readInt());
+                        break;
                     case 105:
                         privateChatmessage(dis.readInt(), dis.readUTF());
                         break;
@@ -121,6 +125,57 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
     } // run()
+
+    private void sendGameLog(int gameid) throws Exception {
+        ServerMain.debug("Meilt küsitakse mängu ID: " + gameid);
+
+        synchronized (dos) {
+            String[] andmebaasist = sql.query(5, "select mangud.id as manguid,player1,u1.username as u1name,player2,u2.username as u2name from mangud left join users as u1 on u1.id=mangud.player1 left join users as u2 on u2.id=mangud.player2 where mangud.id = ?", String.valueOf(gameid));
+            // kui baasist mängu ei saanud, siis ei tagasta mitte midagi
+            if (andmebaasist[0] == null || andmebaasist[0].length() == 0) {
+                ServerMain.debug("ei leidnud mängu");
+                return;
+            }
+            dos.writeInt(104);
+            dos.writeInt(Integer.parseInt(andmebaasist[0])); // mangu id
+            dos.writeInt(Integer.parseInt(andmebaasist[1])); // player 1 ID
+            dos.writeUTF(andmebaasist[2]); // player 1 name
+            dos.writeInt(Integer.parseInt(andmebaasist[3])); // player 2 ID
+            dos.writeUTF(andmebaasist[4]); // player 2 name
+
+            Connection conn = sql.getConn();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            StringBuilder logi = new StringBuilder(10000000);
+            try {
+
+
+                String query = "SELECT timestampms,userid,tickid,tegevus FROM mangulogi where gameid = ? order by id desc";
+                stmt = conn.prepareStatement(query);
+                stmt.setInt(1, gameid);
+                rs = stmt.executeQuery();
+
+                // iterate through the java resultset
+                while (rs.next()) {
+                    logi.append(rs.getString("timestampms") + "," + rs.getString("userid") + "," + rs.getString("tickid") + "," + rs.getString("tegevus") + "\n");
+                }
+
+            } finally {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+
+            } // finally
+
+            dos.writeUTF(logi.toString());
+
+
+        } // sync
+    }
 
 
     private void createAccount(DataOutputStream dos, String username, String password) throws Exception {
@@ -187,7 +242,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 return;
             }
             String[] andmebaasist = sql.query(2, "select id,password from users where username = ?", username);
-            if (andmebaasist == null ||andmebaasist[0].length() == 0) {
+            if (andmebaasist == null || andmebaasist[0].length() == 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
                 ServerMain.debug(5, "dologin: Kasutajanime " + username + " ei ole.");
