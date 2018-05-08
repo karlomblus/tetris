@@ -17,7 +17,7 @@ public class ServerGameData {
         players.add(player2);
         System.out.println("Lisasime mängija1 " + player1.getUserid() + ": " + player1.getUsername());
         System.out.println("Lisasime mängija2 " + player2.getUserid() + ": " + player2.getUsername());
-        
+
         gameid = sql.insert("insert into mangud (id,player1,player2,started) values (0,?,?,now() )",  String.valueOf(player1.getUserid()), String.valueOf(player2.getUserid()));
         ServerMain.debug(4, "Algatasime mängu ID-ga: "+ gameid);
 
