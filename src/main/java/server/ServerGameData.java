@@ -43,7 +43,7 @@ public class ServerGameData {
 
 
         tickid++;
-        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,?,?,0 )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), "0", String.valueOf(tickid));
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,0,?,0 )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), String.valueOf(tickid));
 
         for (ServerGameConnectionHandler player : players) {
             try {
