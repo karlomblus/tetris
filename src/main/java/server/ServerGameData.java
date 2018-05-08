@@ -17,9 +17,9 @@ public class ServerGameData {
         players.add(player2);
         System.out.println("Lisasime mängija1 " + player1.getUserid() + ": " + player1.getUsername());
         System.out.println("Lisasime mängija2 " + player2.getUserid() + ": " + player2.getUsername());
-        
-        gameid = sql.insert("insert into mangud (id,player1,player2,started) values (0,?,?,now() )",  String.valueOf(player1.getUserid()), String.valueOf(player2.getUserid()));
-        ServerMain.debug(4, "Algatasime mängu ID-ga: "+ gameid);
+
+        gameid = sql.insert("insert into mangud (id,player1,player2,started) values (0,?,?,now() )", String.valueOf(player1.getUserid()), String.valueOf(player2.getUserid()));
+        ServerMain.debug(4, "Algatasime mängu ID-ga: " + gameid);
 
     }
 
@@ -41,7 +41,10 @@ public class ServerGameData {
 
     private void tiksJuhtus() {
 
+
         tickid++;
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,now(),?,?,?,0 )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), "0", String.valueOf(tickid));
+
         for (ServerGameConnectionHandler player : players) {
             try {
                 DataOutputStream dos = player.getDos();
@@ -65,7 +68,8 @@ public class ServerGameData {
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
         Random rand = new Random();
         char randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
-        ServerMain.debug(7, "sendNewTetromino: id " + kellele + " tellis uue tetromino, saadame selle: " + players);
+        ServerMain.debug(7, "sendNewTetromino: id " + kellele + " tellis uue tetromino, saadame selle: " + players+ " tetromino: "+ randomTetromino);
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,now(),?,?,?,? )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), String.valueOf(kellele), String.valueOf(tickid), String.valueOf(randomTetromino));
         for (ServerGameConnectionHandler player : players) {
             try {
                 DataOutputStream dos = player.getDos();
