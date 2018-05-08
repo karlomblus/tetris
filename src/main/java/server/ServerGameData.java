@@ -69,7 +69,7 @@ public class ServerGameData {
         Random rand = new Random();
         char randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
         ServerMain.debug(7, "sendNewTetromino: id " + kellele + " tellis uue tetromino, saadame selle: " + players+ " tetromino: "+ randomTetromino);
-        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,now(),?,?,?,? )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), String.valueOf(kellele), String.valueOf(tickid), String.valueOf(randomTetromino));
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,?,?,? )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), String.valueOf(kellele), String.valueOf(tickid), String.valueOf(randomTetromino));
         for (ServerGameConnectionHandler player : players) {
             try {
                 DataOutputStream dos = player.getDos();
