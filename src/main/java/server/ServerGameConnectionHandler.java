@@ -364,7 +364,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 player.setOpponentID(userid);
                 player.setInvitedUID(0); // võtame kutse maha peale accepti
                 invitedUID = 0;            // mõlemal
-                ServerGameData game = new ServerGameData(this, player);
+                ServerGameData game = new ServerGameData(this, player, sql);
                 this.game = game;
                 player.game = game;
 

@@ -8,22 +8,22 @@ import java.util.regex.Pattern;
 public class ServerWebResponse {
 
     String filename = null; // fail mida välja saadame. Muutuja väärtustame ainult siis kui see on OK
-    String rawurl="";
+    String rawurl = "";
     String moodul = "file"; // shtml = parsime muutujaid   file=saadame tuimalt faili
-    String contentType=null;
-    String userAgent="";    // väärtustame viisaka apache stiilis logimise jaoks
+    String contentType = null;
+    String userAgent = "";    // väärtustame viisaka apache stiilis logimise jaoks
     String hostIP;
-    String referer="";
+    String referer = "";
 
     Socket socket;
     PrintWriter out;
     private static final String lubatud = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890.";
     private static final Set<String> BINARYTYPES = Set.of("jar", "exe");
 
-    public ServerWebResponse(Socket socket,PrintWriter out) {
+    public ServerWebResponse(Socket socket, PrintWriter out) {
         this.out = out;
-        this.socket=socket;
-        hostIP=socket.getInetAddress().toString();
+        this.socket = socket;
+        hostIP = socket.getInetAddress().toString();
     }
 
     public void addheader(String inputLine) {
@@ -38,69 +38,71 @@ public class ServerWebResponse {
         String[] tykid = inputLine.split(" ");
         if (tykid[0].equals("GET")) {
             rawurl = tykid[1].substring(1);
-            if (tykid[1].equals("/")) rawurl="index.shtml";
+            if (tykid[1].equals("/")) rawurl = "index.shtml";
 
             if (ulrllubatud(rawurl)) { // kas urli sümbolid on OK?
-                filename=rawurl;
+                filename = rawurl;
                 // laiendi järgi leiame mis selle päringuga teha tuleb
                 String[] urlitykk = filename.split(Pattern.quote("."));
                 if (urlitykk[urlitykk.length - 1].equals("shtml")) {
                     this.moodul = "shtml";
-                    this.contentType="text/html; charset=UTF-8";
-                }
-                else if (urlitykk[urlitykk.length - 1].equals("html")) {
-                    this.contentType="text/html; charset=UTF-8";
-                }
-                else if (urlitykk[urlitykk.length - 1].equals("txt")) {
-                    this.contentType="text/plain; charset=UTF-8";
-                }
-                else if (urlitykk[urlitykk.length - 1].equals("png")) {
-                    this.contentType="image/png";
-                }
-                else if (
+                    this.contentType = "text/html; charset=UTF-8";
+                } else if (urlitykk[urlitykk.length - 1].equals("html")) {
+                    this.contentType = "text/html; charset=UTF-8";
+                } else if (urlitykk[urlitykk.length - 1].equals("txt")) {
+                    this.contentType = "text/plain; charset=UTF-8";
+                } else if (urlitykk[urlitykk.length - 1].equals("png")) {
+                    this.contentType = "image/png";
+                } else if (
                         BINARYTYPES.contains(urlitykk[urlitykk.length - 1])) {
-                    this.contentType="application/octet-stream";
+                    this.contentType = "application/octet-stream";
                 }
 
             } // url ok
 
 
         } else if (tykid[0].equals("User-Agent:")) {
-            userAgent=tykid[1];
-        }else if (tykid[0].equals("Referer:")) {
-            referer=tykid[1];
+            userAgent = tykid[1];
+        } else if (tykid[0].equals("Referer:")) {
+            referer = tykid[1];
         }
 
     }
 
     private boolean ulrllubatud(String url) {
         for (int i = 0; i < url.length(); i++) {
-            if (keelatudtaht(url.substring(i, i+1))) return false;
+            if (keelatudtaht(url.substring(i, i + 1))) return false;
         }
         return true;
     }
 
     private boolean keelatudtaht(String substring) {
         for (int i = 0; i < lubatud.length(); i++) {
-            if (substring.equals(lubatud.substring(i, i+1))) return false;
+            if (substring.equals(lubatud.substring(i, i + 1))) return false;
         }
         return true;
     }
 
     public void sendresponse() throws IOException {
 
-        ServerMain.debug(6,"url: " + rawurl);
-        if (contentType!=null) ServerMain.debug(6,"contenttype: " + contentType);
-        ServerMain.debug(6,"moodul: " + moodul);
-        ServerMain.debug(6,"host: " + hostIP);
+        ServerMain.debug(6, "url: " + rawurl);
+        if (contentType != null) ServerMain.debug(6, "contenttype: " + contentType);
+        ServerMain.debug(6, "moodul: " + moodul);
+        ServerMain.debug(6, "host: " + hostIP);
 
-        if (filename==null) {
+        if (filename == null) {
             senderror(); // ma ei tea mida must tahetakse või oli url keelatud
             return;
         }
 
-        if (moodul.equals("file")) {sendfile();return;}
-        if (moodul.equals("shtml")) {sendfile();return;} // todo: parsimine teha
+        if (moodul.equals("file")) {
+            sendfile();
+            return;
+        }
+        if (moodul.equals("shtml")) {
+            sendfile();
+            return;
+        } // todo: parsimine teha
 
         // kui siia jõuame, siis ma ei tea mida must tahetakse
         senderror();
@@ -109,14 +111,14 @@ public class ServerWebResponse {
 
     private void sendfile() throws IOException {
 
-        ServerMain.debug(4,"WEB: requested file: " + rawurl + "");
+        ServerMain.debug(4, "WEB: requested file: " + rawurl + "");
 
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        try (   InputStream inStream = classloader.getResourceAsStream("webroot/"+filename);BufferedOutputStream outStream = new BufferedOutputStream(socket.getOutputStream()) ) {
+        try (InputStream inStream = classloader.getResourceAsStream("webroot/" + filename); BufferedOutputStream outStream = new BufferedOutputStream(socket.getOutputStream())) {
             //try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(new File("webroot/"+filename)));BufferedOutputStream outStream = new BufferedOutputStream(socket.getOutputStream()) ) {
 
-            if (inStream==null) {
-                ServerMain.debug(4,"WEB: sendfile: instream oli NULL, faili pole.");
+            if (inStream == null) {
+                ServerMain.debug(4, "WEB: sendfile: instream oli NULL, faili pole.");
                 send404();
                 return;
             }
@@ -126,7 +128,7 @@ public class ServerWebResponse {
             out.printf("Cache-Control: no-cache, no-store, must-revalidate\r\n");
             out.printf("Pragma: no-cache\r\n");
             out.printf("Connection: Close\r\n");
-            if(contentType!=null) out.printf("Content-Type: "+contentType+"\r\n");
+            if (contentType != null) out.printf("Content-Type: " + contentType + "\r\n");
             out.printf("\r\n");
 
             final byte[] buffer = new byte[4096];
@@ -135,23 +137,23 @@ public class ServerWebResponse {
 
         }
 
-
     }
+
     private void send404() {
-        ServerMain.debug(6,"WEB: 404: ei leia faili: "+rawurl);
+        ServerMain.debug(6, "WEB: 404: ei leia faili: " + rawurl);
         out.printf("HTTP/1.1 404 File Not Found\r\n");
         out.printf("Server: Tetris scoreserver\r\n");
         out.printf("Content-Type: text/html; charset=UTF-8\r\n");
         out.printf("\r\n");
-        out.println("<html><body>  Sorry. Faili  "+rawurl+" ei leitud<br>\n </body></html>");   // html sisus pole korrektne reavahetus vist enam oluline sest browser peaks failiga ka sel kujul hakkama saama?
+        out.println("<html><body>  Sorry. Faili  " + rawurl + " ei leitud<br>\n </body></html>");   // html sisus pole korrektne reavahetus vist enam oluline sest browser peaks failiga ka sel kujul hakkama saama?
     }
 
     private void senderror() {
-        ServerMain.debug(6,"Weebiserver saadab vastu 400 errori");
+        ServerMain.debug(6, "Weebiserver saadab vastu 400 errori");
         out.printf("HTTP/1.1 400 bad request\r\n");
         out.printf("Server: Tetris scoreserver\r\n");
         out.printf("Content-Type: text/html; charset=UTF-8\r\n");
         out.printf("\r\n");
-        out.println("<html><body>  Kahjuks ei mõista server seda päringut <br><br>\nURL: "+rawurl+"\n<br>Moodul: "+moodul+"<br>\n </body></html>");
+        out.println("<html><body>  Kahjuks ei mõista server seda päringut <br><br>\nURL: " + rawurl + "\n<br>Moodul: " + moodul + "<br>\n </body></html>");
     }
 }

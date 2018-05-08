@@ -8,17 +8,18 @@ public class ServerGameData {
     private List<ServerGameConnectionHandler> players; // siin on kõik mängijad  (esialgu üle kahe neid pole, aga mõtleme ette)
     private int tickid = 0;
     private int gameid = 0; // mängu ID.
+    private ServerSQL sql;
 
-    public ServerGameData(ServerGameConnectionHandler player1, ServerGameConnectionHandler player2) {
+    public ServerGameData(ServerGameConnectionHandler player1, ServerGameConnectionHandler player2, ServerSQL sql) {
+        this.sql = sql;
         players = new ArrayList<>();
         players.add(player1);
         players.add(player2);
         System.out.println("Lisasime mängija1 " + player1.getUserid() + ": " + player1.getUsername());
         System.out.println("Lisasime mängija2 " + player2.getUserid() + ": " + player2.getUsername());
-
-        // todo: gameid tuleb mängu lisamisest mysql-i
-        gameid = 999;
-
+        
+        gameid = sql.insert("insert into mangud (id,player1,player2,started) values (0,?,?,now() )",  String.valueOf(player1.getUserid()), String.valueOf(player2.getUserid()));
+        ServerMain.debug(4, "Algatasime mängu ID-ga: "+ gameid);
 
     }
 
@@ -103,7 +104,6 @@ public class ServerGameData {
             }
         } // iter
     } // removeUserFromGame
-
 
 
     public int getGameid() {
