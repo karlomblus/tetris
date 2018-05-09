@@ -86,6 +86,9 @@ public class ServerGameConnectionHandler implements Runnable {
                     case 9:
                         rejectInviteToGame(dis.readInt());
                         break;
+                    case 11:
+                        sendGameLog(dis.readInt());
+                        break;                        
                     case 101:
                         receiveGamerMove(dis.readInt(), dis.readChar());
                         break;
@@ -94,9 +97,6 @@ public class ServerGameConnectionHandler implements Runnable {
                         break;
                     case 103:
                         game.sendNewTetromino(userid);
-                        break;
-                    case 104:
-                        sendGameLog(dis.readInt());
                         break;
                     case 105:
                         privateChatmessage(dis.readInt(), dis.readUTF());
@@ -136,7 +136,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 ServerMain.debug("ei leidnud mängu");
                 return;
             }
-            dos.writeInt(104);
+            dos.writeInt(11);
             dos.writeInt(Integer.parseInt(andmebaasist[0])); // mangu id
             dos.writeInt(Integer.parseInt(andmebaasist[1])); // player 1 ID
             dos.writeUTF(andmebaasist[2]); // player 1 name
