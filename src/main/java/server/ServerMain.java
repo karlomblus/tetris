@@ -21,12 +21,6 @@ public class ServerMain {
 
 
 
-
-        // plan: weebiserver täiesti eraldi
-        // tekitame mingi hulga threade weebi ühendustega tegelemiseks
-        // lisaks kuulan ka porti 80
-        // kui tuleb ühendus, annan selle esimesele vabale threadile (ei hakka igakord uut tegema)
-
         // connectioni peale tekitan threadi ja ServerGameConnectionHandler tegeleb
         try (ServerSocket gameServerSocket = new ServerSocket(54321)) {
 

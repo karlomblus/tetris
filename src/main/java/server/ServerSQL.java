@@ -23,7 +23,7 @@ public class ServerSQL {
 
     }
 
-    private Connection getConn() {
+    public Connection getConn() {
         return conn;
     }
 

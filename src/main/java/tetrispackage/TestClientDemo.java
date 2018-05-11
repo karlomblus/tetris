@@ -20,7 +20,10 @@ public class TestClientDemo {
             loesisendit(dis);
 
 
+            dos.writeInt(104);  // küsime vaadata mängu 3
+            dos.writeInt(3);
 
+/*
             Thread.sleep(5000);
             loesisendit(dis);
             loesisendit(dis);
@@ -31,7 +34,7 @@ public class TestClientDemo {
             dos.writeInt(2);
             loesisendit(dis);
             loesisendit(dis);
-
+*/
 
             /*
             System.out.println("Ütleme chatis tere");
@@ -110,6 +113,12 @@ public class TestClientDemo {
                     break;
                 case 100:
                     System.out.println("server tegi tiks: " + dis.readInt()  );
+                    break;
+                case 104:
+                    System.out.println("server andis mängulogi mängule: " + dis.readInt()  );
+                    System.out.println("user1: " + dis.readInt() + " " + dis.readUTF());
+                    System.out.println("user2: " + dis.readInt() + " " + dis.readUTF());
+                    System.out.println("logi: " + dis.readUTF());
                     break;
                 default:
                     System.out.println("Ma ei tea mis server ütles (" + servervastus + ") ja ei oska mitte midagi teha");

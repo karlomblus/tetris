@@ -8,17 +8,21 @@ public class ServerGameData {
     private List<ServerGameConnectionHandler> players; // siin on kõik mängijad  (esialgu üle kahe neid pole, aga mõtleme ette)
     private int tickid = 0;
     private int gameid = 0; // mängu ID.
+    private ServerSQL sql;
+    private List<Character> klotsid1 = new LinkedList<>();
+    private List<Character> klotsid2 = new LinkedList<>();
 
-    public ServerGameData(ServerGameConnectionHandler player1, ServerGameConnectionHandler player2) {
+
+    public ServerGameData(ServerGameConnectionHandler player1, ServerGameConnectionHandler player2, ServerSQL sql) {
+        this.sql = sql;
         players = new ArrayList<>();
         players.add(player1);
         players.add(player2);
         System.out.println("Lisasime mängija1 " + player1.getUserid() + ": " + player1.getUsername());
         System.out.println("Lisasime mängija2 " + player2.getUserid() + ": " + player2.getUsername());
 
-        // todo: gameid tuleb mängu lisamisest mysql-i
-        gameid = 999;
-
+        gameid = sql.insert("insert into mangud (id,player1,player2,started) values (0,?,?,now() )", String.valueOf(player1.getUserid()), String.valueOf(player2.getUserid()));
+        ServerMain.debug(4, "Algatasime mängu ID-ga: " + gameid);
 
     }
 
@@ -40,7 +44,10 @@ public class ServerGameData {
 
     private void tiksJuhtus() {
 
+
         tickid++;
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,0,?,0 )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), String.valueOf(tickid));
+
         for (ServerGameConnectionHandler player : players) {
             try {
                 DataOutputStream dos = player.getDos();
@@ -62,9 +69,15 @@ public class ServerGameData {
 
     public void sendNewTetromino(int kellele) {
         char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
+
+        //todo: genereerime listi ainult siis klotsi kui selle useri random on juba olemas
         Random rand = new Random();
         char randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
-        ServerMain.debug(7, "sendNewTetromino: id " + kellele + " tellis uue tetromino, saadame selle: " + players);
+        // paneme mõlemale kasutajale listi
+        klotsid1.add(randomTetromino);
+        klotsid2.add(randomTetromino);
+        ServerMain.debug(7, "sendNewTetromino: id " + kellele + " tellis uue tetromino, saadame selle: " + players + " tetromino: " + randomTetromino);
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,?,?,? )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), String.valueOf(kellele), String.valueOf(tickid), String.valueOf(randomTetromino));
         for (ServerGameConnectionHandler player : players) {
             try {
                 DataOutputStream dos = player.getDos();
@@ -103,7 +116,6 @@ public class ServerGameData {
             }
         } // iter
     } // removeUserFromGame
-
 
 
     public int getGameid() {
