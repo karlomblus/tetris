@@ -17,11 +17,14 @@ Multiplayer graafiline tetris (1-4 mängijat? Mängu loomise interface läheb ke
 Võrguprotokolli planeerimine II = tetris tööle  - Karl & Theo
 Veebiserver, mis serveerib edetabeleid - Karl
 Lobby lisafunktsionaalsus (mängude logi, järelvaatamine) - Ingo
+Lobby tegemine bug-freeks.
 
 III etapp:
 Võrguprotokolli silumine (tegelt tuleks kohe ilgelt hea protokoll teha) - Karl
 Online sessiooni vaatamise võimalus ning ka järelevaatamine - Theo=client, Karl=server
-Punktinäitamise weebiserverile viisaka sisu loomine? Ingo?
+Punktinäitamise weebiserverile viisaka sisu loomine? Ingo? Vaatab, proovin.
+Järelvaatamise reaalne implementeerimine, debugging, silumine, viin aknad rohkem eraldi klassidesse - Ingo.
+
 
 
 Ideaalis tahaks weebiserveri teha nii, et see suudaks käivitada class faile mis tegeleks siis reaals sisu näitamisega. Umbes nagu tavaliselt lastakse käima .php, siis meie laseks käima javas kirjutatud classe mis siis ühenduvad andmebaasi ja genereerivad html).
