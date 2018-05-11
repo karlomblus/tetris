@@ -36,8 +36,8 @@ import java.util.concurrent.BlockingQueue;
 
 public class Klient extends Application {
     Klient self;
-    Integer laius;
-    Integer kõrgus;
+    private Integer laius;
+    private Integer kõrgus;
     private String nimi;
     private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
     private boolean challengeOpen = false;
@@ -58,12 +58,11 @@ public class Klient extends Application {
     private TextField loginnamefield;
     private PasswordField regpasswordfield;
     private TextField regnamefield;
-    private Listener listener;
     private TetrisGraafikaMultiplayer multiplayerGame;
     OpenChallengeWindow challengewindow;
     //kompaktne soundifaili saamine
-    private MediaPlayer chatsound = new MediaPlayer(new Media(new File(ClassLoader.getSystemClassLoader().getResource("chattick.wav").getFile()).toURI().toString()));
-    private MediaPlayer gamenotificationsound = new MediaPlayer(new Media(new File(ClassLoader.getSystemClassLoader().getResource("gamenotification.mp3").getFile()).toURI().toString()));
+    private MediaPlayer chatsound = new MediaPlayer(new Media(new File(Klient.class.getClassLoader().getResource("chattick.wav").getFile()).toURI().toString()));
+    private MediaPlayer gamenotificationsound = new MediaPlayer(new Media(new File(Klient.class.getClassLoader().getResource("gamenotification.mp3").getFile()).toURI().toString()));
 
     public String getNimi() {
         return nimi;
@@ -77,7 +76,6 @@ public class Klient extends Application {
     public boolean isMpgameopen() {
         return mpgameopen;
     }
-
     public void setMpgameopen(boolean mpgameopen) {
         this.mpgameopen = mpgameopen;
     }
@@ -108,7 +106,7 @@ public class Klient extends Application {
             try {
                 //registreering
                 sendSomething(1);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             newStage.close();
@@ -239,7 +237,7 @@ public class Klient extends Application {
                     sendSomething(4);
 
                     //connecter.getOut().close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.out.println("Socket juba kinni, jätkan välja logimist");
                 }
             }
@@ -320,8 +318,8 @@ public class Klient extends Application {
         stackPane.getChildren().add(pilt);
         stackPane.getChildren().add(singleplayerbtn);
         stackPane.getChildren().add(replaybtn);
-        stackPane.setAlignment(replaybtn, Pos.BOTTOM_RIGHT);
-        stackPane.setAlignment(singleplayerbtn, Pos.BOTTOM_CENTER);
+        StackPane.setAlignment(replaybtn, Pos.BOTTOM_RIGHT);
+        StackPane.setAlignment(singleplayerbtn, Pos.BOTTOM_CENTER);
 
 
         //send nupp
@@ -473,7 +471,7 @@ public class Klient extends Application {
                 try {
                     Stage replaylava = new Stage();
                     //todo vali õige replay, ava TetrisReplay vastava andmetega
-                    replay.start(replaylava,selectedReplayname, "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN",
+                    replay.start(replaylava, selectedReplayname, "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN",
                             "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN");
 
                 } catch (Exception e) {
@@ -495,7 +493,7 @@ public class Klient extends Application {
         newStage.show();
     }
 
-    public void sendSomething(Integer type) throws IOException {
+    public void sendSomething(Integer type) {
         try {
             System.out.println("Saatsin " + type);
             //vastavalt prokokollile:
@@ -642,7 +640,7 @@ public class Klient extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         self = this;
         //üritame käivitamisel ühenduse luua
         try (Socket socket = new Socket("tetris.carlnet.ee", 54321);
@@ -652,7 +650,7 @@ public class Klient extends Application {
             this.out = output;
             System.out.println("Connection to tetris.carlnet.ee established...");
 
-            listener = new Listener(connection, this, input, toLoginorNot);
+            Listener listener = new Listener(connection, this, input, toLoginorNot);
             Thread clienthread = new Thread(listener);
             clienthread.start();
             loggedIN = true;
@@ -670,7 +668,7 @@ public class Klient extends Application {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         launch(args);
     }
 }

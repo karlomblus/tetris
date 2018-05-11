@@ -26,7 +26,7 @@ public class ReplayRunner implements Runnable {
         }
     }
 
-    private void doCommand(String command) throws InterruptedException {
+    private void doCommand(String command) {
         switch (command) {
             case "RIGHT":
                 replay.moveRight();

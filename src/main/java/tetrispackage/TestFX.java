@@ -17,7 +17,7 @@ public class TestFX extends Application {
     }
 
     @Override
-    public void start(Stage peaLava) throws Exception {
+    public void start(Stage peaLava) {
 
 
         Button nupp1 = new Button("Run");

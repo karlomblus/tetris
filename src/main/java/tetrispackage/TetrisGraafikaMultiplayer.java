@@ -111,7 +111,7 @@ public class TetrisGraafikaMultiplayer {
             client.setMpgameopen(false);
             try {
                 client.sendSomething(102);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 System.out.println("Failed to send info about closing/exiting the MP game");
             }
             Platform.exit();

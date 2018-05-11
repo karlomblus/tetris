@@ -23,7 +23,7 @@ public class ServerGameData {
     }
 
 
-    void start() throws Exception {
+    void start() {
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {

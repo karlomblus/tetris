@@ -18,7 +18,7 @@ public class OpenChallengeWindow {
         lava.close();
     }
 
-    public void start(Stage primaryStage, String user, Klient client) throws Exception {
+    public void start(Stage primaryStage, String user, Klient client) {
         VBox comp = new VBox();
         comp.setAlignment(Pos.CENTER);
         Label messagelabel = new Label("Challenging " + user + ". Waiting for response...");

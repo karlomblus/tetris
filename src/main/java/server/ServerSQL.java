@@ -5,7 +5,7 @@ import java.sql.*;
 public class ServerSQL {
     private Connection conn = null;
 
-    public ServerSQL() throws Exception {
+    public ServerSQL() {
 
         ServerConfig cfg = new ServerConfig();
 

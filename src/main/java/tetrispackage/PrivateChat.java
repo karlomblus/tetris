@@ -42,7 +42,7 @@ public class PrivateChat {
                     System.out.println("Trying to send message");
                     client.sendSomething(105);
                     chatWindow.appendText(client.getNimi() + ">> " + writearea.getText() + "\n");
-                } catch (IOException error) {
+                } catch (Exception error) {
                     messagearea.appendText("Socket kinni. Ei saanud saata.");
                 }
                 writearea.clear();

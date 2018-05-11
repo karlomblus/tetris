@@ -26,7 +26,7 @@ public class Listener extends Thread {
         }
     }
 
-    public Listener(Socket socket, Klient client, DataInputStream in, BlockingQueue<Integer> tologinornot) throws Exception {
+    public Listener(Socket socket, Klient client, DataInputStream in, BlockingQueue<Integer> tologinornot) {
         this.socket = socket;
         this.client = client;
         this.in = in;
