@@ -4,7 +4,6 @@ import chati_leiutis.Klient;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -13,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.util.*;
 
@@ -72,26 +72,9 @@ public class TetrisGraafikaMultiplayer {
             tickAndDrawForOpponent();
         });
         opponentMoved.addListener((o, oldVal, newVal) -> {
-            if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
-                if (opponentMoved.getValue() == 2) {
-                    opponentTetromino.moveLeft();
-                } else if (opponentMoved.getValue() == 3) {
-                    opponentTetromino.moveRight();
-                } else if (opponentMoved.getValue() == 0) {
-                    opponentTetromino.rotate();
-                } else if (opponentMoved.getValue() == 1) {
-                    opponentTetromino.drop();
-                }
-                if (opponentMoveTiksuID != tickProperty.getValue()) {
-                    System.out.println("OUT OF SYNC!!! ");
-                    System.out.println("MoveTiks: " + opponentMoveTiksuID);
-                    System.out.println("TickID " + tickProperty.getValue());
-                    syncproblem = 1;
-                }
-            }
+            moveOpponentTetro();
             opponentMoved.setValue(-1);
         });
-
 
         //kood selleks, et klikkides tetrise mängule deselectib chatirea.(Muidu ei saa klotse liigutada peale chattimist)
         localTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
@@ -105,62 +88,12 @@ public class TetrisGraafikaMultiplayer {
             }
         });
 
-        peaLava.setOnCloseRequest((we) -> {
-            System.out.println("Tetris stage closed!");
-            //multiplayer läheb kinni
-            client.setMpgameopen(false);
-            try {
-                client.sendSomething(102);
-            } catch (Exception e) {
-                System.out.println("Failed to send info about closing/exiting the MP game");
-            }
-            Platform.exit();
-        });
-        peaLava.setOnShowing(event -> { //Do only once
-            //draw('I');
-        });
+        peaLava.setOnCloseRequest((we) -> closeGame());
         Scene tetrisStseen = new Scene(root, TetrisGraafika.getResoWidth() * 2 + privateChat.getWidth() * 2, resoHeight, Color.SNOW);  // luuakse stseen
         tetrisStseen.setOnKeyPressed(event -> {
             myCurrentActiveKeys.put(event.getCode(), true);
-            if (!myTetromino.isDrawingAllowed() && !myTetromino.gameStateOver()) {
-                if (myCurrentActiveKeys.containsKey(KeyCode.RIGHT) && myCurrentActiveKeys.get(KeyCode.RIGHT)) {
-                    if (myTetromino.moveRight()) {
-                        try {
-                            client.sendKeypress(tickProperty.getValue(), RIGHT);
-                        } catch (IOException error) {
-                            privateChat.keyPressSendingFailed();
-                        }
-                    }
-                }
-                if (myCurrentActiveKeys.containsKey(KeyCode.LEFT) && myCurrentActiveKeys.get(KeyCode.LEFT)) {
-                    if (myTetromino.moveLeft()) {
-                        try {
-                            client.sendKeypress(tickProperty.getValue(), LEFT);
-                        } catch (IOException error) {
-                            privateChat.keyPressSendingFailed();
-                        }
-                    }
-                }
-                if (myCurrentActiveKeys.containsKey(KeyCode.UP) && myCurrentActiveKeys.get(KeyCode.UP)) {
-                    if (myTetromino.rotate()) {
-                        try {
-                            client.sendKeypress(tickProperty.getValue(), UP);
-                        } catch (IOException error) {
-                            privateChat.keyPressSendingFailed();
-                        }
-                    }
-                }
-                if (myCurrentActiveKeys.containsKey(KeyCode.DOWN) && myCurrentActiveKeys.get(KeyCode.DOWN)) {
-                    try {
-                        client.sendKeypress(tickProperty.getValue(), DOWN);
-                    } catch (IOException error) {
-                        privateChat.keyPressSendingFailed();
-                    }
-                    myTetromino.drop();
-                    myTetromino.setNewRandomTetroReceived(false);
-                    randomTetroRequestSent = 0;
-                }
-            }
+            checkPressedKeysAndMove();
+
         });
         tetrisStseen.setOnKeyReleased(event ->
                 myCurrentActiveKeys.put(event.getCode(), false)
@@ -172,8 +105,72 @@ public class TetrisGraafikaMultiplayer {
         peaLava.show();  // lava tehakse nähtavaks
     }
 
-    public void begin() {
-        //launch();
+    void closeGame() {
+        System.out.println("Tetris stage closed!");
+        //multiplayer läheb kinni
+        client.setMpgameopen(false);
+        try {
+            client.sendSomething(102);
+        } catch (Exception e) {
+            System.out.println("Failed to send info about closing/exiting the MP game");
+        }
+        Platform.exit();
+    }
+
+    void checkPressedKeysAndMove() {
+        if (!myTetromino.isDrawingAllowed() && !myTetromino.gameStateOver()) {
+            if (myCurrentActiveKeys.containsKey(KeyCode.RIGHT) && myCurrentActiveKeys.get(KeyCode.RIGHT)) {
+                if (myTetromino.moveRight()) {
+                    try {
+                        client.sendKeypress(tickProperty.getValue(), RIGHT);
+                    } catch (IOException error) {
+                        privateChat.keyPressSendingFailed();
+                    }
+                }
+            }
+            if (myCurrentActiveKeys.containsKey(KeyCode.LEFT) && myCurrentActiveKeys.get(KeyCode.LEFT)) {
+                if (myTetromino.moveLeft()) {
+                    try {
+                        client.sendKeypress(tickProperty.getValue(), LEFT);
+                    } catch (IOException error) {
+                        privateChat.keyPressSendingFailed();
+                    }
+                }
+            }
+            if (myCurrentActiveKeys.containsKey(KeyCode.UP) && myCurrentActiveKeys.get(KeyCode.UP)) {
+                if (myTetromino.rotate()) {
+                    try {
+                        client.sendKeypress(tickProperty.getValue(), UP);
+                    } catch (IOException error) {
+                        privateChat.keyPressSendingFailed();
+                    }
+                }
+            }
+            if (myCurrentActiveKeys.containsKey(KeyCode.DOWN) && myCurrentActiveKeys.get(KeyCode.DOWN)) {
+                try {
+                    client.sendKeypress(tickProperty.getValue(), DOWN);
+                } catch (IOException error) {
+                    privateChat.keyPressSendingFailed();
+                }
+                myTetromino.drop();
+                myTetromino.setNewRandomTetroReceived(false);
+                randomTetroRequestSent = 0;
+            }
+        }
+    }
+
+    void moveOpponentTetro() {
+        if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
+            if (opponentMoved.getValue() == 2) {
+                opponentTetromino.moveLeft();
+            } else if (opponentMoved.getValue() == 3) {
+                opponentTetromino.moveRight();
+            } else if (opponentMoved.getValue() == 0) {
+                opponentTetromino.rotate();
+            } else if (opponentMoved.getValue() == 1) {
+                opponentTetromino.drop();
+            }
+        }
     }
 
     void tickAndDrawForMe() {
