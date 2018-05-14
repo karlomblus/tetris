@@ -67,11 +67,11 @@ public class TetrisGraafikaMultiplayer {
         root.getChildren().add(opponentTetrisArea);
         root.getChildren().add(privateChat.getChatArea());
 
-        tickProperty.addListener((ChangeListener) (o, oldVal, newVal) -> {
+        tickProperty.addListener((o, oldVal, newVal) -> {
             tickAndDrawForMe();
             tickAndDrawForOpponent();
         });
-        opponentMoved.addListener((ChangeListener) (o, oldVal, newVal) -> {
+        opponentMoved.addListener((o, oldVal, newVal) -> {
             if (!opponentTetromino.isDrawingAllowed() && !opponentTetromino.gameStateOver()) {
                 if (opponentMoved.getValue() == 2) {
                     opponentTetromino.moveLeft();
