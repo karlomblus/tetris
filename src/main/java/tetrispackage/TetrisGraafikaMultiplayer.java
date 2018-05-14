@@ -78,7 +78,7 @@ public class TetrisGraafikaMultiplayer {
                 } else if (opponentMoved.getValue() == 3) {
                     opponentTetromino.moveRight();
                 } else if (opponentMoved.getValue() == 0) {
-                    opponentTetromino.rotateLeft();
+                    opponentTetromino.rotate();
                 } else if (opponentMoved.getValue() == 1) {
                     opponentTetromino.drop();
                 }
@@ -142,7 +142,7 @@ public class TetrisGraafikaMultiplayer {
                     }
                 }
                 if (myCurrentActiveKeys.containsKey(KeyCode.UP) && myCurrentActiveKeys.get(KeyCode.UP)) {
-                    if (myTetromino.rotateLeft()) {
+                    if (myTetromino.rotate()) {
                         try {
                             client.sendKeypress(tickProperty.getValue(), UP);
                         } catch (IOException error) {

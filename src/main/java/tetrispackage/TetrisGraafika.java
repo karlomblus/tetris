@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.sql.Time;
 import java.util.*;
 
 public class TetrisGraafika {
@@ -73,7 +74,8 @@ public class TetrisGraafika {
                     tetromino.drop();
                 }
                 if (currentActiveKeys.containsKey(KeyCode.UP) && currentActiveKeys.get(KeyCode.UP)) {
-                    tetromino.rotateLeft();
+                    //tetromino.rotateLeft();
+                    tetromino.rotate();
                 }
             }
         });

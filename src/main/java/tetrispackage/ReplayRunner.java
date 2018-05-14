@@ -35,7 +35,7 @@ public class ReplayRunner implements Runnable {
                 replay.moveLeft();
                 break;
             case "UP":
-                replay.rotateLeft();
+                replay.rotate();
                 break;
             case "DOWN":
                 replay.drop();
