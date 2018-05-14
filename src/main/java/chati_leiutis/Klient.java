@@ -29,6 +29,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -61,8 +62,8 @@ public class Klient extends Application {
     private TetrisGraafikaMultiplayer multiplayerGame;
     OpenChallengeWindow challengewindow;
     //kompaktne soundifaili saamine
-    private MediaPlayer chatsound = new MediaPlayer(new Media(new File(Klient.class.getClassLoader().getResource("chattick.wav").getFile()).toURI().toString()));
-    private MediaPlayer gamenotificationsound = new MediaPlayer(new Media(new File(Klient.class.getClassLoader().getResource("gamenotification.mp3").getFile()).toURI().toString()));
+    private MediaPlayer chatsound;
+    private MediaPlayer gamenotificationsound;
 
     public String getNimi() {
         return nimi;
@@ -81,6 +82,12 @@ public class Klient extends Application {
     }
 
     public Klient() {
+        try {
+            chatsound = new MediaPlayer(new Media(Klient.class.getClassLoader().getResource("chattick.wav").toURI().toString()));
+            gamenotificationsound = new MediaPlayer(new Media(Klient.class.getClassLoader().getResource("gamenotification.mp3").toURI().toString()));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     public Klient(DataOutputStream out) {
