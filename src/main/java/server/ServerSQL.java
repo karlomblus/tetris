@@ -11,14 +11,14 @@ public class ServerSQL {
 
 
         try {
-            conn = DriverManager.getConnection(cfg.getProperty("sqluri","jdbc:mysql://localhost:3306/test?user=test&autoReconnect=true"));
+            conn = DriverManager.getConnection(cfg.getProperty("sqluri", "jdbc:mysql://localhost:3306/test?user=test&autoReconnect=true"));
         } catch (SQLException ex) {
 
             ServerMain.debug("SQLException: " + ex.getMessage());
             ServerMain.debug("SQLState: " + ex.getSQLState());
             ServerMain.debug("VendorError: " + ex.getErrorCode());
-            ServerMain.error("SQL ühendumine katki",ex); // error() laseb prgrammi niikuinii õhku
-           //throw new RuntimeException(ex);
+            ServerMain.error("SQL ühendumine katki", ex); // error() laseb prgrammi niikuinii õhku
+            //throw new RuntimeException(ex);
         }
 
     }
@@ -152,7 +152,7 @@ public class ServerSQL {
         }
     } // getstring
 
-    public String[] query(int mitu,String... args) throws Exception {
+    public String[] query(int mitu, String... args) throws Exception {
         synchronized (conn) {
 
             PreparedStatement preparedStatement = conn.prepareStatement(args[0]);
@@ -164,7 +164,7 @@ public class ServerSQL {
 
             if (rs.next()) {
                 for (int i = 0; i < mitu; i++) {
-                    response[i] = rs.getString(i+1);
+                    response[i] = rs.getString(i + 1);
                 }
 
             }

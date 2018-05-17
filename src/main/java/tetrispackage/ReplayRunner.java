@@ -7,7 +7,7 @@ public class ReplayRunner implements Runnable {
     Tetromino replay;
     String commandString;
 
-    public ReplayRunner(Tetromino replay,String commandString) {
+    public ReplayRunner(Tetromino replay, String commandString) {
         this.replay = replay;
         this.commandString = commandString;
     }
@@ -15,13 +15,13 @@ public class ReplayRunner implements Runnable {
     private void beginReplay() throws InterruptedException {
         //tükitan sobivalt commandide sõne ja täidan käsud vastavad delayga.
         String[] commands = commandString.split(";");
-        for (String command:commands) {
+        for (String command : commands) {
             String[] parts = command.split(",");
             int time = Integer.parseInt(parts[0]);
             String moveToReplay = parts[1];
             Thread.sleep(time);
             doCommand(moveToReplay);
-            System.out.println("Did the command--------"+moveToReplay);
+            System.out.println("Did the command--------" + moveToReplay);
 
         }
     }

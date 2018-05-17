@@ -1,6 +1,8 @@
 package tetrispackage;
 
 
+import chati_leiutis.MessageID;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -12,7 +14,6 @@ public class TestClientDemo2 {
         Socket socket = new Socket("127.0.0.1", 54321);
         try (DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
              DataInputStream dis = new DataInputStream(socket.getInputStream())) {
-
 
 
             System.out.println("Logime sisse õige parooliga");
@@ -58,7 +59,6 @@ public class TestClientDemo2 {
 */
 
 
-
             for (int i = 0; i < 10; i++) {
                 Thread.sleep(1000);
                 loesisendit(dis);
@@ -68,7 +68,7 @@ public class TestClientDemo2 {
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
 
             System.out.println("Logout");
-            dos.writeInt(4);
+            dos.writeInt(MessageID.LOGOUT);
 
 
         } finally {
@@ -93,19 +93,19 @@ public class TestClientDemo2 {
                     System.out.println("Userlist: uid: " + dis.readInt() + ", name: " + dis.readUTF());
                     break;
                 case 5:
-                    System.out.println("Chatmessage: uid "+dis.readInt()+", user: " + dis.readUTF() + ", message: " + dis.readUTF());
+                    System.out.println("Chatmessage: uid " + dis.readInt() + ", user: " + dis.readUTF() + ", message: " + dis.readUTF());
                     break;
                 case 6:
                     System.out.println("Running games: id: " + dis.readInt() + ", players: " + dis.readUTF() + " ja " + dis.readUTF());
                     break;
                 case 7:
-                    System.out.println("Sain kutse: id: " + dis.readInt() + ", name: " + dis.readUTF() );
+                    System.out.println("Sain kutse: id: " + dis.readInt() + ", name: " + dis.readUTF());
                     break;
                 case 8:
-                    System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt() );
+                    System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt());
                     break;
                 case 100:
-                    System.out.println("server tegi tiks: " + dis.readInt()  );
+                    System.out.println("server tegi tiks: " + dis.readInt());
                     break;
                 default:
                     System.out.println("Ma ei tea mis server ütles (" + servervastus + ") ja ei oska mitte midagi teha");

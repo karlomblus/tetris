@@ -47,11 +47,11 @@ public class TetrisReplay {
         player2tetrisRect.fill(player2);
         player2tetromino = new Tetromino(player2tetrisRect.getRistkülik());
 
-        player1box.getChildren().addAll(namelabel1,player1);
-        player2box.getChildren().addAll(namelabel2,player2);
+        player1box.getChildren().addAll(namelabel1, player1);
+        player2box.getChildren().addAll(namelabel2, player2);
         HBox hbox = new HBox();
         hbox.setSpacing(10);
-        hbox.getChildren().addAll(player1box,player2box);
+        hbox.getChildren().addAll(player1box, player2box);
 
         Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
             @Override

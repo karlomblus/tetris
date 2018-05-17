@@ -42,7 +42,7 @@ public class TetrisGraafika {
                     tetromino.tick();
                     if (tetromino.isDrawingAllowed()) {
                         tetromino.draw("singleplayer");
-                        if (tetromino.getDrawingTurns() == 0){
+                        if (tetromino.getDrawingTurns() == 0) {
                             System.out.println("FINISHED DRAWING");
                         }
                     }

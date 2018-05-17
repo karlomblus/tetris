@@ -13,11 +13,11 @@ public class PrivateChat {
     private TextField writeArea;
     private Klient client;
     TextArea messagearea = new TextArea();
-    private final int width =  140;
+    private final int width = 140;
     VBox chatArea = new VBox();
 
 
-    public PrivateChat(Klient client){
+    public PrivateChat(Klient client) {
         this.client = client;
         chatWindow = messagearea;
         //muudan aknad mitteklikitavaks
@@ -71,7 +71,8 @@ public class PrivateChat {
     public TextArea getMessagearea() {
         return messagearea;
     }
-    public void keyPressSendingFailed(){
+
+    public void keyPressSendingFailed() {
         messagearea.appendText("Socket closed. Keypress sending failed!");
     }
 

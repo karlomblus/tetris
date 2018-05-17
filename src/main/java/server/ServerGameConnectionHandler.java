@@ -1,5 +1,7 @@
 package server;
 
+import chati_leiutis.MessageID;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -88,7 +90,7 @@ public class ServerGameConnectionHandler implements Runnable {
                         break;
                     case 11:
                         sendGameLog(dis.readInt());
-                        break;                        
+                        break;
                     case 101:
                         receiveGamerMove(dis.readInt(), dis.readChar());
                         break;
@@ -136,7 +138,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 ServerMain.debug("ei leidnud mängu");
                 return;
             }
-            dos.writeInt(11);
+            dos.writeInt(MessageID.GETREPLAYDATA);
             dos.writeInt(Integer.parseInt(andmebaasist[0])); // mangu id
             dos.writeInt(Integer.parseInt(andmebaasist[1])); // player 1 ID
             dos.writeUTF(andmebaasist[2]); // player 1 name
@@ -210,7 +212,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
             if (result > 0) {
                 // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
-                dos.writeInt(1);
+                dos.writeInt(MessageID.REGISTRATION);
                 dos.writeUTF("OK, kasutaja loodud, Ingo tahab, et logiksid eraldi sisse");
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " loodud.");
                 //userid = result;
@@ -228,7 +230,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
     private void doLogin(DataOutputStream dos, String username, String password) throws Exception {
         synchronized (dos) {
-            dos.writeInt(2);
+            dos.writeInt(MessageID.LOGIN);
             if (username == null || username.length() < 2) {
                 dos.writeInt(-1);
                 dos.writeUTF("Kasutajanimi liiga lühike");

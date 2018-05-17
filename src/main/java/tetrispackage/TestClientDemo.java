@@ -1,5 +1,7 @@
 package tetrispackage;
 
+import chati_leiutis.MessageID;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
@@ -14,14 +16,14 @@ public class TestClientDemo {
 
 
             System.out.println("Logime sisse õige parooliga");
-            dos.writeInt(2);
+            dos.writeInt(MessageID.LOGIN);
             dos.writeUTF("UusUsername");
             dos.writeUTF("UusParool");
             loesisendit(dis);
 
 
             dos.writeInt(104);  // küsime vaadata mängu 3
-            dos.writeInt(3);
+            dos.writeInt(MessageID.USERLIST);
 
 /*
             Thread.sleep(5000);
@@ -70,12 +72,11 @@ public class TestClientDemo {
             }
 
 
-
             Thread.sleep(20000); // ootame serveri vastuse ära enne kui toru maha viskame; ei ole hea viis
             loesisendit(dis); // väga halb lahendus, hetkel kiiruga/demoks
 
             System.out.println("Ütleme viisakalt bye");
-            dos.writeInt(4);
+            dos.writeInt(MessageID.LOGOUT);
 
         } finally {
             socket.close();
@@ -100,22 +101,22 @@ public class TestClientDemo {
                     System.out.println("Userlist: uid: " + dis.readInt() + ", name: " + dis.readUTF());
                     break;
                 case 5:
-                    System.out.println("Chatmessage: uid "+dis.readInt()+", user: " + dis.readUTF() + ", message: " + dis.readUTF());
+                    System.out.println("Chatmessage: uid " + dis.readInt() + ", user: " + dis.readUTF() + ", message: " + dis.readUTF());
                     break;
                 case 6:
                     System.out.println("Running games: id: " + dis.readInt() + ", players: " + dis.readUTF() + " ja " + dis.readUTF());
                     break;
                 case 7:
-                    System.out.println("Sain kutse: id: " + dis.readInt() + ", name: " + dis.readUTF() );
+                    System.out.println("Sain kutse: id: " + dis.readInt() + ", name: " + dis.readUTF());
                     break;
                 case 8:
-                    System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt() );
+                    System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt());
                     break;
                 case 100:
-                    System.out.println("server tegi tiks: " + dis.readInt()  );
+                    System.out.println("server tegi tiks: " + dis.readInt());
                     break;
                 case 104:
-                    System.out.println("server andis mängulogi mängule: " + dis.readInt()  );
+                    System.out.println("server andis mängulogi mängule: " + dis.readInt());
                     System.out.println("user1: " + dis.readInt() + " " + dis.readUTF());
                     System.out.println("user2: " + dis.readInt() + " " + dis.readUTF());
                     System.out.println("logi: " + dis.readUTF());

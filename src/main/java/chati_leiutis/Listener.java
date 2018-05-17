@@ -3,8 +3,9 @@ package chati_leiutis;
 import javafx.application.Platform;
 import javafx.util.Duration;
 
+import static chati_leiutis.MessageID.*;
+
 import java.io.DataInputStream;
-import java.io.EOFException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
@@ -35,7 +36,7 @@ public class Listener extends Thread {
 
     public void handleIncomingInput(Integer type) throws Exception {
         switch (type) {
-            case 1:
+            case REGISTRATION:
                 //registreerumise vastus: 1 -- OK, -1 == error
                 int registrationreturnmessage = in.readInt();
                 String regerrormessage = in.readUTF();
@@ -43,7 +44,7 @@ public class Listener extends Thread {
                 System.out.println(registrationreturnmessage);
                 //todo teha midagi nende vastustega
                 break;
-            case 2:
+            case LOGIN:
                 try {
                     //sisselogimise vastus: 1 -- OK, -1 == error
                     int loginreturnmessage = in.readInt();
@@ -63,7 +64,7 @@ public class Listener extends Thread {
                     tologinornot.put(0);
                     break;
                 }
-            case 3:
+            case USERLIST:
                 //keegi tuli chatti juurde?
                 int newuser_id = in.readInt();
                 System.out.println(newuser_id);
@@ -73,27 +74,27 @@ public class Listener extends Thread {
 
                 break;
             //todo panna need nimed listi, neid kasutada etc.
-            case 4:
+            case LOGOUT:
                 //keegi lahkus lobbist
                 int goneuser_id = in.readInt();
                 String goneuser_name = in.readUTF();
                 Platform.runLater(() -> client.handleUserList(4, goneuser_id, goneuser_name));
 
                 break;
-            case 5:
+            case SENDMESSAGE:
                 int sentuserID = in.readInt();
                 String sentusername = in.readUTF();
                 String sentmessage = in.readUTF();
                 client.recieveMessage(sentuserID, sentusername, sentmessage);
                 break;
-            case 6:
+            case GETRUNNINGGAMES:
                 //saan käimas olevad mängud
                 int gameID = in.readInt();
                 String username1 = in.readUTF();
                 String username2 = in.readUTF();
                 break;
             //todo teha midagi, panna listi etc...
-            case 7:
+            case SENDCHALLENGE:
                 //tulev challenge
                 int challengerID = in.readInt();
                 String challengerName = in.readUTF();
@@ -102,7 +103,7 @@ public class Listener extends Thread {
                 client.getGamenotificationsound().play();
                 Platform.runLater(() -> client.showIncomingChallengeWindow(challengerID, challengerName));
                 break;
-            case 8:
+            case CHALLENGERESPONSE:
                 int OpponentID = in.readInt();
                 int startinggameID = in.readInt();
                 if (!client.isMpgameopen()) {
@@ -113,7 +114,7 @@ public class Listener extends Thread {
                 //võeti challenge vastu
 
                 break;
-            case 9:
+            case CHALLENGEREFUSE:
                 //todo kui vastane keeldub kutsest
                 in.readInt();
                 String message = in.readUTF();
@@ -147,10 +148,9 @@ public class Listener extends Thread {
             case 103:
                 int kellele = in.readInt();
                 char klots = in.readChar();
-                if (kellele == client.getMultiplayerGame().getOpponentID()){
+                if (kellele == client.getMultiplayerGame().getOpponentID()) {
                     System.out.println("Opponent got random Tetro " + String.valueOf(klots));
-                }
-                else {
+                } else {
                     System.out.println("I got random tetro " + String.valueOf(klots));
                 }
                 if (client.getMultiplayerGame().getOpponentID() == kellele) {
@@ -178,8 +178,7 @@ public class Listener extends Thread {
                 cont = false;
                 client.getEkraan().appendText("Disconnected... please restart to reconnect.");
                 client.getKonsool().setDisable(true);
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }

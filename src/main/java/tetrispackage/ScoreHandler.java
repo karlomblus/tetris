@@ -9,24 +9,28 @@ public class ScoreHandler {
     private Text myScoreText = new Text("");
     private Text opponentScoreText = new Text("");
 
-    public ScoreHandler(Tetromino myTetro){
+    public ScoreHandler(Tetromino myTetro) {
         addMyScoreUpdator(myTetro);
     }
-    public ScoreHandler(Tetromino myTetro, Tetromino opponentTetro){
+
+    public ScoreHandler(Tetromino myTetro, Tetromino opponentTetro) {
         this(myTetro);
         addOpponentScoreUpdator(opponentTetro);
     }
+
     public VBox getScoreArea() {
         return scoreArea;
     }
-    private void addMyScoreUpdator(Tetromino tetro){
+
+    private void addMyScoreUpdator(Tetromino tetro) {
         scoreArea.getChildren().add(myScoreText);
         myScoreText.textProperty().setValue("My score: " + tetro.getRowsCleared().getValue().toString());
         tetro.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
             myScoreText.textProperty().setValue("My score: " + newVal.toString());
         });
     }
-    private void addOpponentScoreUpdator(Tetromino tetro){
+
+    private void addOpponentScoreUpdator(Tetromino tetro) {
         scoreArea.getChildren().add(opponentScoreText);
         opponentScoreText.textProperty().setValue("Opponent score: " + tetro.getRowsCleared().getValue().toString());
         tetro.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {

@@ -1,5 +1,7 @@
 package chati_leiutis;
 
+import static chati_leiutis.MessageID.*;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -26,7 +28,6 @@ import tetrispackage.TetrisReplay;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.URISyntaxException;
@@ -77,6 +78,7 @@ public class Klient extends Application {
     public boolean isMpgameopen() {
         return mpgameopen;
     }
+
     public void setMpgameopen(boolean mpgameopen) {
         this.mpgameopen = mpgameopen;
     }
@@ -112,7 +114,7 @@ public class Klient extends Application {
         registernupp.setOnMouseClicked((event) -> {
             try {
                 //registreering
-                sendSomething(1);
+                sendSomething(REGISTRATION);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -173,7 +175,7 @@ public class Klient extends Application {
                 if (connection == null || connection.isClosed()) {
                     errorlabel.setText("Error, connection error. Please restart.");
                 } else {
-                    sendSomething(2);
+                    sendSomething(LOGIN);
                     //sätin cliendi siseseks nimeks proovitud nime
                     nimi = loginnamefield.getText();
                     int loginvastus = toLoginorNot.take();
@@ -241,7 +243,7 @@ public class Klient extends Application {
                 loggedIN = false;
                 lobbyOpen = false;
                 try {
-                    sendSomething(4);
+                    sendSomething(LOGOUT);
 
                     //connecter.getOut().close();
                 } catch (Exception e) {
@@ -270,7 +272,7 @@ public class Klient extends Application {
         messagearea.setPromptText("Messages...");
 
         //panen userid paika
-        sendSomething(3);
+        sendSomething(USERLIST);
 
         //siia panene kõik chati teksti
         TextField messagefield = new TextField();
@@ -336,7 +338,7 @@ public class Klient extends Application {
             @Override
             public void handle(MouseEvent event) {
                 try {
-                    sendSomething(5);
+                    sendSomething(SENDMESSAGE);
                 } catch (Exception e2) {
                     throw new RuntimeException(e2);
                 }
@@ -348,12 +350,12 @@ public class Klient extends Application {
                 //kui kirjutame logout, siis logime välja
                 try {
                     if (messagefield.getText().equals("logout")) {
-                        sendSomething(4);
+                        sendSomething(LOGOUT);
                         messagefield.clear();
                         ekraan.appendText("You have been disconnected...");
                         loggedIN = false;
                     } else
-                        sendSomething(5);
+                        sendSomething(SENDMESSAGE);
                 } catch (Exception e3) {
                     throw new RuntimeException(e3);
                 }
@@ -401,7 +403,7 @@ public class Klient extends Application {
 
         acceptbutton.setOnMouseClicked((event) -> {
             try {
-                out.writeInt(7);
+                out.writeInt(SENDCHALLENGE);
                 out.writeInt(ID);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -411,8 +413,8 @@ public class Klient extends Application {
 
         declinebutton.setOnMouseClicked((event) -> {
             try {
-                sendSomething(9);
-                out.writeInt(9);
+                sendSomething(CHALLENGEREFUSE);
+                out.writeInt(CHALLENGEREFUSE);
                 out.writeInt(ID);
                 challengeOpen = false;
             } catch (IOException e) {
@@ -429,7 +431,7 @@ public class Klient extends Application {
             public void handle(WindowEvent we) {
                 if (challengeOpen) {
                     try {
-                        out.writeInt(9);
+                        out.writeInt(CHALLENGEREFUSE);
                         out.writeInt(ID);
                         //connecter.getOut().close();
                     } catch (IOException e) {
@@ -451,7 +453,7 @@ public class Klient extends Application {
                 OpenChallengeWindow challenge = new OpenChallengeWindow(inchallengewindow);
                 challengewindow = challenge;
                 challenge.start(inchallengewindow, selectedUserName, self);
-                sendSomething(7);
+                sendSomething(SENDCHALLENGE);
             }
         } catch (Exception e2) {
             throw new RuntimeException(e2);
@@ -505,35 +507,35 @@ public class Klient extends Application {
             System.out.println("Saatsin " + type);
             //vastavalt prokokollile:
             switch (type) {
-                case 1:
+                case REGISTRATION:
                     out.writeInt(type);
                     String regname = regnamefield.getText();
                     String regpass = regpasswordfield.getText();
                     logIn_or_Register(regname, regpass);
                     break;
-                case 2:
+                case LOGIN:
                     out.writeInt(type);
                     String loginname = loginnamefield.getText();
                     String loginpass = loginpasswordfield.getText();
                     logIn_or_Register(loginname, loginpass);
                     break;
-                case 3:
+                case USERLIST:
                     out.writeInt(type);
                     //jääme ootama userlisti
                     break;
-                case 4:
+                case LOGOUT:
                     out.writeInt(type);
                     //väljalogimine
                     break;
-                case 5:
+                case SENDMESSAGE:
                     out.writeInt(type);
                     sendAndClearField(konsool);
                     break;
-                case 6:
+                case GETRUNNINGGAMES:
                     out.writeInt(type);
                     //ootame tagasi käivate mängude listi
                     break;
-                case 7:
+                case SENDCHALLENGE:
                     out.writeInt(type);
                     String challengeeName = userListView.getSelectionModel().getSelectedItem();
                     out.writeInt(name_2_ID.get(challengeeName));
@@ -590,12 +592,12 @@ public class Klient extends Application {
     public void handleUserList(Integer type, Integer ID, String name) {
         if (loggedIN) {
             switch (type) {
-                case 3:
+                case USERLIST:
                     online_users.put(ID, name);
                     name_2_ID.put(name, ID);
                     // userListView.refresh();
                     break;
-                case 4:
+                case LOGOUT:
                     online_users.remove(ID, name);
                     name_2_ID.remove(name, ID);
                     // userListView.refresh();

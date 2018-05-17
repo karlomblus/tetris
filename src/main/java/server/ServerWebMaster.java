@@ -32,14 +32,14 @@ public class ServerWebMaster implements Runnable {
             while (true) {
                 // wait for an incoming connection
                 Socket websocket = gameServerSocket.accept();
-                ServerMain.debug(8,"tuli ühendus webserverisse");
+                ServerMain.debug(8, "tuli ühendus webserverisse");
 
                 socketid.add(websocket);
 
                 // kontrollime, et kõik threadid oleks elus
                 for (int i = 0; i < threade; i++) {
                     if (!threadid[i].isAlive()) {
-                        ServerMain.debug(3,"webserver thread oli maha surnud, elustame");
+                        ServerMain.debug(3, "webserver thread oli maha surnud, elustame");
                         threadid[i] = new Thread(new ServerWebThread(socketid));
                         threadid[i].start();
                     }

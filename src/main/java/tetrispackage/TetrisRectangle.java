@@ -10,7 +10,7 @@ public class TetrisRectangle {
     private final int mitukuubikutPikkuses = TetrisGraafika.getResoHeight() / ruuduSuurus;
     private Rectangle ristkülik[][] = new Rectangle[mitukuubikutPikkuses][mitukuubikutLaiuses];
 
-    void fill (Group area){
+    void fill(Group area) {
         for (int i = 0; i < mitukuubikutPikkuses; i++) {
             for (int j = 0; j < mitukuubikutLaiuses; j++) {
                 ristkülik[i][j] = new Rectangle(j * ruuduSuurus, i * ruuduSuurus, ruuduSuurus, ruuduSuurus);

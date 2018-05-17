@@ -33,8 +33,9 @@ public class ServerPasswordCrypto {
         for (int i = 0; i < 22; i++) {
             returnValue.append(ALPHABET.charAt(RANDOM.nextInt(ALPHABET.length())));
         }
-        return generateSecurePassword(password,new String(returnValue));
+        return generateSecurePassword(password, new String(returnValue));
     }
+
     private static String generateSecurePassword(String password, String salt) {
         String returnValue = null;
         byte[] securePassword = hash(password.toCharArray(), salt.getBytes());
@@ -44,7 +45,7 @@ public class ServerPasswordCrypto {
 
     public static boolean verifyUserPassword(String providedPassword, String securedPassword) {
         boolean returnValue = false;
-        String[] pieces = securedPassword.split("\\.",2);
+        String[] pieces = securedPassword.split("\\.", 2);
         String newSecurePassword = generateSecurePassword(providedPassword, pieces[0]);
         returnValue = newSecurePassword.equalsIgnoreCase(securedPassword);
         return returnValue;
