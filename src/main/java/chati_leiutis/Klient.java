@@ -37,9 +37,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 public class Klient extends Application {
-    Klient self;
-    private Integer laius;
-    private Integer kõrgus;
+    private Klient self;
     private String nimi;
     private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
     private boolean challengeOpen = false;
@@ -56,8 +54,9 @@ public class Klient extends Application {
     private ListView<String> userListView = new ListView<>();
     private ListView<String> replayListView = new ListView<>();
     private TextField konsool;
-    private PasswordField loginpasswordfield;
-    private TextField loginnamefield;
+    private LoginWindow login;
+    //private PasswordField loginpasswordfield;
+    //private TextField loginnamefield;
     private PasswordField regpasswordfield;
     private TextField regnamefield;
     private TetrisGraafikaMultiplayer multiplayerGame;
@@ -65,6 +64,18 @@ public class Klient extends Application {
     //kompaktne soundifaili saamine
     private MediaPlayer chatsound;
     private MediaPlayer gamenotificationsound;
+
+    public void setLoggedIN(boolean loggedIN) {
+        this.loggedIN = loggedIN;
+    }
+
+    public boolean isLoggedIN() {
+        return loggedIN;
+    }
+
+    public Socket getConnection() {
+        return connection;
+    }
 
     public String getNimi() {
         return nimi;
@@ -74,6 +85,9 @@ public class Klient extends Application {
         return multiplayerGame;
     }
 
+    public void setLogin(LoginWindow login) {
+        this.login = login;
+    }
 
     public boolean isMpgameopen() {
         return mpgameopen;
@@ -128,7 +142,11 @@ public class Klient extends Application {
         newStage.show();
     }
 
-    public void showLogIn() {
+    public void showLogIn(Stage stage) {
+
+        LoginWindow login = new LoginWindow(stage);
+        login.start(stage,self);
+        /*
         Stage newStage = new Stage();
 
         BorderPane border = new BorderPane();
@@ -228,13 +246,14 @@ public class Klient extends Application {
 
         newStage.setScene(stageScene);
         newStage.showAndWait();
+        */
     }
 
     public void showLobby() throws Exception {
 
         //säti suurus
-        laius = 700;
-        kõrgus = 600;
+        Integer laius = 700;
+        Integer kõrgus = 600;
         Stage primaryStage = new Stage();
 
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -515,8 +534,8 @@ public class Klient extends Application {
                     break;
                 case LOGIN:
                     out.writeInt(type);
-                    String loginname = loginnamefield.getText();
-                    String loginpass = loginpasswordfield.getText();
+                    String loginname = login.getLoginnamefield().getText();
+                    String loginpass = login.getLoginpasswordfield().getText();
                     logIn_or_Register(loginname, loginpass);
                     break;
                 case USERLIST:
@@ -665,7 +684,7 @@ public class Klient extends Application {
             loggedIN = true;
 
             //näitame loginekraani
-            showLogIn();
+            showLogIn(primaryStage);
             if (loggedIN) {
                 lobbyOpen = true;
                 showLobby();
@@ -673,7 +692,7 @@ public class Klient extends Application {
         } catch (Exception e) {
             System.out.println("Error connecting to server.");
             loggedIN = false;
-            showLogIn();
+            showLogIn(primaryStage);
         }
     }
 
