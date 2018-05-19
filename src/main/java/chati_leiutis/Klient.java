@@ -144,7 +144,7 @@ public class Klient extends Application {
 
     public void showLogIn(Stage stage) {
 
-        LoginWindow login = new LoginWindow(stage);
+        LoginWindow login = new LoginWindow(stage,toLoginorNot);
         login.start(stage,self);
         /*
         Stage newStage = new Stage();
@@ -690,6 +690,7 @@ public class Klient extends Application {
                 showLobby();
             }
         } catch (Exception e) {
+            System.out.println(e);
             System.out.println("Error connecting to server.");
             loggedIN = false;
             showLogIn(primaryStage);

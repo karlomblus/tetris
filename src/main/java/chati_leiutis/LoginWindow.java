@@ -24,11 +24,12 @@ import static chati_leiutis.MessageID.LOGIN;
 public class LoginWindow {
     private PasswordField loginpasswordfield;
     private TextField loginnamefield;
-    private BlockingQueue<Integer> toLoginorNot = new ArrayBlockingQueue<>(5);
+    private BlockingQueue<Integer> toLoginorNot;
     Stage lava;
 
-    public LoginWindow(Stage stage) {
+    public LoginWindow(Stage stage,BlockingQueue toLoginorNot) {
         this.lava = stage;
+        this.toLoginorNot = toLoginorNot;
     }
 
     public PasswordField getLoginpasswordfield() {
