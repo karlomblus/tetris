@@ -43,7 +43,8 @@ i: int   s: string  c: char  Käsu numbril loetavuse huvides i: eest ära jäetu
 < 102 i: userid                    # teine pool lahkus
 > 103                              # klient küsib uue klotsi (endale)
 < 103  i: kellele c: klots         # server annab klotsi (saadab kõigile)   {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
-
+> 104                              # klient tunnistab oma kaotust
+< 104 i: kellelt                   # teine pool tunnistas oma kaotust
 < 105 i: kellelt s: username  s: chatmessage    # teine mängija ütles midagi
 > 105 i: kellele s: chatmessage                 # mängija ütleb midagi
 
