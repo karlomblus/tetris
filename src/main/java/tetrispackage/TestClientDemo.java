@@ -28,7 +28,7 @@ public class TestClientDemo {
 
 
 //            dos.writeInt(104);  // küsime vaadata mängu 3
-  //          dos.writeInt(MessageID.USERLIST);
+            //          dos.writeInt(MessageID.USERLIST);
 
 /*
             Thread.sleep(5000);

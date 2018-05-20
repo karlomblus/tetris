@@ -89,7 +89,7 @@ public class ServerGameConnectionHandler implements Runnable {
                         rejectInviteToGame(dis.readInt());
                         break;
                     case 10:
-                        sandGameslist(dis.readInt(),dis.readInt());
+                        sandGameslist(dis.readInt(), dis.readInt());
                         break;
                     case 11:
                         sendGameLog(dis.readInt());
@@ -138,7 +138,7 @@ public class ServerGameConnectionHandler implements Runnable {
         //todo: kas siin peaks selle teadmisega veel midagi peale hakkama
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() != this.userid) {
-                DataOutputStream dos2=player.getDos();
+                DataOutputStream dos2 = player.getDos();
                 synchronized (dos2) {
                     dos2.writeInt(104);
                     dos2.writeInt(this.userid);
@@ -165,7 +165,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
                 // iterate through the java resultset
                 while (rs.next()) {
-                    logi.append(rs.getString("manguid") + "," + rs.getString("started") + "," + rs.getString("player1id") + "," + rs.getString("player2id")+ "," + rs.getString("player1name") + "," + rs.getString("player2name") + "\n");
+                    logi.append(rs.getString("manguid") + "," + rs.getString("started") + "," + rs.getString("player1id") + "," + rs.getString("player2id") + "," + rs.getString("player1name") + "," + rs.getString("player2name") + "\n");
                 }
 
             } finally {

@@ -72,16 +72,16 @@ public class ServerGameData {
 
     public void sendNewTetromino(int kellele) {
         ServerMain.debug(7, "sendNewTetromino: id " + kellele + " tellis uue tetromino");
-         char randomTetromino;
+        char randomTetromino;
 
         if (klotsijada.get(kellele).size() > 0) { // meil on selle useri jaoks juba random olemas
-             randomTetromino = klotsijada.get(kellele).get(0);
+            randomTetromino = klotsijada.get(kellele).get(0);
             klotsijada.get(kellele).remove(0);
             System.out.println("tetromino listist: " + randomTetromino);
         } else { // sel useril pole enam klotse
             char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
             Random rand = new Random();
-             randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+            randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
             System.out.println("tetromino uus: " + randomTetromino);
             // lisame loodud random klotsi ka kõigile teistele (eeldusel, et neid on kunagi rohkem kui 1)
             for (Map.Entry<Integer, List<Character>> integerListEntry : klotsijada.entrySet()) {
@@ -90,8 +90,6 @@ public class ServerGameData {
                 }
             }
         }
-
-
 
 
         sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,?,?,? )", String.valueOf(gameid), String.valueOf(System.currentTimeMillis()), String.valueOf(kellele), String.valueOf(tickid), String.valueOf(randomTetromino));
