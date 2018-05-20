@@ -103,6 +103,9 @@ public class ServerGameConnectionHandler implements Runnable {
                     case 103:
                         game.sendNewTetromino(userid);
                         break;
+                    case 104:
+                        playerAcknowledgeHisDefeat();
+                        break;
                     case 105:
                         privateChatmessage(dis.readInt(), dis.readUTF());
                         break;
@@ -130,6 +133,19 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
     } // run()
+
+    private void playerAcknowledgeHisDefeat() throws Exception {
+        //todo: kas siin peaks selle teadmisega veel midagi peale hakkama
+        for (ServerGameConnectionHandler player : players) {
+            if (player.getUserid() != this.userid) {
+                DataOutputStream dos2=player.getDos();
+                synchronized (dos2) {
+                    dos2.writeInt(104);
+                    dos2.writeInt(this.userid);
+                } // sync2
+            }
+        }
+    }
 
     private void sandGameslist(int alates, int mitu) throws Exception {
         synchronized (dos) {
