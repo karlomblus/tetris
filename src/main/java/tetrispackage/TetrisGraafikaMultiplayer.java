@@ -197,7 +197,9 @@ public class TetrisGraafikaMultiplayer {
                     randomTetroRequestSent = 0;
                 }
             }
-
+        }
+        else{
+            client.sendSomething(104);
         }
     }
 
