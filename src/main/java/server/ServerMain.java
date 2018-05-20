@@ -1,5 +1,6 @@
 package server;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -66,7 +67,8 @@ public class ServerMain {
 
     public static void logtofile(String msg) {
         try {
-            Files.write(Paths.get("debuglog.txt"), msg.getBytes(), StandardOpenOption.APPEND);
+            java.nio.file.Path path = Paths.get("debuglog.txt");
+            Files.write(path, msg.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             //damn, ma ei lenda õhku kui ei suuda faili kirjutada
             System.out.println("DEBUG FILE WRITE ERRROR");

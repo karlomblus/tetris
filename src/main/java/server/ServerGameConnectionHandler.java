@@ -383,7 +383,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
         }
 
-        
+
     } // getUserList
 
 
