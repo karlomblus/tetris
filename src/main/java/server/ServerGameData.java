@@ -72,14 +72,15 @@ public class ServerGameData {
 
     public void sendNewTetromino(int kellele) {
 
+        char randomTetromino;
 
         if (klotsijada.get(kellele).size() > 0) { // meil on selle useri jaoks juba random olemas
-            char randomTetromino = klotsijada.get(kellele).get(0);
+             randomTetromino = klotsijada.get(kellele).get(0);
             klotsijada.get(kellele).remove(0);
         } else { // sel useril pole enam klotse
             char[] possibleTetrominos = {'I', 'O', 'Z', 'S', 'T', 'J', 'L'};
             Random rand = new Random();
-            char randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
+             randomTetromino = possibleTetrominos[rand.nextInt(possibleTetrominos.length)];
             // lisame loodud random klotsi ka kõigile teistele (eeldusel, et neid on kunagi rohkem kui 1)
             for (Map.Entry<Integer, List<Character>> integerListEntry : klotsijada.entrySet()) {
                 if (integerListEntry.getKey() != kellele) {
