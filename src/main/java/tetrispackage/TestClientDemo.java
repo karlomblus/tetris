@@ -26,21 +26,18 @@ public class TestClientDemo {
             // dos.writeInt(0);
             // dos.writeInt(10);
 
-<<<<<<< HEAD
+
             dos.writeInt(11);  // küsime vaadata mängu 3
             dos.writeInt(3);
-=======
 
-//            dos.writeInt(104);  // küsime vaadata mängu 3
-            //          dos.writeInt(MessageID.USERLIST);
->>>>>>> 66f8419dd55c0a847f57cd7503dad307cd64845a
 
-/*
+
             Thread.sleep(5000);
             loesisendit(dis);
             loesisendit(dis);
             loesisendit(dis);
             loesisendit(dis);
+            /*
             System.out.println("saadame 2-le kutse");
             dos.writeInt(7); // saadame 2-l kutse
             dos.writeInt(2);
