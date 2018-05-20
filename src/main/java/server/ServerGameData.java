@@ -113,6 +113,7 @@ public class ServerGameData {
 
 
     public void removeUserFromGame(ServerGameConnectionHandler removeUser) {
+        ServerMain.debug("Kasutaja saatis 102 ja lahkum mängust: " + removeUser.getUsername());
         players.remove(removeUser);
         removeUser.setOpponentID(0);
         // ütleme teistele, et ta läks minema
