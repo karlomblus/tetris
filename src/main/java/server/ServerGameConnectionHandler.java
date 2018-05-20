@@ -8,7 +8,9 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 public class ServerGameConnectionHandler implements Runnable {
@@ -89,7 +91,7 @@ public class ServerGameConnectionHandler implements Runnable {
                         rejectInviteToGame(dis.readInt());
                         break;
                     case 10:
-                        sandGameslist(dis.readInt(),dis.readInt());
+                        sandGameslist(dis.readInt(), dis.readInt());
                         break;
                     case 11:
                         sendGameLog(dis.readInt());
@@ -135,13 +137,21 @@ public class ServerGameConnectionHandler implements Runnable {
     } // run()
 
     private void playerAcknowledgeHisDefeat() throws Exception {
-        //todo: kas siin peaks selle teadmisega veel midagi peale hakkama
+
+        if (!game.isRunning()) {
+            // mäng ei käi enam (punktidele)
+            return;
+        }
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,0,?,? )", String.valueOf(this.game.getGameid()), String.valueOf(System.currentTimeMillis()), String.valueOf(this.game.getTickid()),"104");
+        game.setRunning(false); // mäng ise jääb käima, aga punkte enam ei jagata
+
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() != this.userid) {
-                DataOutputStream dos2=player.getDos();
+                DataOutputStream dos2 = player.getDos();
                 synchronized (dos2) {
                     dos2.writeInt(104);
                     dos2.writeInt(this.userid);
+                    sql.query("update users  set points=points+1 where id = ? limit 1",String.valueOf(player.getUserid()));
                 } // sync2
             }
         }
@@ -165,7 +175,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
                 // iterate through the java resultset
                 while (rs.next()) {
-                    logi.append(rs.getString("manguid") + "," + rs.getString("started") + "," + rs.getString("player1id") + "," + rs.getString("player2id")+ "," + rs.getString("player1name") + "," + rs.getString("player2name") + "\n");
+                    logi.append(rs.getString("manguid") + "," + rs.getString("started") + "," + rs.getString("player1id") + "," + rs.getString("player2id") + "," + rs.getString("player1name") + "," + rs.getString("player2name") + "\n");
                 }
 
             } finally {
@@ -446,6 +456,10 @@ public class ServerGameConnectionHandler implements Runnable {
         return invitedUID;
     }
 
+    public void setInvitedUID(int invitedUID) {
+        this.invitedUID = invitedUID;
+    }
+
     public void setOpponentID(int opponentID) {
         this.opponentID = opponentID;
     }
@@ -553,7 +567,6 @@ public class ServerGameConnectionHandler implements Runnable {
         }
     } // privateChatmessage
 
-
     private void receiveGamerMove(int tickID, char action) throws Exception {
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() == opponentID && !player.isLogin()) {
@@ -568,10 +581,6 @@ public class ServerGameConnectionHandler implements Runnable {
             }
         }
     } // receiveGamerMove
-
-    public void setInvitedUID(int invitedUID) {
-        this.invitedUID = invitedUID;
-    }
 
     public String toString() {
         return "\n" + userid + ": Nimi " + username + " " + (login ? "LOGIN" : "") + " invite: " + invitedUID + " opponent: " + opponentID;
