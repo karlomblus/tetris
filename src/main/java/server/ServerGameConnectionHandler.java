@@ -222,7 +222,7 @@ public class ServerGameConnectionHandler implements Runnable {
             try {
 
 
-                String query = "SELECT timestampms,userid,tickid,tegevus FROM mangulogi where gameid = ? order by id desc";
+                String query = "SELECT timestampms,userid,tickid,tegevus FROM mangulogi where gameid = ? order by id asc";
                 stmt = conn.prepareStatement(query);
                 stmt.setInt(1, gameid);
                 rs = stmt.executeQuery();
