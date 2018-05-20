@@ -282,7 +282,7 @@ public class ServerGameConnectionHandler implements Runnable {
             int result = sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
 
             if (result > 0) {
-                // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
+
                 dos.writeInt(MessageID.REGISTRATION);
                 dos.writeUTF("OK, kasutaja loodud, Ingo tahab, et logiksid eraldi sisse");
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " loodud.");
@@ -353,8 +353,6 @@ public class ServerGameConnectionHandler implements Runnable {
                 dos.writeUTF("Vale parool");
                 ServerMain.debug(5, "dologin: Kasutajanimi " + username + " parool on vale.");
             }
-
-            // todo: kui OK, siis salvestame sessioonitabelisse
 
 
         } // sync
