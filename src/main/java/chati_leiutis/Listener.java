@@ -122,6 +122,17 @@ public class Listener extends Thread {
                 client.challengewindow.close();
 
                 break;
+            case GETREPLAYDATA:
+                Integer mängunr = in.readInt();
+                Integer player1 = in.readInt();
+                System.out.println(player1);
+                String commandstring1 = in.readUTF();
+                System.out.println(commandstring1);
+                Integer player2 = in.readInt();
+                System.out.println(player2);
+                String commandstring2 = in.readUTF();
+                System.out.println(commandstring2);
+                break;
             case 105:
                 //sissetulev mängu chat message
                 in.readInt();

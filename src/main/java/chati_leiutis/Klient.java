@@ -50,7 +50,6 @@ public class Klient extends Application {
     private DataOutputStream out;
     private TextArea ekraan;
     private ObservableList<String> observableUsers;
-    private ObservableList<String> observableReplays;
     private ListView<String> userListView = new ListView<>();
     private ListView<String> replayListView = new ListView<>();
     private TextField konsool;
@@ -325,7 +324,11 @@ public class Klient extends Application {
         Button replaybtn = new Button("Replays");
 
         replaybtn.setOnMouseClicked((MouseEvent) -> {
-            showReplays();
+            try {
+                showReplays();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         });
 
         Button challengeButton = new Button("Challenge");
@@ -479,14 +482,16 @@ public class Klient extends Application {
         }
     }
 
-    void showReplays() {
+    void showReplays() throws IOException {
         //todo päris andmete serverilt saamine ja siis nende kasutamine
         //todo hetkel lihtsalt faken mingid andmed
+        out.writeInt(GETREPLAYDATA);
+        System.out.println("Saatsin "+GETREPLAYDATA);
         String mäng1 = "Ingo-Theodor   Duration-2651s";
         String mäng2 = "Theodor-Karl    Duration-1m23s";
         String mäng3 = "Ingo-Karl   Duration-3m55s";
 
-        observableReplays = FXCollections.observableArrayList(Arrays.asList(mäng1, mäng2, mäng3));
+        ObservableList<String> observableReplays = FXCollections.observableArrayList(Arrays.asList(mäng1, mäng2, mäng3));
         replayListView.setItems(observableReplays);
         replayListView.setPrefSize(600, 270);
 
