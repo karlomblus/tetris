@@ -138,6 +138,7 @@ public class ServerGameData {
                 synchronized (dos) {
                     if (running) {
                         sql.query("update users  set points=points+1 where id = ? limit 1",String.valueOf(player.getUserid()));
+                        ServerMain.debug(6,"Kasutaja "+ player.getUsername()+ " sai punkti");
                     }
                     dos.writeInt(102);
                     dos.writeInt(player.getUserid());

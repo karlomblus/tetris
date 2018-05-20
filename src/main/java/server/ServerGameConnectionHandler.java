@@ -152,6 +152,7 @@ public class ServerGameConnectionHandler implements Runnable {
                     dos2.writeInt(104);
                     dos2.writeInt(this.userid);
                     sql.query("update users  set points=points+1 where id = ? limit 1", String.valueOf(player.getUserid()));
+                    ServerMain.debug(6,"Kasutaja "+ player.getUsername()+ " sai punkti");
                 } // sync2
             }
         }
