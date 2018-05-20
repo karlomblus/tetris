@@ -3,20 +3,14 @@ package tetrispackage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.sql.Time;
 import java.util.*;
 
 public class TetrisGraafika {
@@ -35,16 +29,13 @@ public class TetrisGraafika {
         ScoreHandler scoreHandler = new ScoreHandler(tetromino);
         hbox.getChildren().add(tetrisArea);
         hbox.getChildren().add(scoreHandler.getScoreArea());
-        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                if (!tetromino.gameStateOver()) {
-                    tetromino.tick();
-                    if (tetromino.isDrawingAllowed()) {
-                        tetromino.draw("singleplayer");
-                        if (tetromino.getDrawingTurns() == 0) {
-                            System.out.println("FINISHED DRAWING");
-                        }
+        Timeline tickTime = new Timeline(new KeyFrame(Duration.seconds(0.2), event -> {
+            if (!tetromino.gameStateOver()) {
+                tetromino.tick();
+                if (tetromino.isDrawingAllowed()) {
+                    tetromino.draw("singleplayer");
+                    if (tetromino.getDrawingTurns() == 0) {
+                        System.out.println("FINISHED DRAWING");
                     }
                 }
             }

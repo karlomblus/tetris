@@ -49,6 +49,9 @@ public class ServerWebResponse {
                     this.contentType = "text/html; charset=UTF-8";
                 } else if (urlitykk[urlitykk.length - 1].equals("html")) {
                     this.contentType = "text/html; charset=UTF-8";
+                } else if (urlitykk[urlitykk.length - 1].equals("json")) {
+                    this.contentType = "text/html; charset=UTF-8";
+                    this.moodul = "json";
                 } else if (urlitykk[urlitykk.length - 1].equals("txt")) {
                     this.contentType = "text/plain; charset=UTF-8";
                 } else if (urlitykk[urlitykk.length - 1].equals("png")) {
@@ -98,8 +101,10 @@ public class ServerWebResponse {
         if (moodul.equals("file")) {
             sendfile();
             return;
-        }
-        if (moodul.equals("shtml")) {
+        } else if (moodul.equals("json")) {
+            sendJson();
+            return;
+        } else if (moodul.equals("shtml")) {
             sendfile();
             return;
         } // todo: parsimine teha
@@ -107,6 +112,23 @@ public class ServerWebResponse {
         // kui siia jõuame, siis ma ei tea mida must tahetakse
         senderror();
 
+    }
+
+    private void sendJson() {
+        System.out.println("json faili tahetakse: " + filename);
+
+        if (filename.equals("top10.json")) {
+            sendHeader(200, "OK");
+            String tulemus = "{\n" +
+                    "    1: {username:\"nimi\",score:55}, \r\n" +
+                    "    2: {username:\"nimi\",score:55}, \n\n" +
+                    "    3: {username:\"nimi\",score:55} \n\n" +
+                    "   }";
+            out.printf(tulemus);
+
+        } else {
+            send404();
+        }
     }
 
     private void sendfile() throws IOException {
@@ -123,13 +145,8 @@ public class ServerWebResponse {
                 return;
             }
 
-            out.printf("HTTP/1.1 200 OK\r\n");
-            out.printf("Server: Tetris scoreserver\r\n");
-            out.printf("Cache-Control: no-cache, no-store, must-revalidate\r\n");
-            out.printf("Pragma: no-cache\r\n");
-            out.printf("Connection: Close\r\n");
-            if (contentType != null) out.printf("Content-Type: " + contentType + "\r\n");
-            out.printf("\r\n");
+            sendHeader(200, "OK");
+
 
             final byte[] buffer = new byte[4096];
             for (int read = inStream.read(buffer); read >= 0; read = inStream.read(buffer))
@@ -139,21 +156,26 @@ public class ServerWebResponse {
 
     }
 
+
     private void send404() {
         ServerMain.debug(6, "WEB: 404: ei leia faili: " + rawurl);
-        out.printf("HTTP/1.1 404 File Not Found\r\n");
-        out.printf("Server: Tetris scoreserver\r\n");
-        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
-        out.printf("\r\n");
+        sendHeader(404, "File Not Found");
         out.println("<html><body>  Sorry. Faili  " + rawurl + " ei leitud<br>\n </body></html>");   // html sisus pole korrektne reavahetus vist enam oluline sest browser peaks failiga ka sel kujul hakkama saama?
     }
 
     private void senderror() {
         ServerMain.debug(6, "Weebiserver saadab vastu 400 errori");
-        out.printf("HTTP/1.1 400 bad request\r\n");
-        out.printf("Server: Tetris scoreserver\r\n");
-        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
-        out.printf("\r\n");
+        sendHeader(400, "bad reques");
         out.println("<html><body>  Kahjuks ei mõista server seda päringut <br><br>\nURL: " + rawurl + "\n<br>Moodul: " + moodul + "<br>\n </body></html>");
+    }
+
+    private void sendHeader(int code, String message) {
+        out.printf("HTTP/1.1 " + code + " " + message + "\r\n");
+        out.printf("Server: Tetris scoreserver\r\n");
+        out.printf("Cache-Control: no-cache, no-store, must-revalidate\r\n");
+        out.printf("Pragma: no-cache\r\n");
+        out.printf("Connection: Close\r\n");
+        if (contentType != null) out.printf("Content-Type: " + contentType + "\r\n");
+        out.printf("\r\n");
     }
 }

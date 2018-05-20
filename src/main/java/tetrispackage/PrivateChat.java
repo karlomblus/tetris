@@ -60,8 +60,12 @@ public class PrivateChat {
     }
 
     public void opponentLeft() {
-        chatWindow.appendText("--------------- " + "\n" + "Your opponent has left the game, closing after 5 seconds...");
+        chatWindow.appendText("--------------- " + "\n" + "Your opponent has left the game. So that means you won! You can continue playing...");
         //todo sulgemine pärast ootamist?
+    }
+
+    public void opponentSurrender() {
+        chatWindow.appendText("--------------- " + "\n" + "Your opponent has surrendered. So that means you won! You can continue playing...");
     }
 
     public VBox getChatArea() {
