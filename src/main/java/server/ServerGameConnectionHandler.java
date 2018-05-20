@@ -450,7 +450,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 dos.writeInt(mang.getGameid());
                 if (mang.getPlayers().get(0) != null) dos.writeUTF(mang.getPlayers().get(0).username);
                 if (mang.getPlayers().size() > 1) {
-                    dos.writeUTF(mang.getPlayers().get(0).username);
+                    dos.writeUTF(mang.getPlayers().get(1).username);
                 } else dos.writeUTF(""); // pole teist mängijat selles mängus enam
             }
         } // sync
