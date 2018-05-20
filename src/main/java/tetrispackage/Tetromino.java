@@ -119,8 +119,6 @@ public class Tetromino {
             }
         }
         if (isFilled == true) {
-            // System.out.println("Filled row found!AAAAAAAAAAAAAAAAAAAAAA");
-            //System.out.println("Filled row: " + filledRowNumber);
             for (int i = 0; i < ruudud[0].length; i++) {
                 setRectStatusAt(filledRowNumber, i, 'B');
             }

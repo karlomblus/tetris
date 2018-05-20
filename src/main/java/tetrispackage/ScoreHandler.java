@@ -1,6 +1,5 @@
 package tetrispackage;
 
-import javafx.beans.value.ChangeListener;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
@@ -25,7 +24,7 @@ public class ScoreHandler {
     private void addMyScoreUpdator(Tetromino tetro) {
         scoreArea.getChildren().add(myScoreText);
         myScoreText.textProperty().setValue("My score: " + tetro.getRowsCleared().getValue().toString());
-        tetro.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
+        tetro.getRowsCleared().addListener((o, oldVal, newVal) -> {
             myScoreText.textProperty().setValue("My score: " + newVal.toString());
         });
     }
@@ -33,7 +32,7 @@ public class ScoreHandler {
     private void addOpponentScoreUpdator(Tetromino tetro) {
         scoreArea.getChildren().add(opponentScoreText);
         opponentScoreText.textProperty().setValue("Opponent score: " + tetro.getRowsCleared().getValue().toString());
-        tetro.getRowsCleared().addListener((ChangeListener) (o, oldVal, newVal) -> {
+        tetro.getRowsCleared().addListener((o, oldVal, newVal) -> {
             opponentScoreText.textProperty().setValue("Opponent score: " + newVal.toString());
         });
     }

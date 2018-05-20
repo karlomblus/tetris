@@ -10,7 +10,7 @@ public class TestClientDemo {
     public static void main(String[] args) throws Exception {
 
         System.out.println("Ühendume serveriga");
-        Socket socket = new Socket("127.0.0.1", 54321);
+        Socket socket = new Socket("tetris.carlnet.ee", 54321);
         try (DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
              DataInputStream dis = new DataInputStream(socket.getInputStream())) {
 
@@ -22,8 +22,13 @@ public class TestClientDemo {
             loesisendit(dis);
 
 
-            dos.writeInt(104);  // küsime vaadata mängu 3
-            dos.writeInt(MessageID.USERLIST);
+            dos.writeInt(10);  // küsime vaadata 10-t viimat mängu
+            dos.writeInt(0);
+            dos.writeInt(10);
+
+
+//            dos.writeInt(104);  // küsime vaadata mängu 3
+  //          dos.writeInt(MessageID.USERLIST);
 
 /*
             Thread.sleep(5000);
@@ -111,6 +116,9 @@ public class TestClientDemo {
                     break;
                 case 8:
                     System.out.println("algas mäng useriga: " + dis.readInt() + ", gameid: " + dis.readInt());
+                    break;
+                case 10:
+                    System.out.println("mängulogi: " + dis.readUTF());
                     break;
                 case 100:
                     System.out.println("server tegi tiks: " + dis.readInt());
