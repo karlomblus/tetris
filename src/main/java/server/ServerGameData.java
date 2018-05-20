@@ -44,6 +44,9 @@ public class ServerGameData {
 
     } // start
 
+    public List<ServerGameConnectionHandler> getPlayers() {
+        return players;
+    }
 
     public boolean isRunning() {
         return running;

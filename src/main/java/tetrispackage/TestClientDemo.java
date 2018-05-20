@@ -27,9 +27,10 @@ public class TestClientDemo {
             // dos.writeInt(10);
 
 
-            dos.writeInt(11);  // küsime vaadata mängu 3
-            dos.writeInt(3);
+            //dos.writeInt(11);  // küsime vaadata mängu 3
+            //dos.writeInt(3);
 
+            dos.writeInt(6); // get  running games
 
 
             Thread.sleep(5000);

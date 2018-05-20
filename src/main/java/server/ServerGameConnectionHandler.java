@@ -11,7 +11,9 @@ import java.net.SocketException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ServerGameConnectionHandler implements Runnable {
 
@@ -152,7 +154,7 @@ public class ServerGameConnectionHandler implements Runnable {
                     dos2.writeInt(104);
                     dos2.writeInt(this.userid);
                     sql.query("update users  set points=points+1 where id = ? limit 1", String.valueOf(player.getUserid()));
-                    ServerMain.debug(6,"Kasutaja "+ player.getUsername()+ " sai punkti");
+                    ServerMain.debug(6, "Kasutaja " + player.getUsername() + " sai punkti");
                 } // sync2
             }
         }
@@ -381,11 +383,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
         }
 
-        // fakeme lisadatat, et testides asi tühi poleks
-        dos.writeInt(3);
-        dos.writeInt(998);
-        dos.writeUTF("Fake");
-
+        
     } // getUserList
 
 
@@ -418,7 +416,8 @@ public class ServerGameConnectionHandler implements Runnable {
     }
 
     private void saveChatmessage(DataOutputStream dos, String message) throws Exception {
-        //todo: salvestame sql-i
+
+        sql.insert("INSERT INTO  lobbychat ( id,uid,message,aeg ) VALUES ( '0', ?,  ?,now() )", String.valueOf(userid), message);
 
         ServerMain.debug(8, "lobbychatmessage " + username + ": " + message);
         for (ServerGameConnectionHandler player : players) {
@@ -438,17 +437,24 @@ public class ServerGameConnectionHandler implements Runnable {
     } // saveChatmessage
 
     private void getRunningGames(DataOutputStream dos) throws Exception {
-        // todo: reaalne
-        dos.writeInt(6);
-        dos.writeInt(2);
-        dos.writeUTF("Malle");
-        dos.writeUTF("Kalle");
-        dos.writeInt(6);
-        dos.writeInt(7);
-        dos.writeUTF("Jüri");
-        dos.writeUTF("Mari");
+        Set<ServerGameData> mangud = new HashSet<>();
+        // lisame kõik mängud seti sisse
+        for (ServerGameConnectionHandler player : players) {
+            if (player.opponentID > 0 && player.login == false && player.game != null && player.game.isRunning()) {
+                mangud.add(player.game);
+            }
+        }
+        synchronized (dos) {
+            for (ServerGameData mang : mangud) {
+                dos.writeInt(6);
+                dos.writeInt(mang.getGameid());
+                if (mang.getPlayers().get(0) != null) dos.writeUTF(mang.getPlayers().get(0).username);
+                if (mang.getPlayers().size() > 1) {
+                    dos.writeUTF(mang.getPlayers().get(0).username);
+                } else dos.writeUTF(""); // pole teist mängijat selles mängus enam
+            }
+        } // sync
 
-        // tuleks teha list kus on sees mängivad pooled ja mängu ID
 
     } // getRunningGames
 
