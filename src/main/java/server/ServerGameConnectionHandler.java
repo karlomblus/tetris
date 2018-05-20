@@ -88,6 +88,9 @@ public class ServerGameConnectionHandler implements Runnable {
                     case 9:
                         rejectInviteToGame(dis.readInt());
                         break;
+                    case 10:
+                        sandGameslist(dis.readInt(),dis.readInt());
+                        break;
                     case 11:
                         sendGameLog(dis.readInt());
                         break;
@@ -127,6 +130,44 @@ public class ServerGameConnectionHandler implements Runnable {
 
 
     } // run()
+
+    private void sandGameslist(int alates, int mitu) throws Exception {
+        synchronized (dos) {
+            dos.writeInt(10);
+            Connection conn = sql.getConn();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            StringBuilder logi = new StringBuilder(10000000);
+            try {
+
+
+                String query = "select mangud.id as manguid,mangud.player1 as player1id,mangud.player2 as player2id,started,u1.username as player1name, u2.username as player2name  from mangud left join users as u1 on mangud.player1 = u1.id left join users as u2 on u2.id=mangud.player2 order by mangud.id desc limit ?,?";
+                stmt = conn.prepareStatement(query);
+                stmt.setInt(1, alates);
+                stmt.setInt(2, mitu);
+                rs = stmt.executeQuery();
+
+                // iterate through the java resultset
+                while (rs.next()) {
+                    logi.append(rs.getString("manguid") + "," + rs.getString("started") + "," + rs.getString("player1id") + "," + rs.getString("player2id")+ "," + rs.getString("player1name") + "," + rs.getString("player2name") + "\n");
+                }
+
+            } finally {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+
+            } // finally
+
+            dos.writeUTF(logi.toString());
+
+
+        } // sync
+    }
 
     private void sendGameLog(int gameid) throws Exception {
         ServerMain.debug("Meilt küsitakse mängu ID: " + gameid);
