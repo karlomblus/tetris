@@ -31,7 +31,7 @@ i: int   s: string  c: char  Käsu numbril loetavuse huvides i: eest ära jäetu
 > 9 i: userid               # klient keeldub kutsest
 < 9: i: userid s: username  # teiselt poolt tuleb tagasi keeldumine 
 > 10 i: alates i: mitu      # klient küsib mängude nimekirja  (default alates 0 - alustame uuematest)
-< 10 s: stringina mängulogi # mänguNR,player1,player1,player2,player2\n
+< 10 s: stringina mängulogi # mänguNR,started,player1ID,player2ID,player1,player2\n
 > 11 i: mänguNR                  # klient küsib mängu järelvaatamist
 < 11 i: mänguNR i: player1 s: player1 i: player2 s: player2 s: tegevuslogi   # server annab vastu tegevuslogi kujul   timestamp,userid,tickID,tegevus\n  (millal, kes, mistiks,mistegi)     mistegi:  0=tiks; {'I', 'O', 'Z', 'S', 'T', 'J', 'L'}=uusklots
 
