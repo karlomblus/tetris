@@ -137,12 +137,12 @@ public class ServerGameConnectionHandler implements Runnable {
     } // run()
 
     private void playerAcknowledgeHisDefeat() throws Exception {
-
+        ServerMain.debug("Kasutaja saatis info enda kaotusest: " + this.getUsername());
         if (!game.isRunning()) {
             // mäng ei käi enam (punktidele)
             return;
         }
-        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,0,?,? )", String.valueOf(this.game.getGameid()), String.valueOf(System.currentTimeMillis()), String.valueOf(this.game.getTickid()),"104");
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,0,?,? )", String.valueOf(this.game.getGameid()), String.valueOf(System.currentTimeMillis()), String.valueOf(this.game.getTickid()), "104");
         game.setRunning(false); // mäng ise jääb käima, aga punkte enam ei jagata
 
         for (ServerGameConnectionHandler player : players) {
@@ -151,7 +151,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 synchronized (dos2) {
                     dos2.writeInt(104);
                     dos2.writeInt(this.userid);
-                    sql.query("update users  set points=points+1 where id = ? limit 1",String.valueOf(player.getUserid()));
+                    sql.query("update users  set points=points+1 where id = ? limit 1", String.valueOf(player.getUserid()));
                 } // sync2
             }
         }
