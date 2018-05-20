@@ -72,7 +72,7 @@ public class ServerGameData {
 
     public void sendNewTetromino(int kellele) {
 
-        char randomTetromino;
+         char randomTetromino;
 
         if (klotsijada.get(kellele).size() > 0) { // meil on selle useri jaoks juba random olemas
              randomTetromino = klotsijada.get(kellele).get(0);
