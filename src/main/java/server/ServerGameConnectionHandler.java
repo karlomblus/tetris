@@ -243,7 +243,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
             } // finally
 
-            // todo: kui string on liiga pikk, siis crashib
+            dos.writeInt(logi.length());
             dos.writeBytes(logi.toString());
 
 
