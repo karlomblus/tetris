@@ -16,7 +16,7 @@ public class ServerMain {
         debug(3, "Mysql connected");
 
 
-        Thread web = new Thread(new ServerWebMaster(3));
+        Thread web = new Thread(new ServerWebMaster(3, sql));
         web.start();
 
 

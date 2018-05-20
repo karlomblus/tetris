@@ -2,6 +2,10 @@ package server;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -14,15 +18,17 @@ public class ServerWebResponse {
     String userAgent = "";    // väärtustame viisaka apache stiilis logimise jaoks
     String hostIP;
     String referer = "";
+    private ServerSQL sql;
 
     Socket socket;
     PrintWriter out;
     private static final String lubatud = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890.";
     private static final Set<String> BINARYTYPES = Set.of("jar", "exe");
 
-    public ServerWebResponse(Socket socket, PrintWriter out) {
+    public ServerWebResponse(Socket socket, PrintWriter out, ServerSQL sql) {
         this.out = out;
         this.socket = socket;
+        this.sql = sql;
         hostIP = socket.getInetAddress().toString();
     }
 
@@ -86,7 +92,7 @@ public class ServerWebResponse {
         return true;
     }
 
-    public void sendresponse() throws IOException {
+    public void sendresponse() throws Exception {
 
         ServerMain.debug(6, "url: " + rawurl);
         if (contentType != null) ServerMain.debug(6, "contenttype: " + contentType);
@@ -114,17 +120,47 @@ public class ServerWebResponse {
 
     }
 
-    private void sendJson() {
+    private void sendJson() throws SQLException {
         System.out.println("json faili tahetakse: " + filename);
 
         if (filename.equals("top10.json")) {
             sendHeader(200, "OK");
-            String tulemus = "{\n" +
-                    "    1: {username:\"nimi\",score:55}, \r\n" +
-                    "    2: {username:\"nimi\",score:55}, \n\n" +
-                    "    3: {username:\"nimi\",score:55} \n\n" +
-                    "   }";
-            out.printf(tulemus);
+
+            Connection conn = sql.getConn();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            StringBuilder tulemus = new StringBuilder(10000); // ehitame siia manuaalselt json vastuse
+            tulemus.append("{ \r\n");
+            int koht = 1;
+            String prefix = "";
+            try {
+
+
+                String query = "select username,points from users order by points desc limit 10";
+                stmt = conn.prepareStatement(query);
+                //stmt.setInt(1, gameid);
+                rs = stmt.executeQuery();
+
+                // iterate through the java resultset
+                while (rs.next()) {
+                    tulemus.append( prefix+  koht + ":{username:\"" + rs.getString("username") + "\",score:" + rs.getString("points") + "}");
+                    prefix = ",\r\n";
+                    koht++;
+                }
+
+            } finally {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+
+            } // finally
+            tulemus.append("\r\n}");
+            out.printf(tulemus.toString());
+
 
         } else {
             send404();

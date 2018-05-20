@@ -8,9 +8,11 @@ import java.util.concurrent.BlockingQueue;
 
 class ServerWebThread implements Runnable {
     BlockingQueue<Socket> socketid;
+    private ServerSQL sql;
 
-    public ServerWebThread(BlockingQueue<Socket> socketid) {
+    public ServerWebThread(BlockingQueue<Socket> socketid, ServerSQL sql) {
         this.socketid = socketid;
+        this.sql=sql;
     }
 
     @Override
@@ -26,7 +28,7 @@ class ServerWebThread implements Runnable {
 
                 try (BufferedReader bis = new BufferedReader(new InputStreamReader(socket.getInputStream())); PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
                     String inputLine;
-                    ServerWebResponse web = new ServerWebResponse(socket, out);
+                    ServerWebResponse web = new ServerWebResponse(socket, out,sql);
                     while ((inputLine = bis.readLine()) != null) {
                         //instr.append(inputLine);
                         //System.out.println("'" + inputLine + "'");
