@@ -4,11 +4,9 @@ import chati_leiutis.Klient;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -77,16 +75,8 @@ public class TetrisGraafikaMultiplayer {
         });
 
         //kood selleks, et klikkides tetrise mängule deselectib chatirea.(Muidu ei saa klotse liigutada peale chattimist)
-        localTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent me) {
-                root.requestFocus();
-            }
-        });
-        opponentTetrisArea.setOnMouseClicked(new EventHandler<MouseEvent>() {
-            public void handle(MouseEvent me) {
-                root.requestFocus();
-            }
-        });
+        localTetrisArea.setOnMouseClicked(me -> root.requestFocus());
+        opponentTetrisArea.setOnMouseClicked(me -> root.requestFocus());
 
         peaLava.setOnCloseRequest((we) -> closeGame());
         Scene tetrisStseen = new Scene(root, TetrisGraafika.getResoWidth() * 2 + privateChat.getWidth() * 2, resoHeight, Color.SNOW);  // luuakse stseen

@@ -1,8 +1,5 @@
 package tetrispackage;
 
-import java.util.HashMap;
-import java.util.List;
-
 public class ReplayRunner implements Runnable {
     Tetromino replay;
     String commandString;
