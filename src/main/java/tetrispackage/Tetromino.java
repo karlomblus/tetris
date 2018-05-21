@@ -20,7 +20,7 @@ public class Tetromino {
     private boolean gameOver = false;
     private char randomTetrominoMP = 'Z';
     private char randomTetrominoSP = 'Z';
-    private boolean newRandomTetroReceived = true;
+    private boolean newRandomTetroReceived = false;
     private int[][] activeTetrominoMatrix;
     private IntegerProperty rowsCleared = new SimpleIntegerProperty() {
     };
