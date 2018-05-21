@@ -23,10 +23,6 @@ public class ServerSQL {
 
     }
 
-    public Connection getConn() {
-        return conn;
-    }
-
     // selle classi töö testimiseks. Normaalolus pole vaja käivitada
     public static void main(String[] argv) throws Exception {
 
@@ -83,6 +79,20 @@ public class ServerSQL {
 
     } // main
 
+    public Connection getConn() {
+        return conn;
+    }
+
+    public int query(String... args) throws Exception {
+        synchronized (conn) {
+            PreparedStatement preparedStmt = conn.prepareStatement(args[0]);
+            for (int i = 1; i < args.length; i++) {
+                preparedStmt.setString(i, args[i]);
+            }
+            preparedStmt.execute();
+        } // sync
+        return 0;
+    } // query
 
     public int insert(String... args) {  // feilimise returnime 0 ja feili põhjus meid väga ei huvita
         synchronized (conn) {

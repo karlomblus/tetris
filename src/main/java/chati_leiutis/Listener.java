@@ -200,7 +200,10 @@ public class Listener extends Thread {
                 Integer player2ID = in.readInt();
                 String player2name = in.readUTF();
                 System.out.println(player2name);
-                String commandstring = in.readUTF();
+                int baite = in.readInt();
+                byte[] bytes = new byte[baite];
+                in.readNBytes(bytes,0,baite);
+                String commandstring = new String(bytes);
                 System.out.println(commandstring);
                 processReplayData(commandstring, player1ID, player2ID);
                 //      Platform.runLater(() -> client.openReplay(player1,player2,commandstring1,commandstring2));
