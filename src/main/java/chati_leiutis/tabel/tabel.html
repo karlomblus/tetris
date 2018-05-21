@@ -6,6 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetris</title>
     <link rel=stylesheet href="tabel.css" type="text/css">
+    <script type="text/javascript">
+        $.getJSON("http://tetris.carlnet.ee/top10.json", function(data) {
+            var html = '';
+            $.each(data, function(key, value){
+                html += '<div class="dcell">';
+                html += '<img src="images/'+value.product+'.png"/>';
+                html += '<label for="'+value.product+'">'+value.name+':</label>';
+                html += '<input type="text" id="'+value.product+'" name="'+value.product+'" value="0" stock="'+value.stock+'" price="'+value.price+'" required>';
+                html += '</div>';
+            });
+            $('#yourContainerId').html(html);
+        });
+    </script>
 </head>
 
 <body>
@@ -13,52 +26,15 @@
     <div class="title">
         <h2>TOP 10 TETRISE MÄNGIJAD</h2>
     </div>
-    <table class="table">
+    <table id="tabel" class="table">
         <tr>
-            <th>PLAYER</th>
+            <th>USERNAME</th>
             <th>SCORE</th>
         </tr>
         <tr>
             <td>1</td>
             <td>score</td>
         </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>score</td>
-        </tr>
-
     </table>
 </div>
 
