@@ -56,7 +56,7 @@ public class ServerWebResponse {
                 } else if (urlitykk[urlitykk.length - 1].equals("html")) {
                     this.contentType = "text/html; charset=UTF-8";
                 } else if (urlitykk[urlitykk.length - 1].equals("json")) {
-                    this.contentType = "text/html; charset=UTF-8";
+                    this.contentType = "application/json; charset=UTF-8";
                     this.moodul = "json";
                 } else if (urlitykk[urlitykk.length - 1].equals("txt")) {
                     this.contentType = "text/plain; charset=UTF-8";
@@ -130,7 +130,7 @@ public class ServerWebResponse {
             ResultSet rs = null;
             PreparedStatement stmt = null;
             StringBuilder tulemus = new StringBuilder(10000); // ehitame siia manuaalselt json vastuse
-            tulemus.append("{ \r\n");
+            tulemus.append("[ \r\n");
             int koht = 1;
             String prefix = "";
             try {
@@ -158,7 +158,7 @@ public class ServerWebResponse {
                 }
 
             } // finally
-            tulemus.append("\r\n}");
+            tulemus.append("\r\n]");
             out.printf(tulemus.toString());
 
 
