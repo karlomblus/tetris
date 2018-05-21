@@ -8,8 +8,12 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ServerGameConnectionHandler implements Runnable {
 
@@ -89,7 +93,7 @@ public class ServerGameConnectionHandler implements Runnable {
                         rejectInviteToGame(dis.readInt());
                         break;
                     case 10:
-                        sandGameslist(dis.readInt(),dis.readInt());
+                        sandGameslist(dis.readInt(), dis.readInt());
                         break;
                     case 11:
                         sendGameLog(dis.readInt());
@@ -135,13 +139,22 @@ public class ServerGameConnectionHandler implements Runnable {
     } // run()
 
     private void playerAcknowledgeHisDefeat() throws Exception {
-        //todo: kas siin peaks selle teadmisega veel midagi peale hakkama
+        ServerMain.debug("Kasutaja saatis info enda kaotusest: " + this.getUsername());
+        if (!game.isRunning()) {
+            // mäng ei käi enam (punktidele)
+            return;
+        }
+        sql.insert("insert into mangulogi (id, gameid,timestamp_sql ,timestampms,userid,tickid,tegevus) values (0,?,now(),?,0,?,? )", String.valueOf(this.game.getGameid()), String.valueOf(System.currentTimeMillis()), String.valueOf(this.game.getTickid()), "104");
+        game.setRunning(false); // mäng ise jääb käima, aga punkte enam ei jagata
+
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() != this.userid) {
-                DataOutputStream dos2=player.getDos();
+                DataOutputStream dos2 = player.getDos();
                 synchronized (dos2) {
                     dos2.writeInt(104);
                     dos2.writeInt(this.userid);
+                    sql.query("update users  set points=points+1 where id = ? limit 1", String.valueOf(player.getUserid()));
+                    ServerMain.debug(6, "Kasutaja " + player.getUsername() + " sai punkti");
                 } // sync2
             }
         }
@@ -165,7 +178,7 @@ public class ServerGameConnectionHandler implements Runnable {
 
                 // iterate through the java resultset
                 while (rs.next()) {
-                    logi.append(rs.getString("manguid") + "," + rs.getString("started") + "," + rs.getString("player1id") + "," + rs.getString("player2id")+ "," + rs.getString("player1name") + "," + rs.getString("player2name") + "\n");
+                    logi.append(rs.getString("manguid") + "," + rs.getString("started") + "," + rs.getString("player1id") + "," + rs.getString("player2id") + "," + rs.getString("player1name") + "," + rs.getString("player2name") + "\n");
                 }
 
             } finally {
@@ -209,7 +222,7 @@ public class ServerGameConnectionHandler implements Runnable {
             try {
 
 
-                String query = "SELECT timestampms,userid,tickid,tegevus FROM mangulogi where gameid = ? order by id desc";
+                String query = "SELECT timestampms,userid,tickid,tegevus FROM mangulogi where gameid = ? order by id asc";
                 stmt = conn.prepareStatement(query);
                 stmt.setInt(1, gameid);
                 rs = stmt.executeQuery();
@@ -230,7 +243,8 @@ public class ServerGameConnectionHandler implements Runnable {
 
             } // finally
 
-            dos.writeUTF(logi.toString());
+            dos.writeInt(logi.length());
+            dos.writeBytes(logi.toString());
 
 
         } // sync
@@ -268,7 +282,7 @@ public class ServerGameConnectionHandler implements Runnable {
             int result = sql.insert("insert into users (id,username,password) values (0,?,?)", username, hashedPassword);
 
             if (result > 0) {
-                // todo: salvestame sessioonitabelisse (seda võiks kasutada web)
+
                 dos.writeInt(MessageID.REGISTRATION);
                 dos.writeUTF("OK, kasutaja loodud, Ingo tahab, et logiksid eraldi sisse");
                 ServerMain.debug(5, "createaccount: Kasutajanimi " + username + " loodud.");
@@ -340,8 +354,6 @@ public class ServerGameConnectionHandler implements Runnable {
                 ServerMain.debug(5, "dologin: Kasutajanimi " + username + " parool on vale.");
             }
 
-            // todo: kui OK, siis salvestame sessioonitabelisse
-
 
         } // sync
     } // doLogin
@@ -370,10 +382,6 @@ public class ServerGameConnectionHandler implements Runnable {
 
         }
 
-        // fakeme lisadatat, et testides asi tühi poleks
-        dos.writeInt(3);
-        dos.writeInt(998);
-        dos.writeUTF("Fake");
 
     } // getUserList
 
@@ -407,7 +415,8 @@ public class ServerGameConnectionHandler implements Runnable {
     }
 
     private void saveChatmessage(DataOutputStream dos, String message) throws Exception {
-        //todo: salvestame sql-i
+
+        sql.insert("INSERT INTO  lobbychat ( id,uid,message,aeg ) VALUES ( '0', ?,  ?,now() )", String.valueOf(userid), message);
 
         ServerMain.debug(8, "lobbychatmessage " + username + ": " + message);
         for (ServerGameConnectionHandler player : players) {
@@ -427,23 +436,34 @@ public class ServerGameConnectionHandler implements Runnable {
     } // saveChatmessage
 
     private void getRunningGames(DataOutputStream dos) throws Exception {
-        // todo: reaalne
-        dos.writeInt(6);
-        dos.writeInt(2);
-        dos.writeUTF("Malle");
-        dos.writeUTF("Kalle");
-        dos.writeInt(6);
-        dos.writeInt(7);
-        dos.writeUTF("Jüri");
-        dos.writeUTF("Mari");
+        Set<ServerGameData> mangud = new HashSet<>();
+        // lisame kõik mängud seti sisse
+        for (ServerGameConnectionHandler player : players) {
+            if (player.opponentID > 0 && player.login == false && player.game != null && player.game.isRunning()) {
+                mangud.add(player.game);
+            }
+        }
+        synchronized (dos) {
+            for (ServerGameData mang : mangud) {
+                dos.writeInt(6);
+                dos.writeInt(mang.getGameid());
+                if (mang.getPlayers().get(0) != null) dos.writeUTF(mang.getPlayers().get(0).username);
+                if (mang.getPlayers().size() > 1) {
+                    dos.writeUTF(mang.getPlayers().get(1).username);
+                } else dos.writeUTF(""); // pole teist mängijat selles mängus enam
+            }
+        } // sync
 
-        // tuleks teha list kus on sees mängivad pooled ja mängu ID
 
     } // getRunningGames
 
 
     public int getInvitedUID() {
         return invitedUID;
+    }
+
+    public void setInvitedUID(int invitedUID) {
+        this.invitedUID = invitedUID;
     }
 
     public void setOpponentID(int opponentID) {
@@ -553,7 +573,6 @@ public class ServerGameConnectionHandler implements Runnable {
         }
     } // privateChatmessage
 
-
     private void receiveGamerMove(int tickID, char action) throws Exception {
         for (ServerGameConnectionHandler player : players) {
             if (player.getUserid() == opponentID && !player.isLogin()) {
@@ -568,10 +587,6 @@ public class ServerGameConnectionHandler implements Runnable {
             }
         }
     } // receiveGamerMove
-
-    public void setInvitedUID(int invitedUID) {
-        this.invitedUID = invitedUID;
-    }
 
     public String toString() {
         return "\n" + userid + ": Nimi " + username + " " + (login ? "LOGIN" : "") + " invite: " + invitedUID + " opponent: " + opponentID;

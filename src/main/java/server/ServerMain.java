@@ -1,7 +1,12 @@
 package server;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +21,7 @@ public class ServerMain {
         debug(3, "Mysql connected");
 
 
-        Thread web = new Thread(new ServerWebMaster(3));
+        Thread web = new Thread(new ServerWebMaster(3, sql));
         web.start();
 
 
@@ -44,7 +49,8 @@ public class ServerMain {
 
     public static void error(String msg, Exception e) {
         System.out.println("Saime errori: " + msg);
-        //todo: logime errori
+        logtofile(msg);
+        logtofile(e.getMessage());
         throw new RuntimeException(e);
     } // error
 
@@ -55,7 +61,18 @@ public class ServerMain {
 
     public static void debug(int debuglevel, String msg) {
         System.out.println("DEBUG: " + msg);
-        //todo: logime 
+        logtofile(msg);
+
     } // error
+
+    public static void logtofile(String msg) {
+        try {
+            java.nio.file.Path path = Paths.get("debuglog.txt");
+            Files.write(path, msg.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            //damn, ma ei lenda õhku kui ei suuda faili kirjutada
+            System.out.println("DEBUG FILE WRITE ERRROR");
+        }
+    }
 
 }

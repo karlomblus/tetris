@@ -27,7 +27,7 @@ public class LoginWindow {
     private BlockingQueue<Integer> toLoginorNot;
     Stage lava;
 
-    public LoginWindow(Stage stage,BlockingQueue toLoginorNot) {
+    public LoginWindow(Stage stage, BlockingQueue toLoginorNot) {
         this.lava = stage;
         this.toLoginorNot = toLoginorNot;
     }

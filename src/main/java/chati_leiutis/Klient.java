@@ -50,7 +50,6 @@ public class Klient extends Application {
     private DataOutputStream out;
     private TextArea ekraan;
     private ObservableList<String> observableUsers;
-    private ObservableList<String> observableReplays;
     private ListView<String> userListView = new ListView<>();
     private ListView<String> replayListView = new ListView<>();
     private TextField konsool;
@@ -144,109 +143,8 @@ public class Klient extends Application {
 
     public void showLogIn(Stage stage) {
 
-        LoginWindow login = new LoginWindow(stage,toLoginorNot);
-        login.start(stage,self);
-        /*
-        Stage newStage = new Stage();
-
-        BorderPane border = new BorderPane();
-        Button singleplayerbutton = new Button("Singleplayer");
-        singleplayerbutton.setFont(new Font(20));
-        border.setBottom(singleplayerbutton);
-        //Singeplayeri käivitamine
-        singleplayerbutton.setOnMouseClicked((MouseEvent) -> {
-
-            try {
-                TetrisGraafika tetris = new TetrisGraafika();
-                TetrisGraafika tetris2 = new TetrisGraafika();
-                Stage lava = new Stage();
-                tetris.start(lava);
-                tetris2.start(lava);
-
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-
-            }
-        });
-
-
-        VBox comp = new VBox();
-        HBox nupudkõrvuti = new HBox();
-        Label namelabel = new Label("Enter your credentials below:");
-        Label errorlabel = new Label("");                       //siia läheb pärast errormessage
-        TextField nameField = new TextField();
-        nameField.setPromptText("Enter your name here...");
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Enter your password here");
-        loginnamefield = nameField;
-        loginpasswordfield = passwordField;
-
-        comp.getChildren().add(namelabel);
-        comp.getChildren().add(nameField);
-
-        Button login_nupp = new Button("Log in");
-        login_nupp.setDefaultButton(true);
-
-        //login event- ootame blockqueuest vastust,vastavalt sellele tegutseme
-        login_nupp.setOnAction(ev -> {
-            try {
-                if (connection == null || connection.isClosed()) {
-                    errorlabel.setText("Error, connection error. Please restart.");
-                } else {
-                    sendSomething(LOGIN);
-                    //sätin cliendi siseseks nimeks proovitud nime
-                    nimi = loginnamefield.getText();
-                    int loginvastus = toLoginorNot.take();
-                    switch (loginvastus) {
-                        case 1:
-                            loggedIN = true;
-                            newStage.close();
-                            break;
-                        case -1:
-                            errorlabel.setText("Error. Please try again.");
-                            break;
-                        case 0:
-                            errorlabel.setText("Unexpected input, something went wrong.");
-
-                    }
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-        loginnamefield.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ENTER) {
-                login_nupp.fire();
-            }
-        });
-
-        Button registreerimis_nupp = new Button("Register new user");
-        registreerimis_nupp.setOnMouseClicked((event) -> {
-            showRegistration();
-        });
-
-        //kui ristist kinni panna, jätan seisma
-        newStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            public void handle(WindowEvent we) {
-                System.out.println("Closing application...");
-                loggedIN = false;
-                //listener.shutDown();   kas seda rida on ikka vaja?
-                Platform.exit();
-
-            }
-        });
-        comp.getChildren().add(passwordField);
-        nupudkõrvuti.getChildren().addAll(login_nupp, registreerimis_nupp);
-        comp.getChildren().add(nupudkõrvuti);
-        comp.getChildren().add(errorlabel);
-
-        border.setCenter(comp);
-        border.setBottom(singleplayerbutton);
-        Scene stageScene = new Scene(border, 300, 300);
-
-        newStage.setScene(stageScene);
-        newStage.showAndWait();
-        */
+        LoginWindow login = new LoginWindow(stage, toLoginorNot);
+        login.start(stage, self);
     }
 
     public void showLobby() throws Exception {
@@ -325,7 +223,11 @@ public class Klient extends Application {
         Button replaybtn = new Button("Replays");
 
         replaybtn.setOnMouseClicked((MouseEvent) -> {
-            showReplays();
+            try {
+                sendSomething(GETREPLAYS);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         });
 
         Button challengeButton = new Button("Challenge");
@@ -479,14 +381,29 @@ public class Klient extends Application {
         }
     }
 
-    void showReplays() {
+    public void openReplay(String player, String player2, String commandstring1, String commandstring2) {
+        TetrisReplay replay = new TetrisReplay();
+        try {
+            Stage replaylava = new Stage();
+            //todo vali õige replay, ava TetrisReplay vastava andmetega
+            replay.start(replaylava, player, player2, "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN",
+                    "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN");
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+
+        }
+    }
+
+    public void showReplays(String[] mängud) throws IOException {
         //todo päris andmete serverilt saamine ja siis nende kasutamine
         //todo hetkel lihtsalt faken mingid andmed
+
         String mäng1 = "Ingo-Theodor   Duration-2651s";
         String mäng2 = "Theodor-Karl    Duration-1m23s";
         String mäng3 = "Ingo-Karl   Duration-3m55s";
 
-        observableReplays = FXCollections.observableArrayList(Arrays.asList(mäng1, mäng2, mäng3));
+        ObservableList<String> observableReplays = FXCollections.observableArrayList(Arrays.asList(mängud));
         replayListView.setItems(observableReplays);
         replayListView.setPrefSize(600, 270);
 
@@ -495,12 +412,10 @@ public class Klient extends Application {
             @Override
             public void handle(MouseEvent event) {
                 String selectedReplayname = replayListView.getSelectionModel().getSelectedItem();
-                TetrisReplay replay = new TetrisReplay();
+
                 try {
-                    Stage replaylava = new Stage();
-                    //todo vali õige replay, ava TetrisReplay vastava andmetega
-                    replay.start(replaylava, selectedReplayname, "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN",
-                            "1000,RIGHT;150,RIGHT;50,LEFT;200,RIGHT;100,LEFT;300,RIGHT;100,LEFT;500,LEFT;100,UP;500,UP;600,DOWN");
+                    out.writeInt(GETREPLAYDATA);
+                    out.writeInt(Integer.parseInt(selectedReplayname.split(",")[0]));
 
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -562,6 +477,12 @@ public class Klient extends Application {
             /*case 9:
                 //todo keeldumine
                 break;*/
+                case GETREPLAYS:
+                    out.writeInt(10);
+                    out.writeInt(0);
+                    out.writeInt(10);
+                    //and wait...
+                    break;
                 case 102:
                     out.writeInt(102);
                     break;

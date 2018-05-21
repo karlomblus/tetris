@@ -6,8 +6,14 @@ import javafx.util.Duration;
 import static chati_leiutis.MessageID.*;
 
 import java.io.DataInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class Listener extends Thread {
@@ -16,6 +22,59 @@ public class Listener extends Thread {
     Klient client;
     DataInputStream in;
     BlockingQueue<Integer> tologinornot;
+
+    static String[] processReplayData(String commandString, int player1ID, int player2ID) {
+        String[] tükid = commandString.split("\n");
+        List<String> tegevuseajad = new ArrayList<>();
+        Collections.reverse(Arrays.asList(tükid));
+        for (String tükk : tükid) {
+            String aeg = tükk.split(",")[0];
+            tegevuseajad.add(aeg);
+        }
+        List<String> korrastatudtegevusajad = new ArrayList<>();
+
+        //sorteerin tegevused 2 listi mängija järgi:
+        List<String> esimesemängijategevused = new ArrayList<>();
+        List<String> teisemängijategevused = new ArrayList<>();
+
+        for (String tükk : tükid) {
+            if (tükk.split(",")[1].equals(Integer.toString(player1ID)))
+                esimesemängijategevused.add(tükk);
+            else
+                teisemängijategevused.add(tükk);
+        }
+
+        //leian mõlemale mängijale delayd nende käskuse vahel, mille abil saan ette anda ReplayRunnerile kui kiiresti replayd tehes käske peab jooksutama
+        List<String> esimesemängijaajad = leiaKorrastatudAjad(esimesemängijategevused);
+        List<String> teisemängijaajad = leiaKorrastatudAjad(teisemängijategevused);
+
+        String commandString1 = koostaSobivCommandString(esimesemängijaajad, esimesemängijategevused);
+        String commandString2 = koostaSobivCommandString(teisemängijaajad, teisemängijategevused);
+        String[] toReturn = {commandString1, commandString2};
+        return toReturn;
+    }
+
+    static String koostaSobivCommandString(List<String> ajad, List<String> käsud) {
+        String toReturn = "";
+        for (int i = 0; i < käsud.size(); i++) {
+            toReturn = toReturn + ajad.get(i) + "," + käsud.get(i) + ";";
+        }
+        return toReturn;
+    }
+
+    static List<String> leiaKorrastatudAjad(List<String> korrastamatakäsud) {
+        List<String> toReturn = new ArrayList<>();
+        for (int i = 0; i < korrastamatakäsud.size(); i++) {
+            if (i == 0)
+                toReturn.add("1000");
+            else {
+                BigInteger praugunetegevus = new BigInteger(korrastamatakäsud.get(i));
+                BigInteger eelminetegevus = new BigInteger(korrastamatakäsud.get(i - 1));
+                toReturn.add((praugunetegevus.subtract(eelminetegevus)).toString());
+            }
+        }
+        return toReturn;
+    }
 
     public void shutDown() {
         try {
@@ -122,6 +181,34 @@ public class Listener extends Thread {
                 client.challengewindow.close();
 
                 break;
+            case GETREPLAYS:
+                String mängulogidpikana = in.readUTF();
+                String[] mängulogid = mängulogidpikana.split("\n");
+                Platform.runLater(() -> {
+                    try {
+                        client.showReplays(mängulogid);
+                    } catch (IOException e) {
+                        System.out.println("Error getting replay games, sorry.");
+                    }
+                });
+                break;
+            case GETREPLAYDATA:
+                Integer mängunr = in.readInt();
+                Integer player1ID = in.readInt();
+                String player1name = in.readUTF();
+                System.out.println(player1name);
+                Integer player2ID = in.readInt();
+                String player2name = in.readUTF();
+                System.out.println(player2name);
+                int baite = in.readInt();
+                byte[] bytes = new byte[baite];
+                in.readNBytes(bytes,0,baite);
+                String commandstring = new String(bytes);
+                System.out.println(commandstring);
+                processReplayData(commandstring, player1ID, player2ID);
+                //      Platform.runLater(() -> client.openReplay(player1,player2,commandstring1,commandstring2));
+
+                break;
             case 105:
                 //sissetulev mängu chat message
                 in.readInt();
@@ -161,6 +248,8 @@ public class Listener extends Thread {
                     client.getMultiplayerGame().getMyTetromino().setNewRandomTetroReceived(true);
                 }
                 break;
+            case 104:
+                client.getMultiplayerGame().getPrivateChat().opponentSurrender();
             default:
                 if (tologinornot.size() == 0)
                     tologinornot.put(0);
@@ -175,6 +264,7 @@ public class Listener extends Thread {
                 int incmsg = in.readInt();
                 this.handleIncomingInput(incmsg);
             } catch (SocketException e) {
+                System.out.println(e);
                 cont = false;
                 client.getEkraan().appendText("Disconnected... please restart to reconnect.");
                 client.getKonsool().setDisable(true);

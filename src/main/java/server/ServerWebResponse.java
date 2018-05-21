@@ -2,6 +2,10 @@ package server;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -14,15 +18,17 @@ public class ServerWebResponse {
     String userAgent = "";    // väärtustame viisaka apache stiilis logimise jaoks
     String hostIP;
     String referer = "";
+    private ServerSQL sql;
 
     Socket socket;
     PrintWriter out;
     private static final String lubatud = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890.";
     private static final Set<String> BINARYTYPES = Set.of("jar", "exe");
 
-    public ServerWebResponse(Socket socket, PrintWriter out) {
+    public ServerWebResponse(Socket socket, PrintWriter out, ServerSQL sql) {
         this.out = out;
         this.socket = socket;
+        this.sql = sql;
         hostIP = socket.getInetAddress().toString();
     }
 
@@ -49,6 +55,9 @@ public class ServerWebResponse {
                     this.contentType = "text/html; charset=UTF-8";
                 } else if (urlitykk[urlitykk.length - 1].equals("html")) {
                     this.contentType = "text/html; charset=UTF-8";
+                } else if (urlitykk[urlitykk.length - 1].equals("json")) {
+                    this.contentType = "application/json; charset=UTF-8";
+                    this.moodul = "json";
                 } else if (urlitykk[urlitykk.length - 1].equals("txt")) {
                     this.contentType = "text/plain; charset=UTF-8";
                 } else if (urlitykk[urlitykk.length - 1].equals("png")) {
@@ -83,7 +92,7 @@ public class ServerWebResponse {
         return true;
     }
 
-    public void sendresponse() throws IOException {
+    public void sendresponse() throws Exception {
 
         ServerMain.debug(6, "url: " + rawurl);
         if (contentType != null) ServerMain.debug(6, "contenttype: " + contentType);
@@ -98,8 +107,10 @@ public class ServerWebResponse {
         if (moodul.equals("file")) {
             sendfile();
             return;
-        }
-        if (moodul.equals("shtml")) {
+        } else if (moodul.equals("json")) {
+            sendJson();
+            return;
+        } else if (moodul.equals("shtml")) {
             sendfile();
             return;
         } // todo: parsimine teha
@@ -107,6 +118,53 @@ public class ServerWebResponse {
         // kui siia jõuame, siis ma ei tea mida must tahetakse
         senderror();
 
+    }
+
+    private void sendJson() throws SQLException {
+        System.out.println("json faili tahetakse: " + filename);
+
+        if (filename.equals("top10.json")) {
+            sendHeader(200, "OK");
+
+            Connection conn = sql.getConn();
+            ResultSet rs = null;
+            PreparedStatement stmt = null;
+            StringBuilder tulemus = new StringBuilder(10000); // ehitame siia manuaalselt json vastuse
+            tulemus.append("[ \r\n");
+            int koht = 1;
+            String prefix = "";
+            try {
+
+
+                String query = "select username,points from users order by points desc limit 10";
+                stmt = conn.prepareStatement(query);
+                //stmt.setInt(1, gameid);
+                rs = stmt.executeQuery();
+
+                // iterate through the java resultset
+                while (rs.next()) {
+                    tulemus.append( prefix+  koht + ":{username:\"" + rs.getString("username") + "\",score:" + rs.getString("points") + "}");
+                    prefix = ",\r\n";
+                    koht++;
+                }
+
+            } finally {
+
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+
+            } // finally
+            tulemus.append("\r\n]");
+            out.printf(tulemus.toString());
+
+
+        } else {
+            send404();
+        }
     }
 
     private void sendfile() throws IOException {
@@ -123,13 +181,8 @@ public class ServerWebResponse {
                 return;
             }
 
-            out.printf("HTTP/1.1 200 OK\r\n");
-            out.printf("Server: Tetris scoreserver\r\n");
-            out.printf("Cache-Control: no-cache, no-store, must-revalidate\r\n");
-            out.printf("Pragma: no-cache\r\n");
-            out.printf("Connection: Close\r\n");
-            if (contentType != null) out.printf("Content-Type: " + contentType + "\r\n");
-            out.printf("\r\n");
+            sendHeader(200, "OK");
+
 
             final byte[] buffer = new byte[4096];
             for (int read = inStream.read(buffer); read >= 0; read = inStream.read(buffer))
@@ -139,21 +192,26 @@ public class ServerWebResponse {
 
     }
 
+
     private void send404() {
         ServerMain.debug(6, "WEB: 404: ei leia faili: " + rawurl);
-        out.printf("HTTP/1.1 404 File Not Found\r\n");
-        out.printf("Server: Tetris scoreserver\r\n");
-        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
-        out.printf("\r\n");
+        sendHeader(404, "File Not Found");
         out.println("<html><body>  Sorry. Faili  " + rawurl + " ei leitud<br>\n </body></html>");   // html sisus pole korrektne reavahetus vist enam oluline sest browser peaks failiga ka sel kujul hakkama saama?
     }
 
     private void senderror() {
         ServerMain.debug(6, "Weebiserver saadab vastu 400 errori");
-        out.printf("HTTP/1.1 400 bad request\r\n");
-        out.printf("Server: Tetris scoreserver\r\n");
-        out.printf("Content-Type: text/html; charset=UTF-8\r\n");
-        out.printf("\r\n");
+        sendHeader(400, "bad reques");
         out.println("<html><body>  Kahjuks ei mõista server seda päringut <br><br>\nURL: " + rawurl + "\n<br>Moodul: " + moodul + "<br>\n </body></html>");
+    }
+
+    private void sendHeader(int code, String message) {
+        out.printf("HTTP/1.1 " + code + " " + message + "\r\n");
+        out.printf("Server: Tetris scoreserver\r\n");
+        out.printf("Cache-Control: no-cache, no-store, must-revalidate\r\n");
+        out.printf("Pragma: no-cache\r\n");
+        out.printf("Connection: Close\r\n");
+        if (contentType != null) out.printf("Content-Type: " + contentType + "\r\n");
+        out.printf("\r\n");
     }
 }
