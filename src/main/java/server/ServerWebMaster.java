@@ -18,7 +18,7 @@ public class ServerWebMaster implements Runnable {
     @Override
     public void run() {
 
-        socketid = new ArrayBlockingQueue<>(100);
+        socketid = new ArrayBlockingQueue<>(1000);
 
         Thread[] threadid = new Thread[threade];
         for (int i = 0; i < threade; i++) {

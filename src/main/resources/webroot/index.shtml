@@ -11,5 +11,12 @@
 
 
 <body> Oled ühendunud tetrise serveri külge. <br><br>Varsti näed siin skoore ja saad mängu alla <a href="download.html">laadida</a>.
+
+<br>
+<br>
+<br>
+Ingo teeb siia html edetabeli, mis loeb <a href="top10.json">json andmeid</a>.<br>
+<br>
+<br>
 </body>
 </html>

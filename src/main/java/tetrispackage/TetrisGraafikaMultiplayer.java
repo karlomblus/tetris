@@ -19,7 +19,7 @@ public class TetrisGraafikaMultiplayer {
     private final int resoWidth = 150 * 3;
     private final int resoHeight = 330;
     private IntegerProperty tickProperty = new SimpleIntegerProperty();
-    private int randomTetroRequestSent = 1;
+    private int randomTetroRequestSent = 0;
     public static final char UP = 0;
     public static final char DOWN = 1;
     public static final char LEFT = 2;
@@ -183,6 +183,7 @@ public class TetrisGraafikaMultiplayer {
                     myTetromino.draw("multiplayer"); //after drawing, getDrawingTurns is no longer 2
                 }
                 myTetromino.tick();
+
                 if (myTetromino.getDrawingTurns() == 2) {
                     randomTetroRequestSent = 0;
                 }
@@ -194,13 +195,18 @@ public class TetrisGraafikaMultiplayer {
 
     void tickAndDrawForOpponent() {
         if (!opponentTetromino.gameStateOver()) {
-            opponentTetromino.tick();
+            if (!opponentTetromino.isDrawingAllowed()){
+                opponentTetromino.tick();
+            }
             if (opponentTetromino.isDrawingAllowed() && opponentTetromino.isNewRandomTetroReceived()) {
+                opponentTetromino.tick();
                 opponentTetromino.draw("multiplayer");
                 if (opponentTetromino.getDrawingTurns() == 0) {
                     opponentTetromino.setNewRandomTetroReceived(false);
                 }
             }
+
+
         }
     }
 
