@@ -68,6 +68,7 @@ public class ServerMain {
     public static void logtofile(String msg) {
         try {
             java.nio.file.Path path = Paths.get("debuglog.txt");
+            msg = msg + "\n";
             Files.write(path, msg.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException e) {
             //damn, ma ei lenda õhku kui ei suuda faili kirjutada
