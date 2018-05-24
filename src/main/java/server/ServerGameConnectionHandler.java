@@ -315,7 +315,7 @@ public class ServerGameConnectionHandler implements Runnable {
                 return;
             }
             String[] andmebaasist = sql.query(2, "select id,password from users where username = ?", username);
-            if ( andmebaasist.length==0 ||  andmebaasist[0].length() == 0) {
+            if ( andmebaasist[0]==null ||  andmebaasist[0].length() == 0) {
                 dos.writeInt(-1);
                 dos.writeUTF("Sellist kasutajanime ei ole"); // väidetavalt pole turvaline eraldi infot anda, aga regamisprotsessis saab kasutajanime eksisteerimist niikuinii kontrollida
                 ServerMain.debug(5, "dologin: Kasutajanime " + username + " ei ole.");
