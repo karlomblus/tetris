@@ -143,7 +143,7 @@ public class ServerWebResponse {
 
                 // iterate through the java resultset
                 while (rs.next()) {
-                    tulemus.append( prefix+  koht + ":{username:\"" + rs.getString("username") + "\",score:" + rs.getString("points") + "}");
+                    tulemus.append( prefix+   "{username:\"" + rs.getString("username") + "\",score:" + rs.getString("points") + "}");
                     prefix = ",\r\n";
                     koht++;
                 }
